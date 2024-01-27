@@ -143,14 +143,14 @@ Keep in mind that with the free version you can only have one domain.
   - Step 4: On you newly created app, go to Auth. 
   - Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.
 
-        ```json
+  ```json
             
         {
           "client_id": "Client ID given by Linkedin",
           "client_secret": "Client Secret given by Linkedin"
         }
             
-        ```
+  ```
   - Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
     - openid
     - email
@@ -229,17 +229,19 @@ Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on t
 
   If using conda: 
 
-  ```bash
-    conda activate linkedinassistant
-   ```
+```bash
+conda activate linkedinassistant
+```
 
 Now, run the script `configurate.cmd` to configure the service.
 This will create a data folder in `C:ProgramData/LinkedinAssistant` and copy the config files there.
 You need to go back to the root folder of the project, and run the script:
+
+
 ```bash
-  cd .. 
-  configurate.cmd
- ```
+cd .. 
+configurate.cmd
+```
 
 When you run this program as a Windows Service, all logs and config files will be stored in `C:ProgramData/LinkedinAssistant` folder.
 
@@ -248,7 +250,7 @@ Some popup error might appear, as long as it is related to torchvison or torchau
 
 ```bash
 pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
-  ```
+```
 
 This will create the necessary EXE and dependencies in `dist` folder. 
 
@@ -258,7 +260,7 @@ After that:
 
 ```bash
   .\dist\service\service.exe install
-  ```
+```
 
 If this works, you have done everything correctly.
 
