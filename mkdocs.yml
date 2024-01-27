@@ -1,0 +1,32 @@
+site_name: LinkedIn Assistant
+site_url: https://linkedin_assistant.readthedocs.io/
+
+theme:
+    name: readthedocs
+use_directory_urls: false
+nav:
+  - Home: README.md
+  - Information:
+        - About: information/rationale.md
+        - Sources Handler: information/sources_handler/rationale.md
+        - Publications Handler: information/publications_handler/rationale.md
+        - Sources:
+            - Arxiv: information/sources/arxiv/rationale.md
+            - Manual PDF Input: information/sources/manual_pdfs/rationale.md
+            - Rapid:
+                - Google News: information/sources/rapid/google_news/rationale.md
+                - Medium: information/sources/rapid/medium/rationale.md
+  - LLM Components:
+      - About: llm/rationale.md
+      - ColBERT: llm/colbert/rationale.md
+      - Langchain Agent: llm/langchain_agent/rationale.md
+  - PDF Handler: pdf/rationale.md
+  - Telegram Bot: telegram/rationale.md
+  - Windows Service: windows/rationale.md
+  - Main Component: main/rationale.md
+  - About : LICENSE
+
+extra:
+  author: Daniel Cabrera
+  email: danicr2515@gmail.com
+  github: @dan415
