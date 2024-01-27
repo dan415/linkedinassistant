@@ -1,0 +1,12 @@
+{
+  "k": 10,
+  "queries": [
+                "What is the document about?",
+                "How does it work?",
+                "What is the main idea?",
+                "What is innovative about it?",
+                "What are the conclusions?"
+            ],
+  "kmeans_iters": 10,
+  "document_max_len": 100
+}

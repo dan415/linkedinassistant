@@ -1,0 +1,6 @@
+{
+    "minimum_length": 50,
+    "paragraph_min_length": 10,
+    "input_directory": "res/manual_pdfs/input",
+    "output_directory": "res/manual_pdfs/output"
+}

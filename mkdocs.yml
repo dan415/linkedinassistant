@@ -24,6 +24,7 @@ nav:
   - Telegram Bot: telegram/rationale.md
   - Windows Service: windows/rationale.md
   - Main Component: main/rationale.md
+  - Next Steps: todo/rationale.md
   - About : LICENSE
 
 extra:

@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 *.so
+*.*bits
 build/
 dist/
 test
@@ -11,4 +12,5 @@ logs
 linkedinassistant311
 .idea/
 .env
+
 

@@ -1,0 +1,11 @@
+{
+    "bot_name": "TeleLinkedinBot",
+    "name": "",
+    "token": "",
+    "ngrok_token": "",
+    "domain": "",
+    "suggestion_period": 1,
+    "chat_id": null,
+    "just_published": false,
+    "suggestions_are_blocked": true
+}
