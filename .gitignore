@@ -1,4 +1,8 @@
-*__pycache__/*
+__pycache__/
+*.py[cod]
+*.so
+build/
+dist/
 test
 res
 conda*
