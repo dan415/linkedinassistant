@@ -3,7 +3,6 @@
 
 I created this project because I wanted to create posts about cool articles and
 papers that would come up every week, but did not have the time for it. So I decided
-review them and post them.
 to create a program that would generate the posts for me, and I would only need to review them and post them.
 
 The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
