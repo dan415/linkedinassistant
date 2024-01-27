@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/index.html" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>LinkedIn Assistant</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "README.md";
+        var mkdocs_page_url = "/index.html";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="index.html" class="icon icon-home"> LinkedIn Assistant
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="index.html">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Information</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="information/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="information/sources_handler/rationale.html">Sources Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="information/publications_handler/rationale.md">Publications Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="information/sources/arxiv/rationale.html">Arxiv</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+    <ul>
+                <li class="toctree-l3"><a class="" href="information/sources/rapid/google_news/rationale.md">Google News</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">LLM Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="llm/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="llm/colbert/rationale.html">ColBERT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="llm/langchain_agent/rationale.html">Langchain Agent</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="pdf/rationale.html">PDF Handler</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="windows/rationale.html">Windows Service</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="main/rationale.html">Main Component</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="todo/rationale.html">Next Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="LICENSE">About</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">LinkedIn Assistant</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html" class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Home</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1>Linkedin GPT-based Posting Creator Assistant</h1>
+
+<p>I created this project because I wanted to create posts about cool articles and
+papers that would come up every week, but did not have the time for it. So I decided
+review them and post them.
+to create a program that would generate the posts for me, and I would only need to</p>
+<p>The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
+LLM model. All design decisions are based on the idea that this program is meant to be run as a Windows service locally.
+That's why all agents constantly update their status on a local file (so that if the laptop turns off abruptly, the status
+is not lost). As of now, I still need to implement the behaviour for the stop signal though.</p>
+<p>This program is comprised of 7 main components:
+- Information Searching: This component is in charge of searching for information on the internet. It is based on the
+  Google Search API, and it is implemented in the <code>searcher.py</code> file. It is a simple class that receives a query and
+  returns a list of results. It is meant to be used by the <code>search_agent.py</code> agent.
+- Telegram Bot: This component is in charge of communicating with the Telegram Bot API. It is implemented in the
+  <code>telegram_bot.py</code> file. It is a simple class that receives a message and sends it to the Telegram Bot API. It is meant
+  to be used by the <code>telegram_agent.py</code> agent.
+- Linkedn Component: This component is in charge of generating the posts. It is implemented in the <code>posting.py</code> file. It
+  is a simple class that receives a query and returns a list of results. It is meant to be used by the <code>posting_agent.py</code>
+  agent.
+- LLM Component: This component is in charge of generating the posts. It is implemented in the <code>llm.py</code> file. It is a
+  simple class that receives a query and returns a list of results. It is meant to be used by the <code>llm_agent.py</code> agent.
+- Windows Service: This component is in charge of running the program as a Windows service. It is implemented in the
+  <code>service.py</code> file. It is a simple class that receives a query and returns a list of results. It is meant to be used by
+  the <code>service_agent.py</code> agent.
+- Main: This component is in charge of running the program. It is implemented in the <code>main.py</code> file. It is a simple class
+  that receives a query and returns a list of results. It is meant to be used by the <code>main_agent.py</code> agent.</p>
+<h2>Installation</h2>
+
+<p>In order to install the program, you need to do the following:</p>
+<ul>
+<li>
+<h3 id="install-the-dependencies">Install the dependencies</h3>
+</li>
+</ul>
+<p>in conda:</p>
+<pre><code class="language-bash">  conda env create -f environment.yml
+</code></pre>
+<ul>
+<li>
+<h3 id="create-a-telegram-bot-and-get-the-api-key">Create a Telegram Bot and get the API key.</h3>
+</li>
+<li>Step 1. Open the Telegram app on your computer/phone
+  To create a Telegram bot, you'll need to have the Telegram app installed on your computer. If you don't have it already, you can download it from the Telegram website.</li>
+<li>Step 2. Connect to BotFather
+    BotFather is a bot created by Telegram that allows you to create and manage your own bots. To connect to BotFather, search for "@BotFather" in the Telegram app and click on the result to start a conversation.</li>
+<li>Step 3. Select the New Bot option
+    In the conversation with BotFather, select the "New Bot" option to start creating your new bot. BotFather will guide you through the rest of the process.</li>
+<li>Step 4. Add a bot name
+  Next, BotFather will ask you to provide a name for your bot. Choose a name that accurately reflects the purpose of your bot and is easy to remember.</li>
+<li>Step 5. Choose a username for your bot</li>
+<li>Step 6. BotFather will ask you to choose a username for your bot. This username will be used to create a unique URL that people can use to access your bot. Choose a username that is easy to remember and related to your bot's purpose.</li>
+</ul>
+<p>At the end of the process, you should have given a bot token by @botFather. You need to save that information, and other information such as the bot name that you chose on
+the Telegram Bot config file on ./telegram/config.json:</p>
+<pre><code class="language-json">
+{
+    &quot;bot_name&quot;: &quot;@whatever_bot_username&quot;,
+    &quot;name&quot;: &quot;Your_Bot_Name(what appears on top)&quot;,
+    &quot;token&quot;: &quot;Token given by BotFather&quot;
+}
+
+</code></pre>
+<ul>
+<li>
+<h3 id="configure-ngrok-to-have-a-persistant-domain">Configure Ngrok to have a persistant domain</h3>
+</li>
+</ul>
+<p>Create an account on Ngrok
+    - Step 1. On https://dashboard.ngrok.com/get-started/setup/windows, copy the authtoken and paste
+      it onto the the Telegram Bot config file. same as before, on ./telegram/config.json:
+    - Step 2: Go to "Domains" on the left menu, and create a new domain.
+    - Step 3: Copy the domain name and token that you generated and paste it into the Telegram Bot config file. same as before, on ./telegram/config.json:</p>
+<pre><code>    ```json
+
+    {
+      "ngrok_token": "Token given by Ngrok",
+      "domain": "Domain given by Ngrok"
+    }
+
+    ```
+</code></pre>
+<p>Keep in mind that with the free version you can only have one domain.</p>
+<ul>
+<li>
+<h3 id="configure-you-rapidapi-sources">Configure you RapidAPI sources</h3>
+</li>
+</ul>
+<p>Create an account on RapidAPI: 
+    - Step 1. Go to https://rapidapi.com/ and search for the following APIs:
+        - Google Search API
+    - Step 2. Subscribe to the Medium API:
+    Go to https://rapidapi.com/nishujain199719-vgIfuFHZxVZ/api/medium2 and click on subscribe.
+    - Step 3. Subscribe to the Google API:
+    Go to https://rapidapi.com/rphrp1985/api/google-api31/ and click on subscribe.
+    - Step 4. Copy the key that it shows after subscribing to the API on the API Key Header, ans paste into the config.json inside ./information/sources/rapid/news/config.json and ./information/sources/rapid/medium/config.json:</p>
+<pre><code>    ```json
+
+    {
+      "api_key": "Key given by RapidAPI"
+    }
+
+    ```
+</code></pre>
+<ul>
+<li>
+<h3 id="configure-your-adobe-pdf-api">Configure your Adobe PDF API</h3>
+</li>
+</ul>
+<p>Create an account on Adobe PDF
+    - Step 1. Go to the Adobe Developer Console at https://developer.adobe.com/console/home 
+    - Step 2. Click on "Create Project"
+    - Step 2. Click on add API
+    - Step 3. Select the "Adobe PDF Services API"
+    - Step 4. Select OAuth Server to Server as the authentication method
+    - Step 5. Check the Adobe PDF Services box
+    - Step 6. Once created, you should see an OAuth API Key, and a button to generate an access token. Click on the credential. Now you should also 
+  see an Organization ID at the bottom
+    - Step 7. Click on generate access token, 
+    - Step 9. Copy  OAuth API Key, Organization ID and the Access Token into the config.json inside ./pdf/config.json:</p>
+<pre><code>    ```json
+
+    {
+      "client_id": "OAuth API Key given by Adobe",
+      "client_secret": "Access Token given by Adobe",
+      "service_principal_credentials": {
+        "organization_id": "Organization ID given by Adobe"
+       }
+    }
+
+    ```
+</code></pre>
+<ul>
+<li>
+<h3 id="create-you-linkedin-page-and-get-the-api-key">Create you LinkedIn page and get the API key</h3>
+</li>
+<li>
+<p>Step 1. Go to Linkedin Developers: https://www.linkedin.com/developers/login and login with your Linkedin account.</p>
+</li>
+<li>Step 2. Go to "My Apps" and click on "Create App"</li>
+<li>Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.</li>
+<li>Step 4: On you newly created app, go to Auth. </li>
+<li>
+<p>Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.</p>
+<pre><code>```json
+
+{
+  "client_id": "Client ID given by Linkedin",
+  "client_secret": "Client Secret given by Linkedin"
+}
+
+```
+</code></pre>
+<ul>
+<li>Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):</li>
+<li>openid</li>
+<li>email</li>
+<li>w_member_social</li>
+<li>profile</li>
+</ul>
+</li>
+<li>
+<p>Step 7: Copy the persistant URL that we generated before with Ngrok, and paste it into the Authorized Redirect URLs section, adding /callback at the end:
+    https://whatever_domain_you_generated/callback</p>
+</li>
+<li>Step 8. Go to the Products Tab, and request access for the following products:<ul>
+<li>Share on Linkedin</li>
+<li>Sign In with LinkedIn using OpenID Connect
+  After this, if you did not have the necessasry OAuth 2.0 Scope permissions, you should have them now.</li>
+</ul>
+</li>
+<li>
+<p>Step 9. Go to the Team Members Tab, and make sure you appear as Team member. If you do not, add yourself as a team member.</p>
+</li>
+<li>
+<h3 id="configure-your-openai-api">Configure your OpenAI API</h3>
+<p>Create an account on OpenAI
+- Step 1. Go to https://beta.openai.com/ and login with your OpenAI account.
+  - Step 2. Go to "My Account" and copy your API key.
+    - Step 3. Paste your API key into the ./llm/langchain_agent/config.json file</p>
+<pre><code>  ```json
+
+           {
+            "environment": {
+              "OPENAI_API_KEY": "apikey"
+            }
+          }
+
+  ```
+</code></pre>
+<ul>
+<li>
+<p>Step 5. If instead of using the OpenAI API, you want to use the OpenAI, you are accessing OpenAI through service, like Azure, you also need to add some more information:
+       ```json</p>
+<pre><code>   {
+    "environment": {
+      "OPENAI_API_KEY": "apikey",
+      "OPENAI_API_TYPE": "type: for example azure",
+      "OPENAI_API_VERSION": "version: for example: 2023-09-15-preview",
+      "OPENAI_API_BASE": "your api base endpoint"
+    }
+</code></pre>
+<p>}</p>
+<p><code>- Step 6. Configure the OpenAI parameters. If using the OpenAI APIl only the model_name is necesssary. If using it from Open AI studio, you need to add the deployment_id as well.</code>json
+   {
+      "openai_configs": {
+         "deployment_id": "",
+         "model_name": "gpt-4",
+         "max_tokens": 8192
+       }
+   }
+       ```</p>
+</li>
+</ul>
+</li>
+<li>
+<h3 id="install-c-build-tools-from-visual-studio">Install C++ Build Tools from Visual Studio</h3>
+</li>
+</ul>
+<p>Torch requires C++ Build Tools from Visual Studio to be installed.</p>
+<p>For this you can: 
+1. Install Visual Studio (I installed 2022)
+2. Install the C++ Desktop Development Workload
+3. Open a command prompt and run: <code>where cl.exe</code> to find the path to the C++ compiler
+4. Add the path to the C++ compiler to your PATH environment variable
+5. Run <code>C:\Program Files\Microsoft Visual Studio xx.x\VC\vcvarsall.bat</code> (where xx.x is the version of Visual Studio you installed) to set up the environment variables for the C++ compiler</p>
+<p>For my architecture and Windows SDK version (gets installed with the C++ Build Tools) I ran <code>\"Program Files"\"Microsoft Visual Studio"\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat X64 10.0.22621.0</code></p>
+<ul>
+<li>
+<h3 id="install-the-windows-service">Install the Windows Service</h3>
+</li>
+</ul>
+<p>Activate the environment:</p>
+<p>Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on this session:</p>
+<p>If using conda: </p>
+<p><code>bash
+    conda activate linkedinassistant</code></p>
+<p>Now, run the script <code>configurate.cmd</code> to configure the service.
+This will create a data folder in <code>C:ProgramData/LinkedinAssistant</code> and copy the config files there.
+You need to go back to the root folder of the project, and run the script:</p>
+<pre><code class="language-bash">  cd .. 
+  configurate.cmd
+ ```
+
+When you run this program as a Windows Service, all logs and config files will be stored in `C:ProgramData/LinkedinAssistant` folder.
+
+Then, you need to create the EXE file with pyinstaller:
+Some popup error might appear, as long as it is related to torchvison or torchaudio, it is controlled and will be fine, just accept them and let it continue.    
+
+```bash
+pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
+  ```
+
+This will create the necessary EXE and dependencies in `dist` folder. 
+
+
+After that: 
+
+
+```bash
+  .\dist\service\service.exe install
+  ```
+
+If this works, you have done everything correctly.
+
+
+Optionally, you can set the service to start automatically when the computer starts:
+
+```bash
+  sc config linkedin_assistant start=delayed-auto
+</code></pre>
+<p>Finally, start the service:</p>
+<pre><code class="language-bash"> .\dist\service\service.exe start
+</code></pre>
+<h2> Author </h2>
+<p>Daniel Cabrera Rodríguez</p>
+<p>Github: @dan415</p>
+<p>Email: danicr2515@gmail.com</p>
+<p>Please, do not hesitate to contact if you have any questions or suggestions.</p>
+<h2> License </h2>
+
+<p>MIT License
+Copyright (c) 2024 Daniel Cabrera Rodriguez</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining 
+a copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be 
+included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR 
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="information/rationale.html" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="information/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.5.3
+Build Date UTC : 2024-01-27 19:33:27.018390+00:00
+-->

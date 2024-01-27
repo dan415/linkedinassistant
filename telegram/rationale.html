@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/telegram/rationale.html" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Telegram Bot - LinkedIn Assistant</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Telegram Bot";
+        var mkdocs_page_input_path = "telegram/rationale.md";
+        var mkdocs_page_url = "/telegram/rationale.html";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../index.html" class="icon icon-home"> LinkedIn Assistant
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Information</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../information/publications_handler/rationale.md">Publications Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+    <ul>
+                <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">LLM Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../windows/rationale.html">Windows Service</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../main/rationale.html">Main Component</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../todo/rationale.html">Next Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../LICENSE">About</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LinkedIn Assistant</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html" class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Telegram Bot</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2> Telegram Bot</h2>
+
+<p>The idea of this bot is that it will allow to interact with the system from a Telegram client. The bot will allow to
+chat with the LLM conversation agent, receive publication suggestions, ask the agent to change the publication drafts, 
+discard drafts, and publish them.</p>
+<p>The bot is based on the Origami Telegram Bot package, used for building Telegram bots in Python.</p>
+<p>In order to be able to circle through conversation threads, the memory pickle of the LLM agents is actually the object that is stored
+on the pending for approval directory. These are loaded and maintained in a circular list of suggestions. The bot will then
+allow to move forward and backwards through the list of suggestions, and to approve, discard them or change them.</p>
+<h3> Suggestion Pool</h3>
+
+<p>The suggestion pool is a list of suggestions that are stored in the pending for approval directory. Each suggestion is composed
+by a memory pickle (path to it) and an index, specifying the index of the suggestion in the list of suggestions. This two fields are stored
+in a JSON file called <code>config.json</code> inside telegram/suggestions. It has the following format:</p>
+<pre><code class="language-json">{
+  &quot;pool&quot;: [
+    {
+      &quot;id&quot;: 0,
+      &quot;path&quot;: &quot;absolute_path.pkl&quot;
+    },
+    {
+      &quot;id&quot;: 1,
+      &quot;path&quot;: &quot;absolute_path.pkl&quot;
+    }
+  ],
+  &quot;current&quot;: {
+        &quot;id&quot;: 5,
+        &quot;path&quot;: &quot;absolute_path.pkl&quot;
+    }
+}
+</code></pre>
+<p>The suggestions pool can be iterated through, and it stores the current suggestion index in the <code>current</code> field. The <code>current</code> field also updates
+when the user uses the <code>next</code> and <code>previous</code> commands. The suggestion pool also provide a <code>select</code> method, which allows to select a suggestion
+by its index. Please refer to the source code of <code>pool.py</code> for more detailed information about the methods for now.</p>
+<H3> Algorithm </H3>
+
+<p>The algorithm is as follows:</p>
+<p>While True: 
+   1. Check if the bot has just published. If so, wait for suggestion_period days.
+   2. Check if suggestions are blocked. If so, wait for 5 minutes in order to check again
+   3. If suggestions are not blocked, update the suggestions and check if there are suggestions.
+   4. If there are suggestions, send the current suggestion and block suggestions. Then the flow of the program
+   is carried by the interaction with the user via Telegram.</p>
+<h3> Bot State</h3>
+
+<p>This class is used to store the state of the bot. It is used to store the chat id, the current suggestion, and the
+suggestions are blocked or not. For every publication (suggestion) there needs to be a conversation thread.
+Via Bot commands I can change the conversation thread, so I can finish "tuning" the publication and then publish it.</p>
+<p>As said on the Algorithm section, suggestions can be blocked. This is done in order to avoid the bot to send suggestions
+when the user is already interacting with the bot. The bot will send a suggestion, and then block suggestions until the
+user has finished interacting with the bot. This is done by setting the <code>suggestions_blocked</code> field to True. When the user
+finishes interacting with the bot, the <code>suggestions_blocked</code> field is set to False, and the bot will send a new suggestion
+if there is one available. Also, if the sending of suggestions fails,  suggestions get blocked in order to avoid the bot
+sending failing continuously.</p>
+<p>The Bot is now designed to respond to one person only. It obviosly could respond to whoever sent messages to it, but in order 
+to send suggestions (which do not require interaction with the user) it needs to know the chat id of the user. This is why
+the bot is designed to respond to one person only. This is the purpose of the <code>chat_id</code> field.</p>
+<p>The suggestions are in order, so I can go to the next or previous suggestion. I can also select a suggestion by index.
+Also, this state also saves information about when to automatically make suggestions, which would be when no suggestion is
+selected and after some time after a publication is made. The stateful decorator is used to update the config file after
+a function is called, so the file is always updated with the object state.</p>
+<h3> Bot Commands</h3>
+
+<ul>
+<li><code>/start</code>: Starts the bot. It will send a welcome message and a suggestion if there is one available.</li>
+<li><code>/next</code>: Sends the next suggestion (and changes the thread of conversation) if there is one available.</li>
+<li><code>/previous</code>: Sends the previous suggestion (and changes the thread of conversation) if there is one available.</li>
+<li><code>/select {index}</code>: Selects a suggestion by index. It will send the selected suggestion and change the thread of conversation.</li>
+<li><code>/list</code>: Lists the suggestions in the pool with their index.</li>
+<li><code>/publish</code>: Publishes the current suggestion. If not authenticated, it will send a message with the link to the authentication page.</li>
+<li><code>/allow</code>: Allows the bot to send suggestions. </li>
+<li><code>/stop</code>: Blocks the bot from sending suggestions.</li>
+<li><code>/healthcheck</code>: Sends a message to the user (to see if the bot is alive).</li>
+<li><code>/clear</code>: Discards the current suggestion.</li>
+<li><code>/update</code>: Updates the suggestions pool. It reloads them from the pending for approval directory.</li>
+<li><code>/current</code>: Sends the current suggestion. This is what will get published if the user uses the <code>/publish</code> command.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../pdf/rationale.html" class="btn btn-neutral float-left" title="PDF Handler"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../windows/rationale.html" class="btn btn-neutral float-right" title="Windows Service">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../pdf/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../windows/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

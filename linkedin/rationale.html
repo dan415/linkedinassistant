@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/linkedin/rationale.html" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Rationale - LinkedIn Assistant</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Rationale";
+        var mkdocs_page_input_path = "linkedin/rationale.md";
+        var mkdocs_page_url = "/linkedin/rationale.html";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../index.html" class="icon icon-home"> LinkedIn Assistant
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Information</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../information/publications_handler/rationale.md">Publications Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+    <ul>
+                <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">LLM Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../windows/rationale.html">Windows Service</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../main/rationale.html">Main Component</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../todo/rationale.html">Next Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../LICENSE">About</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LinkedIn Assistant</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html" class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Rationale</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2> LinkedIn </h2>
+
+<p>This module is used to integrate with LinkedIn. It is used to authenticate the user and to give access to the LinkedIn API to post content.</p>
+<h3> Authentication </h3>
+
+<p>This module exposes two REST methods to authenticate the user with LinkedIn. The first one is used to get the URL to redirect the user to, and the second one is used to get the access token after the user has been redirected back to the application.</p>
+<p>The authentication process is as follows: 
+1. The user tries to publish content to LinkedIn.
+2. The application checks if the user is authenticated. If not, it redirects the user to the authentication URL, exposed on "/". This sends the auth request to LinkedIn using the client_id and secret of the application.
+3. After the user is redirected to the LinkedIn Authentication page, the user needs to log in with an account that is member of the page.
+4. After the user logs in, LinkedIn redirects the user back to the application, with the access token as a parameter at "/callback".
+5. The Callback saves the access token in the LinkedIn config file, and then the user can finally prompt to publish again, this time succesfully.</p>
+<h3> Configuration </h3>
+
+<p>The configuration file is located in the <code>information/sources/linkedin</code> folder, and is named <code>config.json</code>. It contains the following parameters:</p>
+<ul>
+<li><code>client_id</code>: The client ID of the application. This is used to authenticate the user with LinkedIn.</li>
+<li><code>client_secret</code>: The client secret of the application. This is used to authenticate the user with LinkedIn.</li>
+<li><code>redirect_uri</code>: The redirect URI of the application. This is used to authenticate the user with LinkedIn.</li>
+<li><code>access_token</code>: The access token of the user. This is used to authenticate the user with LinkedIn.</li>
+<li><code>linkedin_id</code>: The LinkedIn ID of the page to post to. This is used to authenticate the user with LinkedIn.</li>
+<li><code>footer</code>: The footer to add to the post. This is used to add a footer to the post. I use it to specify that the post was posted automatically by an AI</li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

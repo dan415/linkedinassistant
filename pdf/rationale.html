@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/pdf/rationale.html" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>PDF Handler - LinkedIn Assistant</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PDF Handler";
+        var mkdocs_page_input_path = "pdf/rationale.md";
+        var mkdocs_page_url = "/pdf/rationale.html";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../index.html" class="icon icon-home"> LinkedIn Assistant
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Information</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../information/publications_handler/rationale.md">Publications Handler</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+    <ul>
+                <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">LLM Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">About</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
+                  </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">PDF Handler</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../windows/rationale.html">Windows Service</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../main/rationale.html">Main Component</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../todo/rationale.html">Next Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../LICENSE">About</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LinkedIn Assistant</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html" class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">PDF Handler</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3> Adobe PDF module </h3>
+
+<p>This module is used to get the pdf text file. The reason why I use this API instead
+of some free library is that this is one of the more accurate libraries I have seen at retrieving
+the chapters/sections of a pdf file. It is not perfect, but it is the best I have seen so far.</p>
+<p>Note that a PDF is unstructured data, so it is not possible to get the paragraphs of a PDF in one single way</p>
+<p>What I do is call the API with the pdf bytes. The API is going to download the results on a file, that I do not want to keep, so I create a TemporaryDirectory and extract the results there.
+Then I read the json that's in the Zip and return the chapters. The Temp dir is discarded so I do not need to
+worry about deleting the files.</p>
+<p>Note that this API has a limit per month, and any attempts will fail if the limit is reached.</p>
+<h3> Configuration </h3>
+
+<p>The configuration is stored in a json file named <code>config.json</code> inside ./pdf. It has the following format:</p>
+<pre><code class="language-json">{
+  &quot;client_credentials&quot;: {
+    &quot;client_id&quot;: &quot;&quot;,
+    &quot;client_secret&quot;: &quot;&quot;
+  },
+  &quot;service_principal_credentials&quot;: {
+    &quot;organization_id&quot;: &quot;&quot;
+  }
+}
+</code></pre>
+<p>These credentials are obtained from the Adobe Developer Console. More information on the Installation section.</p>
+<h3> Extraction </h3>
+
+<p>The extraction process is as follows:</p>
+<p>I iterate through the elements of the generated json with the elements of the pdf. For
+each element with regex pattern </p>
+<pre><code class="language-regex">//Document/H1[\[*\]]*
+`````
+
+I consider to be a chapter title. For each chapter title, I iterate through the elements, obtaining 
+elements with either paragraph pattern:
+
+```regex
+//Document/P(\[[\d]*\])?(?:/ParagraphSpan(\[\d]*\])?)?$
+</code></pre>
+<p>or bullet point pattern:</p>
+<pre><code class="language-regex">//Document/L*LBody$
+</code></pre>
+<p>and append them to the chapter if they are not of length 0.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../llm/langchain_agent/rationale.html" class="btn btn-neutral float-left" title="Langchain Agent"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../telegram/rationale.html" class="btn btn-neutral float-right" title="Telegram Bot">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../llm/langchain_agent/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../telegram/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
