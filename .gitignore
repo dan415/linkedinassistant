@@ -1,4 +1,4 @@
-/__pycache__/
+*__pycache__/*
 test
 res
 conda*
@@ -6,4 +6,5 @@ conda*
 logs
 linkedinassistant311
 .idea/
+.env
 
