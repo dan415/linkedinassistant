@@ -273,29 +273,23 @@ the Telegram Bot config file on ./telegram/config.json:</p>
 <li>Step 2. Go to "My Apps" and click on "Create App"</li>
 <li>Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.</li>
 <li>Step 4: On you newly created app, go to Auth. </li>
-<li>
-<p>Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.</p>
-<pre><code>```json
-
-{
-  "client_id": "Client ID given by Linkedin",
-  "client_secret": "Client Secret given by Linkedin"
-}
-
-```
-</code></pre>
-<ul>
-<li>Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):</li>
-<li>openid</li>
-<li>email</li>
-<li>w_member_social</li>
-<li>profile</li>
+<li>Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.</li>
 </ul>
-</li>
-<li>
-<p>Step 7: Copy the persistant URL that we generated before with Ngrok, and paste it into the Authorized Redirect URLs section, adding /callback at the end:
-    https://whatever_domain_you_generated/callback</p>
-</li>
+<p>```json</p>
+<pre><code>    {
+      "client_id": "Client ID given by Linkedin",
+      "client_secret": "Client Secret given by Linkedin"
+    }
+</code></pre>
+<p>```
+  - Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
+    - openid
+    - email
+    - w_member_social
+    - profile</p>
+<ul>
+<li>Step 7: Copy the persistant URL that we generated before with Ngrok, and paste it into the Authorized Redirect URLs section, adding /callback at the end:
+    https://whatever_domain_you_generated/callback</li>
 <li>Step 8. Go to the Products Tab, and request access for the following products:<ul>
 <li>Share on Linkedin</li>
 <li>Sign In with LinkedIn using OpenID Connect
@@ -366,41 +360,26 @@ the Telegram Bot config file on ./telegram/config.json:</p>
 <p>Activate the environment:</p>
 <p>Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on this session:</p>
 <p>If using conda: </p>
-<p><code>bash
-    conda activate linkedinassistant</code></p>
+<pre><code class="language-bash">conda activate linkedinassistant
+</code></pre>
 <p>Now, run the script <code>configurate.cmd</code> to configure the service.
 This will create a data folder in <code>C:ProgramData/LinkedinAssistant</code> and copy the config files there.
 You need to go back to the root folder of the project, and run the script:</p>
-<pre><code class="language-bash">  cd .. 
-  configurate.cmd
- ```
-
-When you run this program as a Windows Service, all logs and config files will be stored in `C:ProgramData/LinkedinAssistant` folder.
-
-Then, you need to create the EXE file with pyinstaller:
-Some popup error might appear, as long as it is related to torchvison or torchaudio, it is controlled and will be fine, just accept them and let it continue.    
-
-```bash
-pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
-  ```
-
-This will create the necessary EXE and dependencies in `dist` folder. 
-
-
-After that: 
-
-
-```bash
-  .\dist\service\service.exe install
-  ```
-
-If this works, you have done everything correctly.
-
-
-Optionally, you can set the service to start automatically when the computer starts:
-
-```bash
-  sc config linkedin_assistant start=delayed-auto
+<pre><code class="language-bash">cd .. 
+configurate.cmd
+</code></pre>
+<p>When you run this program as a Windows Service, all logs and config files will be stored in <code>C:ProgramData/LinkedinAssistant</code> folder.</p>
+<p>Then, you need to create the EXE file with pyinstaller:
+Some popup error might appear, as long as it is related to torchvison or torchaudio, it is controlled and will be fine, just accept them and let it continue.    </p>
+<pre><code class="language-bash">pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
+</code></pre>
+<p>This will create the necessary EXE and dependencies in <code>dist</code> folder. </p>
+<p>After that: </p>
+<pre><code class="language-bash">  .\dist\service\service.exe install
+</code></pre>
+<p>If this works, you have done everything correctly.</p>
+<p>Optionally, you can set the service to start automatically when the computer starts:</p>
+<pre><code class="language-bash">  sc config linkedin_assistant start=delayed-auto
 </code></pre>
 <p>Finally, start the service:</p>
 <pre><code class="language-bash"> .\dist\service\service.exe start
@@ -476,5 +455,5 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
 <!--
 MkDocs version : 1.5.3
-Build Date UTC : 2024-01-27 20:02:25.377112+00:00
+Build Date UTC : 2024-01-27 20:06:59.996450+00:00
 -->
