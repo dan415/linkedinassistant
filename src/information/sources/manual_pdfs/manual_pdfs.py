@@ -118,9 +118,9 @@ class ManualSourceEngine(ContentSearchEngine):
         logger.info("Getting pdf bytes")
         pdfs = []
         pdfs_bytes = []
-        for file in os.listdir(os.path.join(self.project_dir, self.input_directory)):
+        for file in os.listdir(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"))):
             if file.endswith(".pdf"):
-                with open(os.path.join(self.project_dir, self.input_directory, file), "rb") as f:
+                with open(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"), file), "rb") as f:
                     pdfs_bytes.append(f.read())
                 pdfs.append(file)
         logger.info(f"Pdf bytes retrieved for {pdfs}")
@@ -131,7 +131,7 @@ class ManualSourceEngine(ContentSearchEngine):
         logger.info("Moving pdfs")
         for pdf in pdfs:
             logger.info(f"Moving {pdf}")
-            shutil.move(os.path.join(self.input_directory, pdf), os.path.join(self.output_directory, pdf))
+            shutil.move(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"), pdf), os.path.join(os.path.abspath("/"), self.output_directory, pdf))
 
     def preprocess(self, pdf):
         """

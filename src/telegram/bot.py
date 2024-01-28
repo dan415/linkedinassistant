@@ -22,7 +22,9 @@ from src.utils.log_handler import TruncateByTimeHandler
 MAX_RETRIES = 5
 PWD = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
+LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData",
+                                                                                             "linkedin_assistant",
+                                                                                             "logs")
 FILE = os.path.basename(__file__)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -31,7 +33,9 @@ handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
 
-config_dir = os.path.join(PWD, "config.json") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "telegram",  "config.json")
+config_dir = os.path.join(PWD, "config.json") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData",
+                                                                                           "linkedin_assistant",
+                                                                                           "telegram", "config.json")
 
 
 def stateful(func):
@@ -414,7 +418,6 @@ class BotsCommands:
     def conversation_mode(self, message):
         self.state.block_suggestions()
 
-
     def publish(self, message):
         """
         Publish the current suggestion. This is used to publish the current suggestion. It will post the suggestion to linkedin.
@@ -447,8 +450,6 @@ class BotsCommands:
         else:
             self.bot.send_message(message.chat.id, "No publication available yet")
 
-
-
     # IDEAS:
     """
     1. Send PDFs to the bot via Telegram, so they are added to the manual PDFs input folder and can be processed.
@@ -463,6 +464,7 @@ class MessageListener(Listener):
     This class is used to listen to messages. It is used to listen to messages and send them to the LLMChain agent.
     They get added to the conversation thread and the response is sent back to the user.
     """
+
     def __init__(self, bot, state):
         self.bot = bot
         self.state = state
@@ -521,8 +523,10 @@ class TeleLinkedinBot:
         self.state = None
         self.publisher = LinkedinPublisher()
         self.domain = ""
-
-        self.reload_config()
+        try:
+            self.reload_config()
+        except Exception as e:
+            logger.error("Error reloading config: %s", e)
 
     def __enter__(self):
         """
@@ -556,12 +560,16 @@ class TeleLinkedinBot:
             if key in self.__dict__.keys():
                 self.__setattr__(key, config[key])
 
+        logger.info("Config reloaded")
+
         self.bot = Bot(self.token)
+        logger.info("Bot created")
         self.state = BotState()
         self.state.auth_address = f'https://{self.domain}'
         self.bot.add_listener(MessageListener(self.bot, self.state))
         self.bot.add_commands(BotsCommands(self.bot, self.publisher, self.state))
         self.bot.start()
+        logger.info("Bot started")
 
     def run(self):
         """
@@ -579,7 +587,6 @@ class TeleLinkedinBot:
         while True:
             time.sleep(5)
             chat_id = self.state.get_chat_id()
-            logger.info("Chat id: %s", chat_id)
             if self.state.has_just_published():
                 logger.info("Just published, waiting for %s days", self.suggestion_period)
                 time.sleep(60 * 60 * 24 * self.suggestion_period)
@@ -602,7 +609,18 @@ class TeleLinkedinBot:
                     self.state.reset()
 
 
+def run():
+    with TeleLinkedinBot() as bot:
+        logger.info("Entered bot")
+        try:
+            bot.run()
+        except Exception as e:
+            logger.error("Error running bot: %s", e)
+            bot.bot.send_message(bot.state.get_chat_id(), "Error running bot: {}".format(e))
+            bot.state.reset()
+    logger.info("Exited bot")
+
+
 if __name__ == '__main__':
     logger.info("Starting bot script")
-    with TeleLinkedinBot() as bot:
-        bot.run()
+    run()
