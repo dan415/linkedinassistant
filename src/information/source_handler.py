@@ -14,7 +14,8 @@ from src.utils.log_handler import TruncateByTimeHandler
 
 PWD = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
+LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
+                                                                                     "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,9 @@ handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'
 handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources",
+                          "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+
 
 def stateful(func):
     """
@@ -31,6 +34,7 @@ def stateful(func):
     to exit the program abruptly, (for example: If my laptop runs out of battery) the state information remains. This is meant
     to be used with methods that update state variables
     """
+
     @wraps(func)
     def update_config(self, *args, **kwargs):
         result = func(self, *args, **kwargs)
@@ -96,7 +100,7 @@ class SourcesHandler:
         title = self.clean_title(material["title"])
         logger.info(f"Saving material {title}.")
         # Cleans the title for the file name
-        with open(os.path.join(self.project_dir, self.publications_directory, f"{title}.json"), "w") as f:
+        with open(os.path.join(os.path.abspath("/"), self.publications_directory, f"{title}.json"), "w") as f:
             json.dump(material, f, default=str, indent=4)
         logger.info(f"Saved material {title}.")
 
@@ -164,7 +168,7 @@ class SourcesHandler:
             config = json.load(f)
         for key in config.keys():
             if key == "publications_directory":
-                self.publications_directory = os.path.join(os.path.join(*self.publications_directory.split("/")))
+                self.publications_directory = os.path.join(os.path.abspath("/"), os.path.join(*self.publications_directory.split("/")))
             if key == "active_sources":
                 active_sources = config.get("active_sources", self.active_sources)
                 has_changed = self.active_sources != active_sources
@@ -175,6 +179,10 @@ class SourcesHandler:
                 self.__setattr__(key, config[key])
 
 
-if __name__ == '__main__':
-    logger.info("Initializing sources handler script")
+def run():
+    """Runs the sources handler"""
     SourcesHandler().run()
+
+
+if __name__ == '__main__':
+    run()

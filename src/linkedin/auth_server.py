@@ -138,13 +138,13 @@ def callback():
     return render_template_string(page)
 
 
-if __name__ == '__main__':
+def run():
     """
-    This is the main function. It starts the server and ngrok to expose the server to the internet. We use 
+    This is the main function. It starts the server and ngrok to expose the server to the internet. We use
     ngrok because we need to specify a redirect uri in the linkedin app, and it needs to be a public url.
-    
+
     The code that exposes the API is on the Telegram bot.
-    
+
     Beware that this is not secure, what I do is to allow traffic only from my phone MAC address, so that only I can
     access the server.
     """
@@ -155,3 +155,9 @@ if __name__ == '__main__':
     redirect_uri = config["redirect_uri"]
     del config
     app.run(host='localhost', port=5000)
+
+if __name__ == '__main__':
+    """
+    Run the main function.
+    """
+    run()

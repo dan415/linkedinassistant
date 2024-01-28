@@ -6,6 +6,7 @@ theme:
 use_directory_urls: false
 nav:
   - Home: README.md
+  - Release Notes: release_notes/rationale.md
   - Information Components:
       - About: information/rationale.md
       - Sources Handler: information/sources_handler/rationale.md

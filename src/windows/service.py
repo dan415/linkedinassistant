@@ -27,7 +27,7 @@ import servicemanager
 import win32event
 import win32service
 import win32serviceutil
-from src.main import linkedin_assistant
+from src.main import linkedin_assistant, linkedin_assistant_win
 
 
 class LinkedinAssistantService(win32serviceutil.ServiceFramework):
@@ -61,9 +61,10 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
                     logger.info("Service stop requested.")
                     break
                 logger.info("Running Linkedin Assistant.")
-                linkedin_assistant.run(self.subprocess_stop_event)
+                linkedin_assistant_win.run(self.subprocess_stop_event)
             except Exception as e:
-                logger.error("Error in Linkedin Assistant: %s", e)
+                logger.error(f"Error in Linkedin Assistant: {e}")
+                self.stop_event.set()
                 break
 
     def SvcDoRun(self):
@@ -73,8 +74,6 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
         """
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE, servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
-        # service_thread = threading.Thread(target=self.run)
-        # service_thread.start()
         self.run()
 
     def SvcStop(self):

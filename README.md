@@ -1,15 +1,9 @@
 
 <h1>Linkedin GPT-based Posting Creator Assistant</h1>
 
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10576228.svg)](https://doi.org/10.5281/zenodo.10576228)  [![readthedocs](https://readthedocs.org/projects/linkedinassistant/badge/?version=latest)](https://linkedinassistant.readthedocs.io/en/latest/)
-
-
 I created this project because I wanted to create posts about cool articles and
 papers that would come up every week, but did not have the time for it. So I decided
 to create a program that would generate the posts for me, and I would only need to review them and post them.
-
-
 
 The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
 LLM model. All design decisions are based on the idea that this program is meant to be run as a Windows service locally.
@@ -209,6 +203,20 @@ Keep in mind that with the free version you can only have one domain.
            }
        ```
       
+- ### Configure service configuration files:
+
+Some configuration files require you to define some directories where the program will store files related to the publication creation process.
+You need to define the following directories:
+
+- `publications_directory`: The directory where the publications are stored. You need to define this directory in the `information` config file.
+- `publications_pending_approval_directory`: The directory where the publications pending approval are stored.  You need to define this directory in the `information` config file.
+- `base_path`: This needs to be set to the same path as the `publications_pending_approval_directory` in the `suggestions` config file. This is where the suggestion pool will get loaded from.
+- `input_directory`: This directory is where the Manual pdf search engine will look for pdfs to add extract information from. You need to define this directory in the `information/sources/manual_pdfs` config file.
+- `output_directory`: This directory is where the Manual pdf search engine will store the pdfs that it processes. You need to define this directory in the `information/sources/manual_pdfs` config file.
+
+
+Note: These directories need to be absolute paths
+
 - ### Install C++ Build Tools from Visual Studio
 
 Torch requires C++ Build Tools from Visual Studio to be installed.

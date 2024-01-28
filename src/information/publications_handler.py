@@ -7,7 +7,8 @@ from src.utils.log_handler import TruncateByTimeHandler
 
 PWD = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
+LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
+                                                                                     "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -15,10 +16,13 @@ handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'
 handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information",
+                          "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+
 
 class PublicationsHandler:
     """Class in charge of taking raw documents obtained from sources and outputting a publication draft"""
+
     def __init__(self):
         self.publication_ideas_dir = "res/publication_ideas"
         self.publications_pending_approval_directory = "res/pending_approval"
@@ -62,7 +66,9 @@ class PublicationsHandler:
                 response = self.langchain_gpt.call(publication_dict, "Please, write a post")
                 if response:
                     try:
-                        self.langchain_gpt.save_memory(os.path.join(os.path.join(*self.publications_pending_approval_directory.split("/")), f'{publication}.pkl'))
+                        self.langchain_gpt.save_memory(
+                            os.path.join(*self.publications_pending_approval_directory.split("/"),
+                                         f'{publication}.pkl'))
                         os.remove(os.path.join(source_dir, publication))
                     except Exception as e:
                         logger.error("Error processing publication %s: %s", publication, e)
@@ -74,10 +80,15 @@ class PublicationsHandler:
             config = json.load(f)
         for key in config.keys():
             if key in ["publication_ideas_dir", "publications_pending_approval_directory"]:
-                self.__setattr__(key, os.path.join(*config[key].split("/")))
+                self.__setattr__(key, os.path.join(os.path.abspath("/"), *config[key].split("/")))
             self.__setattr__(key, config[key])
+
+
+def run():
+    """Run the main function."""
+    PublicationsHandler().run()
 
 
 if __name__ == '__main__':
     logger.info("Initializing publications handler script")
-    PublicationsHandler().run()
+    run()

@@ -1,7 +1,6 @@
 {
     "client_id": "",
     "client_secret": "",
-    "publications_directory": "res/pending_publication",
     "linkedin_id": "",
     "redirect_uri": "",
     "footer": "\n\nDisclaimer: This post was created by my AI Posting Assistant. My assistant searches for new posting ideas from papers, news, articles, etc. creates posts that get sent to me via Telegram for validation, and posts them if approved. If you want to know more about this, please don't hesitate to contact me!",

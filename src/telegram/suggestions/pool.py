@@ -9,7 +9,8 @@ from src.utils.log_handler import TruncateByTimeHandler
 PWD = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(PWD, "..", "..", ".."))
 FILE = os.path.basename(__file__)
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
+LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
+                                                                                     "linkedin_assistant", "logs")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -17,7 +18,9 @@ handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'
 logger.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "telegram", "suggestions", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "telegram", "suggestions",
+                          "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+
 
 def stateful(func):
     """
@@ -25,6 +28,7 @@ def stateful(func):
     :param func: function to decorate
     :return: decorated function
     """
+
     @wraps(func)
     def update_config(self, *args, **kwargs):
         self.update()
@@ -45,7 +49,6 @@ def stateful(func):
 
 
 class Suggestion:
-
     """
     Suggestion class. It is used to store the suggestions in the pool.
     It just stores the id, which would be the index and the path to the file.
@@ -74,6 +77,31 @@ class Suggestion:
         """
         return f"{self.get_content()}"
 
+    def __eq__(self, other):
+        """
+        Equality of the suggestion. It is used to compare the suggestions. It is used to check if a suggestion is
+        in the pool.
+        :param other: other suggestion to compare with
+        :return:
+        """
+        if isinstance(other, Suggestion):
+            return self.path == other.path
+        return False
+
+    def __hash__(self):
+        """
+        Hash of the suggestion. It is used to compare the suggestions. It is used to check if a suggestion is
+        in the pool.
+        :return:
+        """
+        return hash(self.path)
+
+    def __repr__(self):
+        """
+        Representation of the suggestion. It is the same as the string representation.
+        :return:
+        """
+        return self.__str__()
 
     @classmethod
     def from_dict(cls, dict):
@@ -106,6 +134,7 @@ class SuggestionPool:
     suggetions.
 
     """
+
     def __init__(self):
         """
         Initialize the suggestion pool. It loads the suggestions from the pending_approval directory.
@@ -113,6 +142,7 @@ class SuggestionPool:
         self.pool = list()
         self.base_path = os.path.join(PROJECT_DIR, "res", "pending_approval")
         self.current = None
+        self.reload_config()
 
     def reload_config(self):
         """Reload the configuration."""
@@ -120,6 +150,8 @@ class SuggestionPool:
         with open(config_dir, "r") as f:
             config = json.load(f)
 
+        self.base_path = os.path.join(os.path.abspath("/"), *config.get("base_path").split("/")) if config.get(
+            "base_path") else self.base_path
         self.pool = [Suggestion.from_dict(suggestion) for suggestion in config.get("pool")]
         self.current = Suggestion.from_dict(config.get("current"))
         if self.current not in self.pool:
@@ -238,6 +270,7 @@ class SuggestionPool:
 
         :return:
         """
+        logger.info(f"Updating pool from {self.base_path}")
         for suggestion in os.listdir(self.base_path):
             if suggestion not in self.pool:
                 self.append(Suggestion(len(self.pool), os.path.join(self.base_path, suggestion)))

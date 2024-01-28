@@ -20,6 +20,7 @@ in a JSON file called `config.json` inside telegram/suggestions. It has the foll
 
 ```json
 {
+   "base_path": "absolute_path/to_pending_approval_publications_directory",
   "pool": [
     {
       "id": 0,

@@ -203,6 +203,20 @@ Keep in mind that with the free version you can only have one domain.
            }
        ```
       
+- ### Configure service configuration files:
+
+Some configuration files require you to define some directories where the program will store files related to the publication creation process.
+You need to define the following directories:
+
+- `publications_directory`: The directory where the publications are stored. You need to define this directory in the `information` config file.
+- `publications_pending_approval_directory`: The directory where the publications pending approval are stored.  You need to define this directory in the `information` config file.
+- `base_path`: This needs to be set to the same path as the `publications_pending_approval_directory` in the `suggestions` config file. This is where the suggestion pool will get loaded from.
+- `input_directory`: This directory is where the Manual pdf search engine will look for pdfs to add extract information from. You need to define this directory in the `information/sources/manual_pdfs` config file.
+- `output_directory`: This directory is where the Manual pdf search engine will store the pdfs that it processes. You need to define this directory in the `information/sources/manual_pdfs` config file.
+
+
+Note: These directories need to be absolute paths
+
 - ### Install C++ Build Tools from Visual Studio
 
 Torch requires C++ Build Tools from Visual Studio to be installed.
