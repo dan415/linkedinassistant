@@ -1,6 +1,9 @@
 
 <h1>Linkedin GPT-based Posting Creator Assistant</h1>
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10578028.svg)](https://doi.org/10.5281/zenodo.10578028)  [![readthedocs](https://readthedocs.org/projects/linkedinassistant/badge/?version=latest)](https://linkedinassistant.readthedocs.io/en/latest/)
+
 I created this project because I wanted to create posts about cool articles and
 papers that would come up every week, but did not have the time for it. So I decided
 to create a program that would generate the posts for me, and I would only need to review them and post them.
