@@ -76,6 +76,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://linkedin_assistant.readthedocs.io/release_notes/rationale.html</loc>
+         <lastmod>2024-01-28</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://linkedin_assistant.readthedocs.io/resources/rationale.html</loc>
          <lastmod>2024-01-28</lastmod>
          <changefreq>daily</changefreq>

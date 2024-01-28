@@ -45,6 +45,10 @@
     </ul>
                 </li>
               </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="release_notes/rationale.html">Release Notes</a>
+                </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="information/rationale.html">About</a>
@@ -340,6 +344,21 @@ the Telegram Bot config file on ./telegram/config.json:</p>
 </ul>
 </li>
 <li>
+<h3 id="configure-service-configuration-files">Configure service configuration files:</h3>
+</li>
+</ul>
+<p>Some configuration files require you to define some directories where the program will store files related to the publication creation process.
+You need to define the following directories:</p>
+<ul>
+<li><code>publications_directory</code>: The directory where the publications are stored. You need to define this directory in the <code>information</code> config file.</li>
+<li><code>publications_pending_approval_directory</code>: The directory where the publications pending approval are stored.  You need to define this directory in the <code>information</code> config file.</li>
+<li><code>base_path</code>: This needs to be set to the same path as the <code>publications_pending_approval_directory</code> in the <code>suggestions</code> config file. This is where the suggestion pool will get loaded from.</li>
+<li><code>input_directory</code>: This directory is where the Manual pdf search engine will look for pdfs to add extract information from. You need to define this directory in the <code>information/sources/manual_pdfs</code> config file.</li>
+<li><code>output_directory</code>: This directory is where the Manual pdf search engine will store the pdfs that it processes. You need to define this directory in the <code>information/sources/manual_pdfs</code> config file.</li>
+</ul>
+<p>Note: These directories need to be absolute paths</p>
+<ul>
+<li>
 <h3 id="install-c-build-tools-from-visual-studio">Install C++ Build Tools from Visual Studio</h3>
 </li>
 </ul>
@@ -410,7 +429,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="information/rationale.html" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="release_notes/rationale.html" class="btn btn-neutral float-right" title="Release Notes">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -434,7 +453,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
     
     
     
-      <span><a href="information/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="release_notes/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -454,5 +473,5 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
 <!--
 MkDocs version : 1.5.3
-Build Date UTC : 2024-01-28 16:04:27.099172+00:00
+Build Date UTC : 2024-01-28 16:20:10.797871+00:00
 -->

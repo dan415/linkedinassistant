@@ -43,6 +43,10 @@
                 <li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a>
                 </li>
               </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../release_notes/rationale.html">Release Notes</a>
+                </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
@@ -144,6 +148,7 @@ allow to move forward and backwards through the list of suggestions, and to appr
 by a memory pickle (path to it) and an index, specifying the index of the suggestion in the list of suggestions. This two fields are stored
 in a JSON file called <code>config.json</code> inside telegram/suggestions. It has the following format:</p>
 <pre><code class="language-json">{
+   &quot;base_path&quot;: &quot;absolute_path/to_pending_approval_publications_directory&quot;,
   &quot;pool&quot;: [
     {
       &quot;id&quot;: 0,
