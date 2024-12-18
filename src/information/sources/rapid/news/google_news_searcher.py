@@ -1,47 +1,28 @@
-import json
-import logging
-from ast import literal_eval
-import datetime
-
 import requests
 import os
-
 from bs4 import BeautifulSoup
-
 from src.information.sources.information_source import requires_valid_period
 from src.information.sources.rapid.manager import RapidSource
-from src.utils.log_handler import TruncateByTimeHandler
+import src.core.utils.functions as F
 
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', "..", "..", "..", ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
-                                                                                      "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources", "rapid", "news", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
-DEBUG_FLAG = False
+logger = F.get_logger(dump_to=FILE)
+
 
 class GoogleNewsInformationEngine(RapidSource):
     """Searches for content in the information source."""
 
     def __init__(self, information_source):
         """Initialize the searcher with the information source."""
-        super().__init__(information_source)
+
         self.topics = []
         self.limit = 1000
         self.max_results = 25
         self.period = 30
-        self.api_key = None
-        self.pwd = os.path.dirname(os.path.abspath(__file__))
         self.url = "https://google-api31.p.rapidapi.com/"
         self.host = "google-api31.p.rapidapi.com"
         self.minimum_length = 50
-        self.reload_config(config_dir)
+        super().__init__(information_source)
 
     def get_text(self, url):
         """Get the text given a Google News URL. It uses beautiful soup to extract the text from the HTML"""
@@ -66,12 +47,9 @@ class GoogleNewsInformationEngine(RapidSource):
 
         """
 
-        if DEBUG_FLAG:
-            return []
-
         logger.info("Searching for content in %s", self.information_source)
         headers = {
-            'x-rapidapi-key': self.api_key,
+            'x-rapidapi-key': self.get_api_key(),
             'x-rapidapi-host': self.host
         }
         all_results = []
@@ -89,7 +67,7 @@ class GoogleNewsInformationEngine(RapidSource):
                     result['summary'] = result.pop('body')
                     result["link"] = result.pop("url")
                     result["content"] = self.get_text(result["link"])
-                    result["information_source"] = self.information_source
+                    result["information_source"] = self.information_source.value
                     if save_callback:
                         self.save_if_valid(save_callback, result)
                 all_results.extend(results)

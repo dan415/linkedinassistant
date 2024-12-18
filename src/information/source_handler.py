@@ -4,28 +4,17 @@ import logging
 import os
 import re
 import threading
-import time
-import uuid
 from functools import wraps
 
+from src.core.config.manager import ConfigManager
+from src.core.database.mongo import MongoDBClient
+from src.information.publications import PublicationIterator
 from src.information.sources.information_source import get_information_source_from_value
 from src.information.sources.provider import ContentSearchEngineProvider
-from src.utils.log_handler import TruncateByTimeHandler
+import src.core.utils.functions as F
 
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
-                                                                                     "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources",
-                          "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+logger = F.get_logger(dump_to=FILE)
 
 
 def stateful(func):
@@ -38,16 +27,7 @@ def stateful(func):
     @wraps(func)
     def update_config(self, *args, **kwargs):
         result = func(self, *args, **kwargs)
-        logger.debug("Updating config of sources handler.")
-        with open(config_dir, "r") as f:
-            config = json.load(f)
-
-        for key in config.keys():
-            config[key] = getattr(self, key)
-
-        with open(config_dir, "w") as f:
-            json.dump(config, f, default=str, indent=4)
-
+        self.save_config()
         return result
 
     return update_config
@@ -68,8 +48,11 @@ class SourcesHandler:
         self.one_by_one = True
         self.last_run_time = None
         self.sleep_time = 1
-        self.publications_directory = os.path.join("res", "publication_ideas")
+        self.publications_collection = ""
+        self.config_schema = "information"
+        self.config_client = ConfigManager()
         self.reload_config()
+        self.publications_manager = PublicationIterator(self.publications_collection)
 
     def run(self):
         """Main loop of the class, it runs the search engines and sleeps until scheduled next execution"""
@@ -78,18 +61,7 @@ class SourcesHandler:
             if self.active:
                 self.run_search_engines()
                 logger.debug("Source handler sleeping.")
-            time.sleep(self.sleep_time)
-
-    def clean_title(self, title):
-        """
-        Clean the title. It removes special characters and makes it lower case.
-        :param title:  title to be cleaned
-        :return:
-        """
-        title = title.lower().strip()
-        title = re.sub(r'[^a-zA-Z0-9_]', '_', title)
-        title = title[0:min(len(title), 90)]
-        return title
+            F.sleep(self.sleep_time)
 
     def save_material(self, material):
         """Saves the processed material needed to create a publication. The material is saved in the publications directory
@@ -97,12 +69,9 @@ class SourcesHandler:
         :param material: material to be saved. It is a dictionary
         """
 
-        title = self.clean_title(material["title"])
-        logger.info(f"Saving material {title}.")
-        # Cleans the title for the file name
-        with open(os.path.join(os.path.abspath("/"), self.publications_directory, f"{title}.json"), "w") as f:
-            json.dump(material, f, default=str, indent=4)
-        logger.info(f"Saved material {title}.")
+        logger.info(f"Saving material {material.get('title', '')}.")
+        self.publications_manager.insert(material)
+        logger.info(f"Saved material {material.get('title', '')}.")
 
     def init_active_sources(self):
         """Initializes the active sources. This method is called when the active sources are changed.
@@ -141,7 +110,6 @@ class SourcesHandler:
         if self.last_run_time and datetime.datetime.now() - datetime.timedelta(
                 days=self.execution_period) < datetime.datetime.strptime(self.last_run_time, "%Y-%m-%d %H:%M:%S"):
             logger.debug("Sources handler needs to wait more time to run.")
-            time.sleep(self.sleep_time * 3600 * 24)
             return []
         threads = []
         for search_engine in self.search_engines:
@@ -155,20 +123,14 @@ class SourcesHandler:
 
     def update_last_run_time(self):
         """Updates the last run time on the config.json file"""
-        with open(config_dir, "r") as f:
-            config = json.load(f)
-        config["last_run_time"] = self.last_run_time
-        with open(config_dir, "w") as f:
-            json.dump(config, f, default=str, indent=4)
+        self.config_client.update_config_key(self.config_schema, "last_run_time", self.last_run_time)
 
     def reload_config(self):
         """Reload the configuration."""
         logger.debug("Reloading config")
-        with open(config_dir, "r") as f:
-            config = json.load(f)
+        config = self.config_client.load_config(self.config_schema)
+
         for key in config.keys():
-            if key == "publications_directory":
-                self.publications_directory = os.path.join(os.path.abspath("/"), os.path.join(*self.publications_directory.split("/")))
             if key == "active_sources":
                 active_sources = config.get("active_sources", self.active_sources)
                 has_changed = self.active_sources != active_sources
@@ -177,6 +139,14 @@ class SourcesHandler:
                     self.init_active_sources()
             else:
                 self.__setattr__(key, config[key])
+
+    def save_config(self):
+        config = self.config_client.load_config(self.config_schema)
+
+        for key in config.keys():
+            config[key] = getattr(self, key)
+
+        self.config_client.save_config(self.config_schema, config)
 
 
 def run():

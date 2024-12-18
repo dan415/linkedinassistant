@@ -1,35 +1,15 @@
-import asyncio
-import logging
 import os
-import signal
-import subprocess
-import sys
 from origamibot.core.sthread import StoppableThread
 # Im just reusing the StoppableThread class from origamibot, given that they had it already
-
 from time import sleep
-
-import win32event
-
 import src.information.publications_handler as publications_handler
 import src.information.source_handler as source_handler
-import src.linkedin.auth_server as auth_server
+import src.linkedin.auth.server as auth_server
 import src.telegram.bot as bot
-from src.utils.log_handler import TruncateByTimeHandler
-
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData",
-                                                                                             "linkedin_assistant",
-                                                                                             "logs")
+import src.core.utils.functions as F
 
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
+logger = F.get_logger(dump_to=FILE)
 
 """
 This main file is used to run all the servers at the same time. It is used to run the bot, the publications handler, the

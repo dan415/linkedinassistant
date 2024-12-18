@@ -3,7 +3,8 @@
 
 I created this project because I wanted to create posts about cool articles and
 papers that would come up every week, but did not have the time for it. So I decided
-to create a program that would generate the posts for me, and I would only need to review them and post them.
+review them and post them.
+to create a program that would generate the posts for me, and I would only need to
 
 The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
 LLM model. All design decisions are based on the idea that this program is meant to be run as a Windows service locally.
@@ -138,14 +139,14 @@ Keep in mind that with the free version you can only have one domain.
   - Step 4: On you newly created app, go to Auth. 
   - Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.
 
-  ```json
+        ```json
             
         {
           "client_id": "Client ID given by Linkedin",
           "client_secret": "Client Secret given by Linkedin"
         }
             
-  ```
+        ```
   - Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
     - openid
     - email
@@ -203,20 +204,6 @@ Keep in mind that with the free version you can only have one domain.
            }
        ```
       
-- ### Configure service configuration files:
-
-Some configuration files require you to define some directories where the program will store files related to the publication creation process.
-You need to define the following directories:
-
-- `publications_directory`: The directory where the publications are stored. You need to define this directory in the `information` config file.
-- `publications_pending_approval_directory`: The directory where the publications pending approval are stored.  You need to define this directory in the `information` config file.
-- `base_path`: This needs to be set to the same path as the `publications_pending_approval_directory` in the `suggestions` config file. This is where the suggestion pool will get loaded from.
-- `input_directory`: This directory is where the Manual pdf search engine will look for pdfs to add extract information from. You need to define this directory in the `information/sources/manual_pdfs` config file.
-- `output_directory`: This directory is where the Manual pdf search engine will store the pdfs that it processes. You need to define this directory in the `information/sources/manual_pdfs` config file.
-
-
-Note: These directories need to be absolute paths
-
 - ### Install C++ Build Tools from Visual Studio
 
 Torch requires C++ Build Tools from Visual Studio to be installed.
@@ -238,19 +225,17 @@ Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on t
 
   If using conda: 
 
-```bash
-conda activate linkedinassistant
-```
+  ```bash
+    conda activate linkedinassistant
+   ```
 
 Now, run the script `configurate.cmd` to configure the service.
 This will create a data folder in `C:ProgramData/LinkedinAssistant` and copy the config files there.
 You need to go back to the root folder of the project, and run the script:
-
-
 ```bash
-cd .. 
-configurate.cmd
-```
+  cd .. 
+  configurate.cmd
+ ```
 
 When you run this program as a Windows Service, all logs and config files will be stored in `C:ProgramData/LinkedinAssistant` folder.
 
@@ -259,7 +244,7 @@ Some popup error might appear, as long as it is related to torchvison or torchau
 
 ```bash
 pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
-```
+  ```
 
 This will create the necessary EXE and dependencies in `dist` folder. 
 
@@ -269,7 +254,7 @@ After that:
 
 ```bash
   .\dist\service\service.exe install
-```
+  ```
 
 If this works, you have done everything correctly.
 

@@ -1,67 +1,40 @@
-import json
-import logging
 import os
 import re
-import shutil
-from functools import wraps
+import tempfile
+from typing import AnyStr
 
-
+from src.core.b2.b2_handler import B2Handler
+from src.core.pdf.provider import PDFExtractorProvider
 from src.information.sources.information_source import ContentSearchEngine, requires_valid_period
-from src.llm.ColBERT.colvbert_information_retrieval import ColbertDocumentChapterRetrieval
-from src.pdf.extractor import AdobePDFExtractor
-from src.utils.log_handler import TruncateByTimeHandler
+from src.llm.retrieval.provider import DocumentRetrieverProvider
+from src.core.pdf.extractor import PDFExtractor
+import src.core.utils.functions as F
 
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', "..", "..", ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources", "manual_pdfs", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
-
-def stateful(func):
-    @wraps(func)
-    def update_config(self, *args, **kwargs):
-        result = func(self, *args, **kwargs)
-        logger.info("Updating config of sources handler.")
-        with open(config_dir, "r") as f:
-            config = json.load(f)
-
-        for key in config.keys():
-            config[key] = getattr(self, key)
-
-        with open(config_dir, "w") as f:
-            json.dump(config, f, default=str, indent=4)
-
-        return result
-
-    return update_config
+logger = F.get_logger(dump_to=FILE)
 
 
 class ManualSourceEngine(ContentSearchEngine):
-
     """
-    Searches for content in a folder specified in config.json.
-    It will check for updates on the folder every once in a while, and process the pdf.
+    Searches for content in B2 folders.
+    It will check for updates on the input folder every once in a while, process the PDFs,
+    and move them to the output folder.
 
-    For pdfs I am using Adobe API, which has a limit of requests on free tier, so need to be careful. However, It is the best one I have access
-    to. Azure Document Intelligence works fine as well.
+    For PDFs I am using Adobe API, which has a limit of requests on free tier, so need to be careful.
+    However, It is the best one I have access to. Azure Document Intelligence works fine as well.
     """
 
     def __init__(self, information_source):
         """Initialize the searcher with the information source."""
         super().__init__(information_source)
-        self.pwd = os.path.dirname(os.path.abspath(__file__))
-        self.project_dir = os.path.abspath(os.path.join(self.pwd, '..', "..", "..", ".."))
-        self.input_directory = os.path.join("res", "manual_pdfs", "input")
-        self.output_directory = os.path.join("res", "manual_pdfs", "output")
         self.minimum_length = 50
         self.paragraph_min_length = 10
-        self.reload_config(config_dir)
+        self.provider = None
+        self.pdf_extractor_provider = None
+        self.input_directory = "/Information/Sources/Manual/Input"
+        self.output_directory = "/Information/Sources/Manual/Output"
+        self.pdf_manager = B2Handler()
+        self.reload_config()
 
     @requires_valid_period
     def search(self, save_callback=None) -> list:
@@ -69,107 +42,102 @@ class ManualSourceEngine(ContentSearchEngine):
         logger.info("Searching for content in %s", self.information_source)
         res = []
         try:
-            pdfs, pdfs_bytes = self.get_pdf_bytes()
-            for pdf_info in pdfs_bytes:
-                extracted_content = self.extract_pdf_info(pdf_info)
-                res.append(extracted_content)
-                if save_callback:
-                    self.save_if_valid(save_callback, extracted_content)
+            # Get PDFs from B2 input folder
+            if not self.pdf_manager.authenticate():
+                logger.error("Failed to authenticate with B2")
+                return res
 
-            self.move_pdfs(pdfs)
+            files = self.pdf_manager.list_folder_contents(self.input_directory)
+            pdfs = [f for f in files if isinstance(f, dict) and f.get('name', '').lower().endswith('.pdf')]
+
+            for pdf in pdfs:
+                # Download and process each PDF
+                pdf_content = self.get_pdf_content(pdf['name'])
+                if pdf_content:
+                    extracted_content = self.extract_pdf_info(pdf_content)
+                    if extracted_content:
+                        res.append(extracted_content)
+                        if save_callback:
+                            self.save_if_valid(save_callback, extracted_content)
+                    # Move processed PDF to output folder
+                    source_path = f"{self.input_directory}/{pdf['name']}"
+                    dest_path = f"{self.output_directory}/{pdf['name']}"
+                    self.pdf_manager.move_file(source_path, dest_path)
+
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Error in search: {e}")
         finally:
             logger.info("Content found: %s", res)
             return res
 
-    def filter(self, content):
-        """"
-        Filter the content. It needs to be implemented by the child class, but it is not used in this class.
+    def get_pdf_content(self, filename: str) -> AnyStr | None:
         """
+        Download PDF content directly from B2.
+
+        Args:
+            filename: Name of the PDF file in B2
+
+        Returns:
+            bytes: PDF content if successful, None otherwise
+        """
+        logger.info(f"Getting content for PDF: {filename}")
+        try:
+            # Download the file to a temporary location
+            with tempfile.NamedTemporaryFile(suffix=f".{filename}") as f:
+                if self.pdf_manager.download_pdf(f"{self.input_directory}/{filename}", f.name):
+                    # Read the content
+                    f.seek(0)
+                    content = f.read()
+                    return content
+            return None
+        except Exception as e:
+            logger.error(f"Error getting PDF content: {e}")
+            return None
+
+    def extract_pdf_info(self, pdf_content: bytes):
+        """
+        Extract the PDF info and content using Document Retriever Provider.
+
+        Args:
+            pdf_content: Raw PDF bytes
+
+        Returns:
+            dict: Extracted information including title and content
+        """
+        assert self.provider is not None, "Document Retrieval Provider must be specified beforehand"
+        logger.info("Extracting pdf info")
+        try:
+            extractor = PDFExtractorProvider.build(self.pdf_extractor_provider)
+            text = extractor.extract(pdf_content)
+
+            # Create provider with temporary title first
+            with DocumentRetrieverProvider.get_document_retriever_provider(self.provider,
+                                                                           "temp").update_from_config() as provider:
+                extracted_title = provider.extract_title(text)
+                important_paragraphs = provider.search([text])
+
+            res = {
+                "title": extracted_title,
+                "information_source": self.information_source.value,
+                "content": important_paragraphs
+            }
+        except Exception as e:
+            logger.error(f"Error extracting PDF info: {e}")
+            res = {}
+        return res
+
+    def filter(self, content):
+        """Filter the content (not used in this class)."""
         return content
 
     def clean_title(self, title):
-        """
-        Clean the title. It removes special characters and makes it lower case.
-        :param title:  title to be cleaned
-        :return:
-        """
+        """Clean the title by removing special characters and making it lowercase."""
         title = title.lower().strip()
         title = re.sub(r'[^a-zA-Z0-9_]', '_', title)
         title = title[0:min(len(title), 90)]
         return title
 
     def save_if_valid(self, save, result):
-        """
-        Save the result if it is valid.
-        :param save:  save callback
-        :param result:  result to be saved
-        :return:
-        """
+        """Save the result if it meets minimum length requirements."""
         if len(result.get("content", "")) > self.minimum_length and result.get("title", "") != "":
             save(result)
-
-    def get_pdf_bytes(self):
-        """
-        Get the pdf bytes from the input directory, it iterates all the pdfs in the directory.
-        :return:  pdfs names and pdfs bytes
-        """
-        logger.info("Getting pdf bytes")
-        pdfs = []
-        pdfs_bytes = []
-        for file in os.listdir(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"))):
-            if file.endswith(".pdf"):
-                with open(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"), file), "rb") as f:
-                    pdfs_bytes.append(f.read())
-                pdfs.append(file)
-        logger.info(f"Pdf bytes retrieved for {pdfs}")
-        return pdfs, pdfs_bytes
-
-    def move_pdfs(self, pdfs):
-        """Move the pdfs from input directory to the output directory."""
-        logger.info("Moving pdfs")
-        for pdf in pdfs:
-            logger.info(f"Moving {pdf}")
-            shutil.move(os.path.join(os.path.abspath("/"), *self.input_directory.split("/"), pdf), os.path.join(os.path.abspath("/"), self.output_directory, pdf))
-
-    def preprocess(self, pdf):
-        """
-        Preprocess the pdf, removing non alphanumeric characters, and lowercasing the text.
-        :param pdf:
-        :return:
-        """
-        text = re.sub(r'[^a-zA-Z\s.,!?\'"]', '', pdf)
-        text = text.lower()
-        text = text.strip()
-
-        return text
-    def extract_pdf_info(self, pdf):
-        """
-        Extract the pdf info, title and content.
-        Then it uses Colbert's Query-Document model in order to retrieve the most important paragraphs. This is the stuff that will actually get included
-        in the publication.
-        :param pdf:
-        :return:
-        """
-        logger.info("Extracting pdf info")
-        try:
-            extractor = AdobePDFExtractor()
-            title, chapters = extractor.extract(pdf, return_title=True)
-            res = {"title": title}
-            paragraphs = []
-            for chapter in chapters:
-                paragraphs.extend(chapter["paragraphs"])
-
-            paragraphs = list(map(lambda x: self.preprocess(x), filter(lambda x: len(x) > self.paragraph_min_length, paragraphs)))
-
-            title = self.clean_title(title)
-            with ColbertDocumentChapterRetrieval(title).update_from_config() as colbert:
-                colbert.index_paragraphs(paragraphs)
-                important_paragraphs = colbert.search(paragraphs)
-            res["information_source"] = self.information_source
-            res["content"] = important_paragraphs
-        except Exception as e:
-            logger.error(e)
-            res = {}
-        return res

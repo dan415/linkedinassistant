@@ -1,28 +1,24 @@
 import datetime
-import json
-import logging
+import os
 import re
 import xml.etree.ElementTree as ET
-from functools import wraps
 
 import requests
-import os
-from src.information.sources.information_source import ContentSearchEngine, requires_valid_period
-from src.llm.ColBERT.colvbert_information_retrieval import ColbertDocumentChapterRetrieval
-from src.pdf.extractor import AdobePDFExtractor
-from src.utils.log_handler import TruncateByTimeHandler
 
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', "..", "..", ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
+from src.core.pdf.extractor import PDFExtractor
+from src.core.pdf.provider import PDFExtractorProvider
+from src.information.sources.information_source import ContentSearchEngine, requires_valid_period
+from src.llm.retrieval.provider import DocumentRetrieverProvider
+from .constants import (
+    ARXIV_API_URL,
+    MAX_RESULTS, MINIMUM_LENGTH, PARAGRAPH_MIN_LENGTH,
+    DEFAULT_PERIOD, ARXIV_TOPICS
+)
+import src.core.utils.functions as F
+
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources", "arxiv", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+logger = F.get_logger(dump_to=FILE)
+
 
 def extract_from_xmls(xml):
     """
@@ -58,7 +54,6 @@ def extract_from_xmls(xml):
 
 
 class ArxivSearchEngine(ContentSearchEngine):
-
     """
     Searches for content in Arxiv. Arxiv makes papaer metadata available through an API as xml, and then
     we can download the pdf and extract the content.
@@ -66,28 +61,17 @@ class ArxivSearchEngine(ContentSearchEngine):
 
     def __init__(self, information_source):
         """Initialize the searcher with the information source."""
+        self.max_results = MAX_RESULTS
+        self.minimum_length = MINIMUM_LENGTH
+        self.paragraph_min_length = PARAGRAPH_MIN_LENGTH
+        self.period = DEFAULT_PERIOD
+        self.pdf_extractor_provider = None
+        self.provider = None
+        self.url = ARXIV_API_URL
         super().__init__(information_source)
-        self.max_results = 25
-        self.minimum_length = 50
-        self.paragraph_min_length = 10
-        self.pwd = os.path.dirname(os.path.abspath(__file__))
-        self.period = 7
-        self.url = "http://export.arxiv.org/api/"
 
         # These are Topic IDs from arxiv. They are used to select the topics we want to search for.
-        self.topics = [
-            "cat:math.AG",
-            "cat:cs.AI",
-            "cat:cs.GT",
-            "cat:cs.CV",
-            "cat:cs.ET",
-            "cat:cs.IR",
-            "cat:cs.LG",
-            "cat:cs.NE",
-            "cat:cs.PL",
-            "cat:cs.RO"
-        ]
-        self.reload_config(config_dir)
+        self.topics = ARXIV_TOPICS
 
     def filter(self, content):
         """
@@ -159,32 +143,27 @@ class ArxivSearchEngine(ContentSearchEngine):
         title = re.sub(r'[^a-zA-Z0-9_]', '_', title)
         title = title[0:min(len(title), 90)]
         return title
+
     def extract_pdf_info(self, arxiv):
-        """Save the pdf. It extracts the content from the pdf and saves it in the arxiv dictionary. It uses
-        colbert to extract the most important paragraphs from the pdf.
-        :param arxiv:  arxiv dictionary
+        """Extract content from PDF and process it using the document retriever.
+        :param arxiv: arxiv dictionary
         """
+        assert self.provider is not None, "Document Retrieval Provider must be specified beforehand"
         res = ""
         try:
             logger.info("Extracting pdf info")
             url = arxiv["link"].replace("abs", "pdf") + ".pdf"
             response = requests.get(url)
-            extractor = AdobePDFExtractor()
-            chapters = extractor.extract(response.content)
+            extractor = PDFExtractorProvider.build(self.pdf_extractor_provider)
+            text = extractor.extract(response.content)
 
-            paragraphs = []
-            for chapter in chapters:
-                paragraphs.extend(chapter["paragraphs"])
-
-            paragraphs = list(map(lambda x: self.preprocess(x), filter(lambda x: len(x) > self.paragraph_min_length, paragraphs)))
-
-            title = self.clean_title(arxiv["title"])
-            with ColbertDocumentChapterRetrieval(title).update_from_config() as colbert:
-                colbert.index_paragraphs(paragraphs)
-                important_paragraphs = colbert.search(paragraphs)
+            title = arxiv["title"]
+            with DocumentRetrieverProvider.get_document_retriever_provider(self.provider,
+                                                                           title) as provider:
+                important_paragraphs = provider.search([text])
                 res = "\n".join(important_paragraphs)
                 arxiv["content"] = res
-                arxiv["information_source"] = self.information_source
+                arxiv["information_source"] = self.information_source.value
         except Exception as e:
             logger.error(e)
             arxiv = {}

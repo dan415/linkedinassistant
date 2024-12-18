@@ -1,0 +1,53 @@
+"""Constants for the Telegram bot module."""
+import os
+
+# Configuration
+CONFIG_SCHEMA = "telegram"
+MAX_RETRIES = 5
+
+NGROK_ADDRESS = "localhost:5000"
+NGROK_PROTOCOL = "http"
+
+# Bot Commands
+CMD_START = "start"
+CMD_HEALTHCHECK = "healthcheck"
+CMD_ALLOW = "allow"
+CMD_STOP = "stop"
+CMD_CONVERSE = "converse"
+CMD_ASSIST = "assist"
+CMD_CLEAR = "clear"
+CMD_UPDATE = "update"
+CMD_LIST = "list"
+CMD_SELECT = "select"
+CMD_PREVIOUS = "previous"
+CMD_NEXT = "next"
+CMD_GENERATE_IMAGE = "generate_image"
+CMD_CLEAR_IMAGE = "clear_image"
+CMD_CURRENT = "current"
+CMD_PUBLISH = "publish"
+CMD_UPLOAD_PDF = "upload_pdf"
+CMD_ADD_YOUTUBE = "add_youtube"
+CMD_CHANGE_IMAGE = "change_image"
+
+# Bot Messages
+MSG_START = "Bot started. Chat ID: {}"
+MSG_HEALTHCHECK = "Bot is alive!"
+MSG_SUGGESTIONS_ALLOWED = "Suggestions allowed"
+MSG_SUGGESTIONS_STOPPED = "Suggestions stopped"
+MSG_CONVERSATION_MODE = "Conversation mode activated"
+MSG_ASSISTANT_MODE = "Assistant mode activated"
+MSG_CLEARED = "Current publication cleared"
+MSG_SUGGESTIONS_UPDATED = "Suggestions updated"
+MSG_NO_SUGGESTIONS = "No suggestions available"
+MSG_INVALID_INDEX = "Invalid index"
+MSG_CURRENT_SUGGESTION = "Current suggestion:\n{}"
+MSG_NO_CURRENT_SUGGESTION = "No suggestion selected"
+MSG_PUBLISH_SUCCESS = "Published successfully!"
+MSG_PUBLISH_FAILURE = "Failed to publish"
+MSG_NEED_AUTH = "Authentication required. Please visit: {}"
+MSG_PDF_SAVED = "PDF saved successfully"
+MSG_YOUTUBE_ADDED = "YouTube URL added to pool"
+MSG_INVALID_URL = "Invalid YouTube URL"
+MSG_IMAGE_GENERATING = "Generating image..."
+MSG_IMAGE_CLEARED = "Image cleared"
+MSG_PROVIDE_INSTRUCTIONS = "Please provide instructions for the image change"

@@ -1,41 +1,28 @@
+import base64
 import datetime
-import json
-import logging
-import os
-import sys
 import threading
 import time
-from ast import literal_eval
-from dataclasses import dataclass
 from functools import wraps
-
 from origamibot.listener import Listener
-from origamibot import OrigamiBot as Bot
-import re
-from src.telegram.suggestions.pool import SuggestionPool
-from pyngrok import ngrok
-
+from origamibot import OrigamiBot as Bot, OrigamiBot
+from src.core.config.manager import ConfigManager
+from src.core.constants import SecretKeys
+from src.core.b2.b2_handler import B2Handler
+from src.core.vault.hvault import VaultClient
+from src.information.constants import PublicationState
+from src.information.publications import PublicationIterator
+from src.information.sources.rapid.youtube.pool import YoutubeUrlPool
 from src.linkedin.publisher import LinkedinPublisher
-from src.llm.langchain_agent.langchainGPT import LangChainGPT
-from src.utils.log_handler import TruncateByTimeHandler
+from pyngrok import ngrok
+import requests
+from src.llm.conversation.agent import LangChainGPT
+from src.telegram.constants import *
+import src.core.utils.functions as F
+from src.telegram.exceptions import DownloadFileException, FetchFileException
+import io
 
-MAX_RETRIES = 5
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData",
-                                                                                             "linkedin_assistant",
-                                                                                             "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-
-config_dir = os.path.join(PWD, "config.json") if sys.platform != 'win32' else os.path.join(r"C:\\", "ProgramData",
-                                                                                           "linkedin_assistant",
-                                                                                           "telegram", "config.json")
+logger = F.get_logger(dump_to=FILE)
 
 
 def stateful(func):
@@ -49,20 +36,65 @@ def stateful(func):
     @wraps(func)
     def update_config(self, *args, **kwargs):
         result = func(self, *args, **kwargs)
-        with open(config_dir) as f:
-            config = json.load(f)
+        config = self.config_client.load_config(CONFIG_SCHEMA)
 
         with self.mutex:
             for key in config.keys():
                 if key in self.__dict__.keys():
                     config[key] = getattr(self, key)
 
-        with open(config_dir, "w") as f:
-            json.dump(config, f, indent=4, default=str)
+        self.config_client.save_config(CONFIG_SCHEMA, config)
 
         return result
 
     return update_config
+
+
+class OrigamiBotExtended(OrigamiBot):
+
+    def __init__(self, token):
+        super().__init__(token)
+        self.file_manager = B2Handler()
+
+    def _get_file_path(self, file_id):
+        url = f"https://api.telegram.org/bot{self.token}/getFile?file_id={file_id}"
+        response = requests.get(url)
+        result = response.json()
+        if result['ok']:
+            return result['result']['file_path']
+        else:
+            raise FetchFileException(result)
+
+    def _download_file(self, file_path):
+        url = f"https://api.telegram.org/file/bot{self.token}/{file_path}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.content
+        else:
+            raise DownloadFileException(response.json())
+
+    def get_file(self, document):
+        try:
+            file_path = self._get_file_path(document.file_id)
+            return self._download_file(file_path)
+        except (FetchFileException, DownloadFileException) as ex:
+            logger.error(ex.message)
+            return None
+
+    def process_pdf(self, document, save_folder):
+        bytes = self.get_file(document)
+        if bytes:
+            return self.file_manager.upload_pdf_bytes(bytes, save_folder + "/" + document.file_name)
+        return None
+
+    def process_image(self, image):
+        bytes = self.get_file(image)
+        return base64.b64encode(bytes)
+
+    def send_publication(self, chat_id, publication):
+        self.send_message(chat_id, publication["content"])
+        if publication["image"]:
+            self.send_photo(chat_id, io.BytesIO(base64.b64decode(publication["image"])))
 
 
 class BotState:
@@ -83,19 +115,21 @@ class BotState:
         self.chat_id = None
         self.just_published = False
         self.auth_address = None
-        self.conversation_mode_on = False
+        self.manual_pdfs_dir = "Information/Sources/Manual/Input"
+        self.publications_collection = ""
         self.llm_agent = LangChainGPT()
         self.mutex = threading.Lock()
-        self.pool = SuggestionPool()
-        self.pool.update()
+        self.vault_client = VaultClient()
+        self.config_client = ConfigManager()
+
         logger.debug("Reloading config")
-        with open(config_dir) as f:
-            config = json.load(f)
+        config = self.config_client.load_config(CONFIG_SCHEMA)
+
         for key in config.keys():
             if key in self.__dict__.keys():
                 self.__setattr__(key, config[key])
-        if len(self.pool) > 0 and self.pool.current:
-            self.llm_agent.load_memory(self.pool.current.path)
+
+        self.publications_manager = PublicationIterator(self.publications_collection, PublicationState.PENDING_APPROVAL)
 
     @stateful
     def reset(self):
@@ -105,37 +139,10 @@ class BotState:
         """
         logger.info("Resetting state")
         with self.mutex:
+            self.llm_agent.memory.clear(self.llm_agent.convesation_id)
+            self.llm_agent.convesation_id = None
             self.suggestions_are_blocked = None
             self.just_published = False
-            self.llm_agent.memory.clear()
-
-    def is_conversation_mode(self):
-        """
-        Getter for the conversation mode flag.
-        :return:
-        """
-        with self.mutex:
-            return self.conversation_mode_on or self.pool.current is None
-
-    @stateful
-    def set_conversation_mode(self):
-        """
-        Setter for the conversation mode flag.
-        :return:
-        """
-        logger.info("Setting conversation mode")
-        with self.mutex:
-            self.conversation_mode_on = True
-
-    @stateful
-    def set_assistant_mode(self):
-        """
-        Setter for the conversation mode flag.
-        :return:
-        """
-        logger.info("Setting assistant mode")
-        with self.mutex:
-            self.conversation_mode_on = False
 
     @stateful
     def did_just_published(self, did_publish):
@@ -172,27 +179,6 @@ class BotState:
         logger.info("Blocking suggestions")
         with self.mutex:
             self.suggestions_are_blocked = True
-
-    @stateful
-    def conversation_mode(self):
-        """
-        This is used in order to be able to interact with the bot without suggestions
-        :return:
-        """
-        self.block_suggestions()
-        self.set_conversation_mode()
-        self.llm_agent.memory.clear()
-
-    def assistant_mode(self):
-        """
-        This is used to go back to the assistant mode
-        :return:
-        """
-        self.allow_suggestions()
-        self.set_assistant_mode()
-        self.llm_agent.memory.clear()
-        if self.pool.current:
-            self.llm_agent.load_memory(self.pool.current.path)
 
     @stateful
     def allow_suggestions(self):
@@ -240,10 +226,14 @@ class BotsCommands:
 
     """
 
-    def __init__(self, bot: Bot, publisher, bot_state):
+    def __init__(self, bot: OrigamiBotExtended, publisher, bot_state):
         self.bot = bot
         self.publisher = publisher
         self.state = bot_state
+        # Path for manual PDFs input directory
+
+        # Initialize URL pool for YouTube transcripts
+        self.youtube_url_pool = YoutubeUrlPool()
 
     def start(self, message):
         """
@@ -254,7 +244,9 @@ class BotsCommands:
         logger.info("Starting operation triggered")
         self.state.set_chat_id(message.chat.id)
         self.bot.send_message(
-            message.chat.id, 'Welcome to the Linkedin Assistant Bot!')
+            message.chat.id,
+            MSG_START.format(message.chat.id)
+        )
 
     def healthcheck(self, message):
         """
@@ -263,8 +255,7 @@ class BotsCommands:
         :return:
         """
         logger.info("Healthcheck triggered")
-        self.bot.send_message(
-            message.chat.id, 'I am alive!')
+        self.bot.send_message(message.chat.id, MSG_HEALTHCHECK)
 
     def allow(self, message):
         """
@@ -275,7 +266,8 @@ class BotsCommands:
         logger.info("Allowing suggestions")
         self.state.allow_suggestions()
         self.bot.send_message(
-            message.chat.id, 'Suggestions allowed!')
+            message.chat.id, MSG_SUGGESTIONS_ALLOWED
+        )
 
     def stop(self, message):
         """
@@ -286,29 +278,8 @@ class BotsCommands:
         logger.info("Stopping suggestions")
         self.state.block_suggestions()
         self.bot.send_message(
-            message.chat.id, 'Stopping suggestions!')
-
-    def converse(self, message):
-        """
-        Conversation mode. This is used to stop the bot from sending suggestions when the user is interacting with the bot.
-        :param message: message received
-        :return:
-        """
-        logger.info("Conversation mode")
-        self.state.conversation_mode()
-        self.bot.send_message(
-            message.chat.id, 'Conversation mode!')
-
-    def assist(self, message):
-        """
-        Assistant mode. This is used to stop the bot from sending suggestions when the user is interacting with the bot.
-        :param message: message received
-        :return:
-        """
-        logger.info("Assistant mode")
-        self.state.assistant_mode()
-        self.bot.send_message(
-            message.chat.id, 'Assistant mode!')
+            message.chat.id, MSG_SUGGESTIONS_STOPPED
+        )
 
     def clear(self, message):
         """
@@ -319,25 +290,12 @@ class BotsCommands:
         """
         logger.info("Clear triggered")
         try:
-            self.state.pool.remove(self.state.pool.current.id)
+            self.state.publications_manager.update_state(self.state.llm_agent.conversation_id,
+                                                         PublicationState.DISCARDED)
             self.state.reset()
-            self.bot.send_message(message.chat.id, "Cleared current publication")
+            self.bot.send_message(message.chat.id, MSG_CLEARED)
         except Exception as e:
             self.bot.send_message(message.chat.id, f"Error clearing publication: {e}")
-
-    def update(self, message):
-        """
-        Update the suggestions. This is used to update the suggestions. It will check for new suggestions in the folder.
-        Updating the suggetions is necessary so the Suggestion Pool gets synchronized with the folder.
-        :param message: message received
-        :return:
-        """
-        logger.info("Update triggered")
-        try:
-            self.state.pool.update()
-            self.bot.send_message(message.chat.id, "Updated suggestions")
-        except Exception as e:
-            self.bot.send_message(message.chat.id, f"Error updating suggestions: {e}")
 
     def list(self, message):
         """
@@ -348,13 +306,13 @@ class BotsCommands:
         """
         logger.info("List triggered")
 
-        if len(self.state.pool) > 0:
-
-            index_plus_suggestions = [f'{i}: {os.path.split(s.path)[-1]}' for i, s in enumerate(self.state.pool)]
+        if len(self.state.publications_manager) > 0:
+            index_plus_suggestions = [f'{i}: {self.state.publications_manager.select(i)}' for i in
+                                      range(len(self.state.publications_manager))]
             logger.info("Suggestions:\n\n%s", "\n".join(index_plus_suggestions))
             self.bot.send_message(message.chat.id, "Suggestions:\n\n{}:".format("\n".join(index_plus_suggestions)))
         else:
-            self.bot.send_message(message.chat.id, "No suggestions to show")
+            self.bot.send_message(message.chat.id, MSG_NO_SUGGESTIONS)
 
     def select(self, message, index: int):
         """
@@ -367,14 +325,14 @@ class BotsCommands:
         logger.info("Select triggered")
         try:
 
-            current, isthesame = self.state.pool.select(index)
-            if isthesame:
+            current = self.state.publications_manager.select(index)
+            if current["publication_id"] == self.state.llm_agent.conversation_id:
                 self.bot.send_message(message.chat.id, "You selected the same suggestion")
             elif current:
-                self.state.llm_agent.load_memory(current.path)
-                self.bot.send_message(message.chat.id, str(current))
+                self.state.llm_agent.conversation_id = current["publication_id"]
+                self.bot.send_publication(message.chat.id, current)
             else:
-                self.bot.send_message(message.chat.id, "selected suggestion is out of bounds")
+                self.bot.send_message(message.chat.id, MSG_INVALID_INDEX)
         except Exception as e:
             logger.error("Error selecting suggestion: %s", e)
             self.bot.send_message(message.chat.id, "Error selecting suggestion")
@@ -387,12 +345,12 @@ class BotsCommands:
         """
         logger.info("Previous triggered")
         try:
-            current, isthesame = self.state.pool.previous()
-            if isthesame or not current:
-                self.bot.send_message(message.chat.id, "No more suggestions")
+            current = self.state.publications_manager.last()
+            if current["publication_id"] == self.state.llm_agent.conversation_id or not current:
+                self.bot.send_message(message.chat.id, MSG_NO_SUGGESTIONS)
             else:
-                self.state.llm_agent.load_memory(current.path)
-                self.bot.send_message(message.chat.id, str(current))
+                self.state.llm_agent.conversation_id = current["publication_id"]
+                self.bot.send_publication(message.chat.id, current)
         except Exception as e:
             logger.error("Error loading previous suggestion: %s", e)
             self.bot.send_message(message.chat.id, "Error loading previous suggestion")
@@ -405,18 +363,39 @@ class BotsCommands:
         """
         logger.info("Next triggered")
         try:
-            current, isthesame = self.state.pool.next()
-            if isthesame or not current:
-                self.bot.send_message(message.chat.id, "No more suggestions")
+            current = next(self.state.publications_manager)
+            if current["publication_id"] == self.state.llm_agent.conversation_id or not current:
+                self.bot.send_message(message.chat.id, MSG_NO_SUGGESTIONS)
             else:
-                self.state.llm_agent.load_memory(current.path)
-                self.bot.send_message(message.chat.id, str(current))
+                self.state.llm_agent.conversation_id = current["publication_id"]
+                self.bot.send_publication(message.chat.id, current)
         except Exception as e:
             logger.error("Error loading next suggestion: %s", e)
             self.bot.send_message(message.chat.id, "Error loading next suggestion")
 
-    def conversation_mode(self, message):
-        self.state.block_suggestions()
+    def clear_image(self, message):
+        """Clear the currently generated image."""
+        try:
+            self.state.llm_agent.image = None
+            self.state.publications_manager.update_image(self.state.llm_agent.conversation_id, None)
+            self.bot.send_message(message.chat.id, "Image cleared")
+        except Exception as e:
+            logger.error("Error loading next suggestion: %s", e)
+            self.bot.send_message(message.chat.id, "Error clearing image")
+
+    def current(self, message):
+        """
+        Get the current suggestion. This is used to get the current suggestion. It will show the current suggestion,
+        so you actually know the content that you will upload to linkedin.
+        :param message:
+        :return:
+        """
+        if not self.state.llm_agent.conversation_id:
+            self.bot.send_message(message.chat.id, MSG_NO_CURRENT_SUGGESTION)
+            return
+
+        current = self.state.publications_manager.get(self.state.llm_agent.conversation_id)
+        self.bot.send_publication(message.chat.id, current)
 
     def publish(self, message):
         """
@@ -425,38 +404,55 @@ class BotsCommands:
         :param message:
         :return:
         """
-        logger.info("Publish triggered")
-        publication = self.state.llm_agent.get_last_message()
-        result = self.publisher.post(publication)
-        if not result:
-            self.bot.send_message(message.chat.id,
-                                  f"Please, authenticate using this link: {self.state.auth_address}")
-        else:
-            self.bot.send_message(message.chat.id, "Published: \n\n{}".format(publication))
-            self.state.pool.remove(self.state.pool.current.id)
-        self.state.did_just_published(result)
 
-    def current(self, message):
+        if not self.state.llm_agent.conversation_id:
+            self.bot.send_message(message.chat.id, MSG_NO_CURRENT_SUGGESTION)
+            return
+
+        if not self.publisher.is_authenticated():
+            self.bot.send_message(message.chat.id,
+                                  f"You need to authenticate first. Please click on this link: {self.state.auth_address}")
+            return
+
+        try:
+            publication = self.state.publications_manager.get_content(self.state.llm_agent.conversation_id)
+            image = self.state.publications_manager.get_image(self.state.llm_agent.conversation_id)
+
+            if image:
+                self.publisher.publish_with_image(publication, base64.b64decode(image))
+            else:
+                self.publisher.publish(publication)
+
+            self.state.publications_manager.update_state(self.state.llm_agent.conversation_id,
+                                                         PublicationState.PUBLISHED)
+
+            self.bot.send_message(message.chat.id, MSG_PUBLISH_SUCCESS)
+            self.state.reset()
+            self.state.suggestions_are_blocked = False
+            self.state.did_just_published = True
+
+        except Exception as e:
+            self.bot.send_message(message.chat.id, f"Failed to publish: {str(e)}")
+
+    def add_youtube(self, message, youtube_url):
         """
-        Get the current suggestion. This is used to get the current suggestion. It will show the current suggestion, so you actually know
-        the content that you will upload to linkedin.
-        :param message:
+        Add a YouTube URL to the transcript retriever pool.
+        :param message: message received, format should be "/add_youtube <youtube_url>"
         :return:
         """
-        logger.info("Get current publication")
-        publication = self.state.llm_agent.get_last_message()
-        if publication:
-            self.bot.send_message(message.chat.id, publication)
-        else:
-            self.bot.send_message(message.chat.id, "No publication available yet")
+        try:
+            # Basic validation for YouTube URL
+            if not ('youtube.com' in youtube_url or 'youtu.be' in youtube_url):
+                self.bot.send_message(message.chat.id, MSG_INVALID_URL)
+                return
 
-    # IDEAS:
-    """
-    1. Send PDFs to the bot via Telegram, so they are added to the manual PDFs input folder and can be processed.
-    2. When I implement Youtube as a source, I can send the link to the bot and it will be processed. This could also be done
-    with Medium or any of the sources for that matter.
-    
-    """
+            # Add URL to the pool
+            self.youtube_url_pool.add_url(youtube_url)
+            self.bot.send_message(message.chat.id, f'YouTube video added to processing queue: {youtube_url}')
+
+        except Exception as e:
+            logger.error(f"Error processing YouTube URL: {str(e)}")
+            self.bot.send_message(message.chat.id, 'Error processing YouTube URL. Please try again.')
 
 
 class MessageListener(Listener):
@@ -469,19 +465,45 @@ class MessageListener(Listener):
         self.bot = bot
         self.state = state
 
+    def respond(self, chat_id, response):
+        self.bot.send_message(chat_id, response)
+
+        if self.state.llm_agent.image:
+            self.state.publications_manager.update_image(self.state.llm_agent.conversation_id,
+                                                         self.state.llm_agent.image)
+            photo = io.BytesIO(base64.b64decode(self.state.llm_agent.image))
+            photo.seek(0)
+            self.bot.send_photo(chat_id, photo)
+            self.state.llm_agent.image = None
+        else:
+            self.state.publications_manager.update_content(self.state.llm_agent.conversation_id, response)
+
     def on_message(self, message):
         """
         On message received. This is used to listen to messages and send them to the LLMChain agent.
         :param message: message received
         :return:
         """
-        if message.text.startswith("/"):
-            return
         logger.info("Message received")
-        response = self.state.llm_agent.call(input=message.text, use_system_prompt=self.state.is_conversation_mode())
-        self.bot.send_message(message.chat.id, response)
-        if self.state.pool.current:
-            self.state.llm_agent.save_memory(self.state.pool.current.path)
+        if message.text and message.text.startswith("/"):
+            return
+        elif message.document and message.document.mime_type == 'application/pdf':
+            result = self.bot.process_pdf(message.document, self.state.manual_pdfs_dir)
+            self.bot.send_message(message.chat.id,
+                                  "File received succesfully!" if result else "Something went wrong, try later :(")
+        elif message.photo:
+            if self.state.llm_agent.conversation_id and self.state.publications_manager.get(
+                    self.state.llm_agent.conversation_id):
+                encoded_bytes = self.bot.process_image(message.photo)
+                result = self.state.publications_manager.update_image(self.state.llm_agent.conversation_id,
+                                                                      encoded_bytes)
+                self.bot.send_message(message.chat.id,
+                                      "Image updated succesfully" if result else "Something went wrong, try later :(")
+
+        with self.state.mutex:  # Prevent loading of suggestions and that kind of thing while the bot is processing the message
+            response = self.state.llm_agent.call(message.text)
+
+        self.respond(message.chat.id, response)
 
     def on_command_failure(self, message, err=None):  # When command fails
         """
@@ -514,19 +536,19 @@ class TeleLinkedinBot:
     """
 
     def __init__(self):
-        self.token = ""
-        self.username = ""
+
         self.name = ""
+        self.bot_name = ""
         self.bot = None
         self.suggestion_period = None
-        self.ngrok_token = ""
         self.state = None
+        self.vault_client = VaultClient()
         self.publisher = LinkedinPublisher()
-        self.domain = ""
-        try:
-            self.reload_config()
-        except Exception as e:
-            logger.error("Error reloading config: %s", e)
+        self.config_client = ConfigManager()
+        self.token = self.vault_client.get_secret(SecretKeys.TELEGRAM_BOT_TOKEN)
+        self.ngrok_token = self.vault_client.get_secret(SecretKeys.NGROK_TOKEN)
+        self.domain = self.vault_client.get_secret(SecretKeys.NGROK_DOMAIN)
+        self.reload_config()
 
     def __enter__(self):
         """
@@ -535,7 +557,7 @@ class TeleLinkedinBot:
         :return: self
         """
         ngrok.set_auth_token(self.ngrok_token)
-        self.http_tunnel = ngrok.connect(addr="localhost:5000", proto="http", domain=self.domain)
+        self.http_tunnel = ngrok.connect(addr=NGROK_ADDRESS, proto=NGROK_PROTOCOL, domain=self.domain)
 
         return self
 
@@ -553,23 +575,18 @@ class TeleLinkedinBot:
     def reload_config(self):
         """Reload the configuration."""
         logger.info("Reloading config")
-        with open(config_dir, "r") as f:
-            config = json.load(f)
+        config = self.config_client.load_config(CONFIG_SCHEMA)
 
         for key in config.keys():
             if key in self.__dict__.keys():
                 self.__setattr__(key, config[key])
 
-        logger.info("Config reloaded")
-
-        self.bot = Bot(self.token)
-        logger.info("Bot created")
+        self.bot = OrigamiBotExtended(self.token)
         self.state = BotState()
         self.state.auth_address = f'https://{self.domain}'
         self.bot.add_listener(MessageListener(self.bot, self.state))
         self.bot.add_commands(BotsCommands(self.bot, self.publisher, self.state))
         self.bot.start()
-        logger.info("Bot started")
 
     def run(self):
         """
@@ -587,18 +604,21 @@ class TeleLinkedinBot:
         while True:
             time.sleep(5)
             chat_id = self.state.get_chat_id()
+            logger.info("Chat id: %s", chat_id)
             if self.state.has_just_published():
                 logger.info("Just published, waiting for %s days", self.suggestion_period)
-                time.sleep(60 * 60 * 24 * self.suggestion_period)
+                F.sleep(self.suggestion_period)
                 self.state.did_just_published(False)
             try:
                 if not self.state.are_suggestions_blocked():
-                    self.state.pool.update()
-                    if len(self.state.pool) > 0:
-                        current = self.state.pool.current
-
-                        self.bot.send_message(chat_id, str(current))
-                        self.state.block_suggestions()
+                    self.state.publications_manager.refresh()
+                    current = next(self.state.publications_manager)
+                    if current:
+                        suggestion = current["content"]
+                        if suggestion:
+                            self.state.llm_agent.conversation_id = current["publication_id"]
+                            self.bot.send_publication(chat_id, suggestion)
+                            self.state.block_suggestions()
                     else:
                         time.sleep(5 * 60)
                         logger.info(f"Suggestions are blocked")
@@ -610,17 +630,10 @@ class TeleLinkedinBot:
 
 
 def run():
+    logger.info("Starting bot script")
     with TeleLinkedinBot() as bot:
-        logger.info("Entered bot")
-        try:
-            bot.run()
-        except Exception as e:
-            logger.error("Error running bot: %s", e)
-            bot.bot.send_message(bot.state.get_chat_id(), "Error running bot: {}".format(e))
-            bot.state.reset()
-    logger.info("Exited bot")
+        bot.run()
 
 
 if __name__ == '__main__':
-    logger.info("Starting bot script")
     run()

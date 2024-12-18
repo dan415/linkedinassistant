@@ -1,29 +1,16 @@
-import json
-import logging
 import os
 from abc import ABC, abstractmethod
 import datetime
-from ast import literal_eval
-
 from enum import Enum
 from functools import wraps
-from typing import Optional, Callable
-
+from typing import Callable
 import numpy as np
+from src.core.config.manager import ConfigManager
+import src.core.utils.functions as F
 
-from src.utils.log_handler import TruncateByTimeHandler
-
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', "..", ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information", "sources", "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+logger = F.get_logger(dump_to=FILE)
+
 
 def get_information_source_from_value(string_value):
     """Get the information source from the string value."""
@@ -41,6 +28,7 @@ class InformationSource(Enum):
     MEDIUM = "medium"
     GOOGLE_NEWS = "google_news"
     MANUAL = "manual"
+    YOUTUBE = "youtube"
 
 
 def requires_valid_period(func):
@@ -50,7 +38,7 @@ def requires_valid_period(func):
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        self.reload_config(self.pwd)
+        self.reload_config()
         if self.period_datetime and  datetime.datetime.now() - datetime.timedelta(days=self.period) < self.period_datetime:
             logger.info("Period is not valid")
             self.period_datetime = datetime.datetime.now()
@@ -62,7 +50,7 @@ def requires_valid_period(func):
         self.update_count(1)
         result = func(self, *args, **kwargs)
 
-        self.save_config(self.pwd)
+        self.save_config()
         return result
 
     return wrapper
@@ -81,7 +69,9 @@ class ContentSearchEngine(ABC):
         self.limit = np.inf
         self.period_datetime = None
         self.config = None
-        self.api_key = None
+        self.pwd = None
+        self.config_client = ConfigManager()
+
 
     def update_count(self, value):
         """Update the count of requests."""
@@ -100,29 +90,17 @@ class ContentSearchEngine(ABC):
         """Filter the content."""
         return NotImplementedError
 
-    def reload_config(self, path=None):
+    def reload_config(self):
         """Reload the configuration from the config.json file."""
         logger.debug("Reloading config")
-        if path is None:
-            path = config_dir
-        with open(path) as f:
-            config = json.load(f)
-
+        config = self.config_client.load_config(f"information-sources-{self.information_source.value}")
         for key in config.keys():
-            if key in ["input_directory", "output_directory"]:
-                self.__setattr__(key, os.path.join(*config[key].split("/")))
             if key != "count_requests":
                 self.__setattr__(key, config[key])
 
-    def save_config(self, path=None):
-        logger.debug("Saving config")
-        if path is None:
-            path = config_dir
-        with open(path, "r") as f:
-            config = json.load(f)
-
+    def save_config(self):
+        config = self.config_client.load_config(f"information-sources-{self.information_source.value}")
         for key in config.keys():
             config[key] = getattr(self, key)
 
-        with open(path, "w") as f:
-            json.dump(config, f, default=str, indent=4)
+        self.config_client.save_config(f"information-sources-{self.information_source.value}", config)

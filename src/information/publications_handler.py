@@ -1,37 +1,25 @@
-import json
-import logging
 import os
-import time
-from src.llm.langchain_agent.langchainGPT import LangChainGPT
-from src.utils.log_handler import TruncateByTimeHandler
+import src.core.utils.functions as F
+from src.core.config.manager import ConfigManager
+from src.information.constants import *
+from src.information.publications import PublicationIterator
+from src.llm.conversation.agent import LangChainGPT
 
-PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', ".."))
-LOGGING_DIR = os.path.join(PROJECT_DIR, "logs") if os.name != 'nt' else os.path.join(r"C:\\", "ProgramData",
-                                                                                     "linkedin_assistant", "logs")
 FILE = os.path.basename(__file__)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = TruncateByTimeHandler(filename=os.path.join(LOGGING_DIR, f'{FILE}.log'), encoding='utf-8', mode='a+')
-handler.setLevel(logging.INFO)
-handler.setFormatter(logging.Formatter(f'%(asctime)s - %(name)s - {__name__} - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-config_dir = os.path.join(r"C:\\", "ProgramData", "linkedin_assistant", "information",
-                          "config.json") if os.name == 'nt' else os.path.join(PWD, "config.json")
+logger = F.get_logger(dump_to=FILE)
 
 
 class PublicationsHandler:
     """Class in charge of taking raw documents obtained from sources and outputting a publication draft"""
-
     def __init__(self):
-        self.publication_ideas_dir = "res/publication_ideas"
-        self.publications_pending_approval_directory = "res/pending_approval"
         self.active = True
-        self.process_sleep_time = 60 * 60 * 24
+        self.process_sleep_time = 1
         self.langchain_gpt = LangChainGPT()
-
-    def __call__(self):
+        self.config_schema = "information"
+        self.publications_collection = ""
+        self.config_client = ConfigManager()
         self.reload_config()
+        self.publications_manager = PublicationIterator(self.publications_collection, PublicationState.DRAFT)
 
     def run(self):
         """
@@ -45,42 +33,25 @@ class PublicationsHandler:
             else:
                 logger.info("Publications handler is not active")
             logger.info("Sleeping")
-            time.sleep(60 * 60 * 24 * self.process_sleep_time)
+            F.sleep(self.process_sleep_time)
 
     def process_publication_ideas(self):
-        self.__process_publication_ideas(os.path.join(os.path.join(*self.publication_ideas_dir.split("/"))))
-
-    def __process_publication_ideas(self, source_dir):
-        """
-        Iterates through the publication ideas on source_dir and gives them to langgpt in order to create a draft for
-        publication. Then saves them on pending publication directory
-        :param source_dir: directory where ideas need to be retrieved from
-
-        """
-        logger.info("Processing publication ideas")
-        for publication in os.listdir(source_dir):
-            logger.info("Processing publication %s", publication)
-            with open(os.path.join(source_dir, publication), "r") as f:
-                publication_dict = json.load(f)
-            if publication_dict:
-                response = self.langchain_gpt.call(publication_dict, "Please, write a post")
-                if response:
-                    try:
-                        self.langchain_gpt.save_memory(
-                            os.path.join(*self.publications_pending_approval_directory.split("/"),
-                                         f'{publication}.pkl'))
-                        os.remove(os.path.join(source_dir, publication))
-                    except Exception as e:
-                        logger.error("Error processing publication %s: %s", publication, e)
+        for publication in self.publications_manager:
+            content = self.langchain_gpt.produce_publication(publication)
+            self.publications_manager.update_content(
+                publication_id=publication["publication_id"],
+                content=content
+            )
+            self.publications_manager.update_state(
+                publication_id=publication["publication_id"],
+                state=PublicationState.PENDING_APPROVAL
+            )
 
     def reload_config(self):
         """Reload the configuration."""
         logger.debug("Reloading config")
-        with open(config_dir, "r") as f:
-            config = json.load(f)
+        config = self.config_client.load_config(self.config_schema)
         for key in config.keys():
-            if key in ["publication_ideas_dir", "publications_pending_approval_directory"]:
-                self.__setattr__(key, os.path.join(os.path.abspath("/"), *config[key].split("/")))
             self.__setattr__(key, config[key])
 
 
