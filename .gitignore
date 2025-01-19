@@ -5,7 +5,6 @@ __pycache__/
 build/
 dist/
 test
-res
 conda*
 *config.json
 logs

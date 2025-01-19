@@ -1,73 +1,67 @@
+import base64
 import io
-import os
 from abc import ABC, abstractmethod
-
-import PyPDF2
+import pypdf
 from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode, AcceleratorOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.io import DocumentStream
-
 import src.core.utils.functions as F
 from src.core.config.manager import ConfigManager
 
-FILE = os.path.basename(__file__)
-logger = F.get_logger(dump_to=FILE)
-
 
 class PDFExtractor(ABC):
-    """Extracts text from PDF files using PyPDF2."""
+    """Abstract base class for extracting text from PDF files."""
+
+    def __int__(self):
+        self.extracted_images = []
 
     @abstractmethod
     def extract(self, pdf_bytes):
-        """Extracts text from PDF file using PyPDF2.
-        
+        """Extracts text from a PDF file.
+
         :param pdf_bytes: PDF file content as bytes
         :return: Extracted text as string
         """
         pass
 
 
-class PyPDFE2xtractor(PDFExtractor):
+class PyPDFExtractor(PDFExtractor):
     """Extracts text from PDF files using PyPDF2."""
 
-    def __init__(self):
-        pass
-
     def extract(self, pdf_bytes):
-        """Extracts text from PDF file using PyPDF2.
+        """Extracts text from a PDF file using PyPDF2.
 
         :param pdf_bytes: PDF file content as bytes
         :return: Extracted text as string
         """
-        logger.info("Extracting text from PDF file using PyPDF2")
 
-        try:
-            pdf_file = io.BytesIO(pdf_bytes)
-            pdf_reader = PyPDF2.PdfReader(pdf_file)
+        pdf_file = io.BytesIO(pdf_bytes)
+        pdf_reader = pypdf.PdfReader(pdf_file)
 
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
-
-            return text
-
-        except Exception as e:
-            logger.error(f"Error extracting text from PDF: {str(e)}")
-            raise
+        text = "".join(page.extract_text() + "\n" for page in pdf_reader.pages)
+        return text
 
 
 class DoclingExtractor(PDFExtractor):
-    """Extracts text from PDF files using PyPDF2."""
+    """Extracts text from PDF files using Docling's DocumentConverter."""
 
     _CONFIG_SCHEMA = "docling"
 
     def __init__(self):
+        super().__init__()
         config_manager = ConfigManager()
         config = config_manager.load_config(self._CONFIG_SCHEMA)
-        table_former_mode = F.get_enum_from_value(config.pop("table_former_mode", "fast"), TableFormerMode)
 
+        table_former_mode = F.get_enum_from_value(
+            config.pop("table_former_mode", "fast"), TableFormerMode
+        )
+
+        accelerator_options = AcceleratorOptions(
+            **config.pop("accelerator_options", {})
+        )
         pipeline_options = PdfPipelineOptions(**config)
+        pipeline_options.accelerator_options = accelerator_options
         pipeline_options.table_structure_options.mode = table_former_mode
 
         self.doc_converter = DocumentConverter(
@@ -77,20 +71,21 @@ class DoclingExtractor(PDFExtractor):
         )
 
     def extract(self, pdf_bytes):
-        """Extracts text from PDF file using PyPDF2.
+        """Extracts text from a PDF file using Docling's DocumentConverter.
 
         :param pdf_bytes: PDF file content as bytes
         :return: Extracted text as string
         """
-        logger.info("Extracting text from PDF file using PyPDF2")
 
-        try:
-            result = self.doc_converter.convert(pdf_bytes)
-            return result.document.export_to_markdown()
-
-        except Exception as e:
-            logger.error(f"Error extracting text from PDF: {str(e)}")
-            raise
-
-
-
+        buf = io.BytesIO(pdf_bytes)
+        source = DocumentStream(name="tmp.pdf", stream=buf)
+        result = self.doc_converter.convert(source)
+        self.extracted_images = list(
+            map(
+                lambda x: base64.b64decode(x.image.uri.unicode_string().split(",")[1]),
+                filter(
+                    lambda y: len(y.captions) > 0,
+                    result.document.pictures)
+            )
+        )
+        return result.document.export_to_markdown()

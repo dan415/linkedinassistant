@@ -1,34 +1,39 @@
-import os
-
-from src.information.sources.arxiv.arxiv_searcher import ArxivSearchEngine
-from src.information.sources.information_source import InformationSource
-from src.information.sources.manual_pdfs.manual_pdfs import ManualSourceEngine
-from src.information.sources.rapid.medium.medium_searcher import MediumSearchEngine
-from src.information.sources.rapid.news.google_news_searcher import GoogleNewsInformationEngine
+from src.information.sources.arxiv import ArxivSearchEngine
+from src.information.sources.base import InformationSource
+from src.information.sources.manual_pdfs import ManualSourceEngine
+from src.information.sources.rapid.medium import MediumSearchEngine
+from src.information.sources.rapid.google_news import GoogleNewsInformationEngine
 from src.information.sources.rapid.youtube.retriever import YoutubeTranscriptRetriever
-import src.core.utils.functions as F
-
-FILE = os.path.basename(__file__)
-logger = F.get_logger(dump_to=FILE)
 
 
 class ContentSearchEngineProvider:
-    """Provides a content search engine. This is just a class that returns a search
-     engine for a given information source, just for abstraction purposes"""
+    """Provides a content search engine for different information sources.
+    This class abstracts the logic of instantiating the appropriate search engine
+    based on the given information source."""
+
+    SEARCH_ENGINE_MAP: dict[InformationSource, type] = {
+        InformationSource.ARXIV: ArxivSearchEngine,
+        InformationSource.MEDIUM: MediumSearchEngine,
+        InformationSource.GOOGLE_NEWS: GoogleNewsInformationEngine,
+        InformationSource.MANUAL: ManualSourceEngine,
+        InformationSource.YOUTUBE: YoutubeTranscriptRetriever,
+    }
 
     @classmethod
-    def get_content_search_engine(cls, information_source):
-        """Get a content search engine for the information source."""
-        logger.info("Getting content search engine for %s", information_source)
-        if information_source == InformationSource.ARXIV:
-            return ArxivSearchEngine(information_source)
-        elif information_source == InformationSource.MEDIUM:
-            return MediumSearchEngine(information_source)
-        elif information_source == InformationSource.GOOGLE_NEWS:
-            return GoogleNewsInformationEngine(information_source)
-        elif information_source == InformationSource.MANUAL:
-            return ManualSourceEngine(information_source)
-        elif information_source == InformationSource.YOUTUBE:
-            return YoutubeTranscriptRetriever(information_source)
-        else:
+    def get_content_search_engine(cls, information_source: InformationSource) -> object:
+        """Retrieve the appropriate content search engine for the specified information source.
+        Args:
+            information_source (InformationSource): Enum value representing the information source.
+
+        Returns:
+            An instance of the appropriate search engine class.
+
+        Raises:
+            ValueError: If the information source is not supported.
+        """
+        search_engine_class = cls.SEARCH_ENGINE_MAP.get(information_source)
+
+        if search_engine_class is None:
             raise ValueError(f"Information source {information_source} is not supported.")
+
+        return search_engine_class()

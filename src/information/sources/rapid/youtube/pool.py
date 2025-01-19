@@ -1,12 +1,12 @@
-import os
 import threading
 import datetime
-import src.core.utils.functions as F
-from src.core.database.mongo import MongoDBClient
-from src.information.constants import YOUTUBE_POOL_COLLECTION
 
-FILE = os.path.basename(__file__)
-logger = F.get_logger(dump_to=FILE)
+from pymongo import MongoClient
+from pymongo.synchronous.collection import Collection
+from pymongo.synchronous.database import Database
+from src.core.constants import SecretKeys, YOUTUBE_COLLECTION
+from src.core.utils.logging import ServiceLogger
+from src.core.vault.hashicorp import VaultClient
 
 
 class YoutubeUrlPool:
@@ -24,10 +24,13 @@ class YoutubeUrlPool:
             return cls._instance
 
     def __init__(self):
+        self.logger = ServiceLogger(__name__)
         if self._initialized:
             return
-
-        self.client = MongoDBClient(collection_name=YOUTUBE_POOL_COLLECTION)
+        vault_client = VaultClient()
+        client: MongoClient = MongoClient(vault_client.get_secret(SecretKeys.MONGO_URI))
+        self.db: Database = client.get_database(vault_client.get_secret(SecretKeys.MONGO_DATABASE))
+        self.client: Collection = self.db[YOUTUBE_COLLECTION]
         self.mutex = threading.Lock()
         self._initialized = True
 
@@ -36,14 +39,18 @@ class YoutubeUrlPool:
         with self.mutex:
             # Check if URL already exists
             if not self.client.find_one({"url": url}):
+                self.logger.info(f"Inserting url {url}")
                 self.client.insert_one({
                     "url": url,
                     "timestamp": datetime.datetime.utcnow()
                 })
+            else:
+                self.logger.info(f"Url {url} already exists in database")
 
     def release(self, url):
         """Remove a URL from the pool"""
         with self.mutex:
+            self.logger.info(f"Deleting URL {url}")
             self.client.delete_one({"url": url})
 
     def get_next_url(self):
@@ -52,7 +59,9 @@ class YoutubeUrlPool:
             url_doc = self.client.find_one(
                 sort=[("timestamp", 1)]  # 1 for ascending order
             )
-            return url_doc["url"] if url_doc else None
+            res = url_doc["url"] if url_doc else None
+            self.logger.debug(f"Getting next url with result: {res}")
+            return res
 
     def has_urls(self):
         """Check if there are URLs to process"""

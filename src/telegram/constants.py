@@ -1,33 +1,9 @@
 """Constants for the Telegram bot module."""
-import os
 
 # Configuration
 CONFIG_SCHEMA = "telegram"
-MAX_RETRIES = 5
-
 NGROK_ADDRESS = "localhost:5000"
 NGROK_PROTOCOL = "http"
-
-# Bot Commands
-CMD_START = "start"
-CMD_HEALTHCHECK = "healthcheck"
-CMD_ALLOW = "allow"
-CMD_STOP = "stop"
-CMD_CONVERSE = "converse"
-CMD_ASSIST = "assist"
-CMD_CLEAR = "clear"
-CMD_UPDATE = "update"
-CMD_LIST = "list"
-CMD_SELECT = "select"
-CMD_PREVIOUS = "previous"
-CMD_NEXT = "next"
-CMD_GENERATE_IMAGE = "generate_image"
-CMD_CLEAR_IMAGE = "clear_image"
-CMD_CURRENT = "current"
-CMD_PUBLISH = "publish"
-CMD_UPLOAD_PDF = "upload_pdf"
-CMD_ADD_YOUTUBE = "add_youtube"
-CMD_CHANGE_IMAGE = "change_image"
 
 # Bot Messages
 MSG_START = "Bot started. Chat ID: {}"
@@ -50,4 +26,24 @@ MSG_YOUTUBE_ADDED = "YouTube URL added to pool"
 MSG_INVALID_URL = "Invalid YouTube URL"
 MSG_IMAGE_GENERATING = "Generating image..."
 MSG_IMAGE_CLEARED = "Image cleared"
+MSG_CONV_ID_NOT_SET = "Conversation ID must be set"
+MSG_IMAGE_NOT_PASSED = "In order to set an image you need to pass an image in the message"
 MSG_PROVIDE_INSTRUCTIONS = "Please provide instructions for the image change"
+MSG_COMMAND_NOT_FOUND = "Command not found"
+MSG_SEARCH_ENGINE_ACTIVATED = "Search engine activated successfully"
+MSG_SEARCH_ENGINE_ACTIVATED_ERR = "Search engine could not be activated"
+MSG_SEARCH_ENGINE_STOPPED = "Search engine stopped successfully"
+MSG_SEARCH_ENGINE_STOPPED_ERR = "Search engine could not be stopped"
+MSG_NO_IMAGES_FOR_PUBLICATION = "There are no images for this publication"
+MSG_ERROR = "Something went wrong, try later :("
+MSG_FILE_RECEIVED_SUCCESS = "File received successfully!"
+MSG_IMAGE_RECEIVED_SUCCESS = "Image updated successfully"
+MSG_ERROR_YOUTUBE = 'Error processing YouTube URL. Please try again.'
+MSG_ERROR_COMMAND_BIND = 'Command failed to bind arguments!'
+MSG_ERROR_LOADING_SUGGESTION = "Error loading next suggestion"
+MSG_SAME_SUGGESTION_SELECTED = "You selected the same suggestion"
+MSG_ERROR_SELECTING_SUGGESTION = "Error selecting suggestion"
+MSG_ERROR_SENDING = "Error sending suggestion: {}"
+MSG_ERROR_PUBLISH = "Failed to publish: {}"
+MSG_ERROR_CLEAR = "Error clearing publication: {}"
+MSG_ERROR_COMMAND = "Error in command: {}"

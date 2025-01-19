@@ -1,28 +1,39 @@
-site_name: Deliverables AI Open Science
-site_url: https://hrl_taxi2people.readthedocs.io/
-site_description:
+site_name: LinkedIn Assistant
+site_url: https://linkedin_assistant.readthedocs.io/
 
 theme:
     name: readthedocs
 use_directory_urls: false
 nav:
   - Home: README.md
-  - General:
-      - Installation: README.md
-      - Rationale: rationale.md
-  - 2 People Taxi Environment: custom/rationale.md
-  - QLearning:
-      - 1 Person: experiments/qlearning/1person/rationale.md
-      - 2 Person: experiments/qlearning/2people/rationale.md
-  - HRL:
-      - 1 Person:
-          - 2 Navigation Options: experiments/hrl/1person/2navoptions/rationale.md
-          - 4 Navigation Options: experiments/hrl/1person/4navoptions/rationale.md
-      - 2 People:
-          - 2 Navigation Options: experiments/hrl/2people/2navoptions/rationale.md
-          - 4 Navigation Options: experiments/hrl/2people/4navoptions/rationale.md
+  - Release Notes: release_notes/rationale.md
+  - Core Components:
+      - LLMs:
+          - Conversations Agent: core/llm/conversation/rationale.md
+          - Model Providers: core/llm/model_providers/rationale.md
+          - Retrieval Workflow: core/llm/retrieval/rationale.md
+      - PDF Module: core/pdf/rationale.md
+      - Publications: core/publications/rationale.md
+  - Information Components:
+      - About: information/rationale.md
+      - Content Searcher: information/searcher/rationale.md
+      - Publications Producer: information/producer/rationale.md
+      - Sources:
+        - Arxiv: information/sources/arxiv/rationale.md
+        - Manual PDF Input: information/sources/manual_pdfs/rationale.md
+        - Rapid:
+          - About: information/sources/rapid/rationale.md
+          - Google News: information/sources/rapid/google_news/rationale.md
+          - Medium: information/sources/rapid/medium/rationale.md
+          - YouTube: information/sources/rapid/youtube/rationale.md
+  - Telegram Bot: telegram/rationale.md
+  - LinkedIn: linkedin/rationale.md
+  - Windows Service: windows/rationale.md
+  - Main Component: main/rationale.md
+  - Next Steps: todo/rationale.md
   - About : LICENSE
 
 extra:
   author: Daniel Cabrera
   email: danicr2515@gmail.com
+  github: dan415

@@ -1,92 +1,132 @@
+# LinkedIn Gen AI Driven Posting Creator Assistant
 
-<h1>Linkedin GPT-based Posting Creator Assistant</h1>
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10578028.svg)](https://doi.org/10.5281/zenodo.10578028)
+[![readthedocs](https://readthedocs.org/projects/linkedinassistant/badge/?version=latest)](https://linkedinassistant.readthedocs.io/en/latest/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-I created this project because I wanted to create posts about cool articles and
-papers that would come up every week, but did not have the time for it. So I decided
-review them and post them.
-to create a program that would generate the posts for me, and I would only need to
-
-The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
-LLM model. All design decisions are based on the idea that this program is meant to be run as a Windows service locally.
-That's why all agents constantly update their status on a local file (so that if the laptop turns off abruptly, the status
-is not lost). As of now, I still need to implement the behaviour for the stop signal though.
+This project was created to simplify the process of sharing posts about fascinating articles and papers that surface every week. The program generates drafts for these posts, allowing the user to focus only on reviewing and publishing.
 
 
-This program is comprised of 7 main components:
-- Information Searching: This component is in charge of searching for information on the internet. It is based on the
-  Google Search API, and it is implemented in the `searcher.py` file. It is a simple class that receives a query and
-  returns a list of results. It is meant to be used by the `search_agent.py` agent.
-- Telegram Bot: This component is in charge of communicating with the Telegram Bot API. It is implemented in the
-  `telegram_bot.py` file. It is a simple class that receives a message and sends it to the Telegram Bot API. It is meant
-  to be used by the `telegram_agent.py` agent.
-- Linkedn Component: This component is in charge of generating the posts. It is implemented in the `posting.py` file. It
-  is a simple class that receives a query and returns a list of results. It is meant to be used by the `posting_agent.py`
-  agent.
-- LLM Component: This component is in charge of generating the posts. It is implemented in the `llm.py` file. It is a
-  simple class that receives a query and returns a list of results. It is meant to be used by the `llm_agent.py` agent.
-- Windows Service: This component is in charge of running the program as a Windows service. It is implemented in the
-  `service.py` file. It is a simple class that receives a query and returns a list of results. It is meant to be used by
-  the `service_agent.py` agent.
-- Main: This component is in charge of running the program. It is implemented in the `main.py` file. It is a simple class
-  that receives a query and returns a list of results. It is meant to be used by the `main_agent.py` agent.
+write the md to import an image
 
-<h2>Installation</h2>
+![LinkedIn Assistant](./docs/linkedin_assistant.svg)
 
-In order to install the program, you need to do the following:
+## Components Overview
 
-- ### Install the dependencies
+This program comprises the following components:
+- **Core**: Implements shared utilities like configuration management and Vault secrets handling.
+- **Information**: Handles raw information scraping and generates initial publication drafts.
+- **Telegram**: Acts as the user interface via a Telegram bot.
+- **LinkedIn**: Manages LinkedIn API interactions and OAuth server functionalities.
 
-in conda:
+---
 
-```bash
-  conda env create -f environment.yml
+## Installation
+
+---
+
+### Step 1: Set Up HashiCorp Secrets Vault
+
+#### Step 1: Set Up HCP Account
+1. **Sign Up/Login**: Visit the [HashiCorp Cloud Platform](https://cloud.hashicorp.com/) and log in or create an account.
+2. **Billing**: Add billing details.
+
+
+#### Step 2: Create an HCP Organization
+1. Navigate to **Organizations** and create one.
+2. Save the **Organization Name** as `HCP_ORGANIZATION`.
+
+
+#### Step 3: Create an HCP Project
+1. In your organization, navigate to **Projects** and create one.
+2. Save the **Project Name** as `HCP_PROJECT`.
+
+
+#### Step 4: Set Up HCP Vault
+1. Go to **HashiCorp Vault** and create a Vault cluster.
+2. Save the cluster details.
+
+
+#### Step 5: Create an Application in HCP Vault
+1. Go to **Access Control** and create an application. Save the **App Name** as `HCP_APP`.
+2. Generate a **Client ID** and **Client Secret**, saving them as `HCP_CLIENT_ID` and `HCP_CLIENT_SECRET`.
+
+
+#### Environment Variables
+Create a `.env` file at the root project level:
+```
+HCP_ORGANIZATION=your_organization
+HCP_PROJECT=your_project
+HCP_APP=your_app
+HCP_CLIENT_ID=your_client_id
+HCP_CLIENT_SECRET=your_client_secret
 ```
 
-- ### Create a Telegram Bot and get the API key. 
-  - Step 1. Open the Telegram app on your computer/phone
-  To create a Telegram bot, you'll need to have the Telegram app installed on your computer. If you don't have it already, you can download it from the Telegram website.
-  - Step 2. Connect to BotFather
-    BotFather is a bot created by Telegram that allows you to create and manage your own bots. To connect to BotFather, search for "@BotFather" in the Telegram app and click on the result to start a conversation.
-  - Step 3. Select the New Bot option
-    In the conversation with BotFather, select the "New Bot" option to start creating your new bot. BotFather will guide you through the rest of the process.
-  - Step 4. Add a bot name
-  Next, BotFather will ask you to provide a name for your bot. Choose a name that accurately reflects the purpose of your bot and is easy to remember.
-  - Step 5. Choose a username for your bot
-  - Step 6. BotFather will ask you to choose a username for your bot. This username will be used to create a unique URL that people can use to access your bot. Choose a username that is easy to remember and related to your bot's purpose.
+*Note: This environment variables will only be needed up until installation is completed. After that, they will have 
+been loaded into the system's keyring or into Dockerized environment*
 
-At the end of the process, you should have given a bot token by @botFather. You need to save that information, and other information such as the bot name that you chose on
-the Telegram Bot config file on ./telegram/config.json:
+---
+
+### Step 2: Set Up MongoDB Atlas
+
+#### Step 1: Create a MongoDB Atlas Account
+1. Visit [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up.
+2. Deploy a free M0 Sandbox cluster.
+3. Obtain the connection string and save it as `MONGO_URI`.
+
+All necessary collections and documents will be created at start time. Necessary configs reside inside 
+*res/json/default_configs.json*.
+
+---
+
+### Step 3: Set Up Backblaze B2 File Storage
+
+1. Sign up at [Backblaze](https://www.backblaze.com/).
+2. Create a B2 Cloud Storage bucket named `linkedin-assistant`.
+3. Generate application keys and save them as `BLACBLAZE_API_KEY` and `BLACBLAZE_KEY_ID`.
+
+---
+
+### Step 4: Set Up Telegram Bot
+
+1. Connect to [BotFather](https://t.me/BotFather).
+2. Create a bot and save the token as `TELEGRAM_BOT_TOKEN`.
+3. Store the bot configuration in MongoDB:
+
 
 ```json
-    
 {
-    "bot_name": "@whatever_bot_username",
-    "name": "Your_Bot_Name(what appears on top)",
-    "token": "Token given by BotFather"
+  "bot_name": "@your_bot_username",
+  "name": "Your Bot Name",
+  "token": "your_bot_token"
 }
-    
 ```
 
-- ### Configure Ngrok to have a persistant domain
+---
 
-  Create an account on Ngrok
-    - Step 1. On https://dashboard.ngrok.com/get-started/setup/windows, copy the authtoken and paste
-      it onto the the Telegram Bot config file. same as before, on ./telegram/config.json:
-    - Step 2: Go to "Domains" on the left menu, and create a new domain.
-    - Step 3: Copy the domain name and token that you generated and paste it into the Telegram Bot config file. same as before, on ./telegram/config.json:
+### Step 5: Configure LinkedIn API
 
-        ```json
-            
-        {
-          "ngrok_token": "Token given by Ngrok",
-          "domain": "Domain given by Ngrok"
-        }
-            
-        ```
+  - Step 1: Go to Linkedin Developers: https://www.linkedin.com/developers/login and login with your Linkedin account.
+  - Step 2. Go to "My Apps" and click on "Create App"
+  - Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.
+  - Step 4: On you newly created app, go to Auth. 
+  - Step 5: Save these in your Vault as `LINKEDIN_CLIENT_ID` and `LINKEDIN_CLIENT_SECRET`.
+  - Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
+    - openid
+    - email
+    - w_member_social
+    - profile
+  - Step 6: Copy the persistant URL that we generated before with Ngrok without the HTTP schema and set it in your vault as `NGROK_DOMAIN`
+  - Step 8. Go to the Products Tab, and request access for the following products:
+    - Share on Linkedin
+    - Sign In with LinkedIn using OpenID Connect
+    
+  After this, if you did not have the necessasry OAuth 2.0 Scope permissions, you should have them now.
+  - Step 9. Go to the Team Members Tab, and make sure you appear as Team member. If you do not, add yourself as a team member.
 
-Keep in mind that with the free version you can only have one domain.
+---
 
-- ### Configure you RapidAPI sources
+### Step 6: Set Up Rapid API (Optional, if want to use Rapid API sources)
 
   Create an account on RapidAPI: 
     - Step 1. Go to https://rapidapi.com/ and search for the following APIs:
@@ -95,116 +135,81 @@ Keep in mind that with the free version you can only have one domain.
     Go to https://rapidapi.com/nishujain199719-vgIfuFHZxVZ/api/medium2 and click on subscribe.
     - Step 3. Subscribe to the Google API:
     Go to https://rapidapi.com/rphrp1985/api/google-api31/ and click on subscribe.
-    - Step 4. Copy the key that it shows after subscribing to the API on the API Key Header, ans paste into the config.json inside ./information/sources/rapid/news/config.json and ./information/sources/rapid/medium/config.json:
+    - Step 4: Subscribe to Youtube Transcribe API: 
+      Go to https://rapidapi.com/ and click subscribe
+    - Step 5. Copy the key that it shows after subscribing to the API on the API Key Header, and set it in you vault 
+      as `RAPID_API_KEY`
 
-        ```json
-            
-        {
-          "api_key": "Key given by RapidAPI"
-        }
-            
-        ```
-
-- ### Configure your Adobe PDF API
-
-  Create an account on Adobe PDF
-    - Step 1. Go to the Adobe Developer Console at https://developer.adobe.com/console/home 
-    - Step 2. Click on "Create Project"
-    - Step 2. Click on add API
-    - Step 3. Select the "Adobe PDF Services API"
-    - Step 4. Select OAuth Server to Server as the authentication method
-    - Step 5. Check the Adobe PDF Services box
-    - Step 6. Once created, you should see an OAuth API Key, and a button to generate an access token. Click on the credential. Now you should also 
-  see an Organization ID at the bottom
-    - Step 7. Click on generate access token, 
-    - Step 9. Copy  OAuth API Key, Organization ID and the Access Token into the config.json inside ./pdf/config.json:
-
-        ```json
-            
-        {
-          "client_id": "OAuth API Key given by Adobe",
-          "client_secret": "Access Token given by Adobe",
-          "service_principal_credentials": {
-            "organization_id": "Organization ID given by Adobe"
-           }
-        }
-            
-        ```
-
-- ### Create you LinkedIn page and get the API key
+---
   
-  - Step 1. Go to Linkedin Developers: https://www.linkedin.com/developers/login and login with your Linkedin account.
-  - Step 2. Go to "My Apps" and click on "Create App"
-  - Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.
-  - Step 4: On you newly created app, go to Auth. 
-  - Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.
-
-        ```json
-            
-        {
-          "client_id": "Client ID given by Linkedin",
-          "client_secret": "Client Secret given by Linkedin"
-        }
-            
-        ```
-  - Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
-    - openid
-    - email
-    - w_member_social
-    - profile
-  
-  - Step 7: Copy the persistant URL that we generated before with Ngrok, and paste it into the Authorized Redirect URLs section, adding /callback at the end:
-    https://whatever_domain_you_generated/callback
-  - Step 8. Go to the Products Tab, and request access for the following products:
-    - Share on Linkedin
-    - Sign In with LinkedIn using OpenID Connect
-  After this, if you did not have the necessasry OAuth 2.0 Scope permissions, you should have them now.
-  - Step 9. Go to the Team Members Tab, and make sure you appear as Team member. If you do not, add yourself as a team member.
+### Step 8: Obtain Youtube API Key from Google Cloud Platform (Optional, if want to use Youtube as source)
 
 
-- ### Configure your OpenAI API
+#### Step 1: Set Up a Google Cloud Project
+- Log in to Google Cloud Console
+- Go to Google Cloud Console.
 
-    Create an account on OpenAI
-    - Step 1. Go to https://beta.openai.com/ and login with your OpenAI account.
-      - Step 2. Go to "My Account" and copy your API key.
-        - Step 3. Paste your API key into the ./llm/langchain_agent/config.json file
+- Create a New Project
 
-          ```json
-                
-                   {
-                    "environment": {
-                      "OPENAI_API_KEY": "apikey"
-                    }
-                  }
-                
-          ```
+- Click on the "Select a project" dropdown in the top navigation bar.
+- Click New Project.
+- Enter a Project Name, choose your Billing Account (if prompted), and click Create.
 
-      - Step 5. If instead of using the OpenAI API, you want to use the OpenAI, you are accessing OpenAI through service, like Azure, you also need to add some more information:
-           ```json
-                
-               {
-                "environment": {
-                  "OPENAI_API_KEY": "apikey",
-                  "OPENAI_API_TYPE": "type: for example azure",
-                  "OPENAI_API_VERSION": "version: for example: 2023-09-15-preview",
-                  "OPENAI_API_BASE": "your api base endpoint"
-                }
-        }
-            
-                
-         ```
-      - Step 6. Configure the OpenAI parameters. If using the OpenAI APIl only the model_name is necesssary. If using it from Open AI studio, you need to add the deployment_id as well.
-      ```json
-           {
-              "openai_configs": {
-                 "deployment_id": "",
-                 "model_name": "gpt-4",
-                 "max_tokens": 8192
-               }
-           }
-       ```
-      
-- ### Install C++ Build Tools from Visual Studio
+#### Step 2: Enable YouTube Data API v3
+- Navigate to the APIs & Services Dashboard
+- In the left-hand menu, click APIs & Services > Library.
+- Search for YouTube Data API v3
+
+- In the search bar, type YouTube Data API v3.
+- Click on the API from the search results.
+- Enable the API
+
+- Click the Enable button to activate the YouTube Data API for your project.
+
+#### Step 3: Create API Credentials
+- Go to the Credentials Page
+- In the left-hand menu, click APIs & Services > Credentials.
+- Click "Create Credentials"
+- In the top toolbar, click the "Create Credentials" button.
+- Select API Key from the dropdown.
+- Copy the API Key
+
+- After creation, a pop-up will display your new API key.
+- Click the Copy icon and save the key somewhere secure.
+
+#### Step 4: Restrict Your API Key (Optional)
+
+- To ensure security, restrict how and where your API key can be used:
+- Edit API Key Restrictions
+- On the Credentials page, click the Edit icon next to your API key.
+- Set Application Restrictions
+- Under Application restrictions, select HTTP referrers (web sites).
+- Add the URL of your website or application.
+- Set API Restrictions
+- Under API restrictions, select Restrict key.
+- Select the YouTube Data API v3 from the dropdown.
+- Click Save.
+
+---
+
+### Step 9: Set up desired LLM providers
+
+Available supported providers are:
+
+- OpenAI
+- Groq
+- Google Gen AI
+- Deepseek
+
+You can obtain the API keys for these providers and set them in your Vault as `OPENAI_API_KEY`,
+`GROQ_API_KEY`, `GOOGLE_GEN_AI_API_KEY`, and `DEEPSEEK_API_KEY` respectively.
+
+**Note: OpenAI is the only image model provider available at the moment. Therefore, it is mandatory to set the `OPENAI_API_KEY` in your Vault,
+if you want to use the image generation tool**.
+
+---
+
+### Step 10: Install C++ Build Tools from Visual Studio (Only if installing as Windows Service)
 
 Torch requires C++ Build Tools from Visual Studio to be installed.
 
@@ -217,93 +222,50 @@ For this you can:
 
 For my architecture and Windows SDK version (gets installed with the C++ Build Tools) I ran `\"Program Files"\"Microsoft Visual Studio"\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat X64 10.0.22621.0`
 
-- ### Install the Windows Service
 
-  Activate the environment:
+--- 
 
-Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on this session:
+### Step 11: Install the service
 
-  If using conda: 
+If using Windows:
 
-  ```bash
-    conda activate linkedinassistant
-   ```
+---
 
-Now, run the script `configurate.cmd` to configure the service.
-This will create a data folder in `C:ProgramData/LinkedinAssistant` and copy the config files there.
-You need to go back to the root folder of the project, and run the script:
-```bash
-  cd .. 
-  configurate.cmd
- ```
+1. Open root project folder on CMD Terminal with Admin Privileges and run
+2. Run .\install.bat  (If you want to rebuild the EXE file run with argument --rebuild)
 
-When you run this program as a Windows Service, all logs and config files will be stored in `C:ProgramData/LinkedinAssistant` folder.
+The program will ask for your user password in order to install the service with your account (It will not validate
+it but installation will fail at the end if incorrectly provided)
 
-Then, you need to create the EXE file with pyinstaller:
-Some popup error might appear, as long as it is related to torchvison or torchaudio, it is controlled and will be fine, just accept them and let it continue.    
+---
+
+
+If using Unix, on terminal, run:
 
 ```bash
-pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
-  ```
-
-This will create the necessary EXE and dependencies in `dist` folder. 
-
-
-After that: 
-
-
-```bash
-  .\dist\service\service.exe install
-  ```
-
-If this works, you have done everything correctly.
-
-
-Optionally, you can set the service to start automatically when the computer starts:
-
-```bash
-  sc config linkedin_assistant start=delayed-auto
+sudo ./install.sh
 ```
 
-
-Finally, start the service:
-
-```bash
- .\dist\service\service.exe start
-```
+---
 
 
-<h2> Author </h2>
-Daniel Cabrera Rodríguez
+## Author
+**Daniel Cabrera Rodríguez**
 
-Github: @dan415
+- **GitHub**: [@dan415](https://github.com/dan415)
+- **Email**: danicr2515@gmail.com
 
-Email: danicr2515@gmail.com
+Feel free to reach out with questions or suggestions!
 
-Please, do not hesitate to contact if you have any questions or suggestions.
+---
 
+## License
 
-<h2> License </h2>
+MIT License © 2024 Daniel Cabrera Rodríguez
 
-MIT License
-Copyright (c) 2024 Daniel Cabrera Rodriguez
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-Permission is hereby granted, free of charge, to any person obtaining 
-a copy of this software and associated documentation files (the "Software"), 
-to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-The above copyright notice and this permission notice shall be 
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR 
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 

@@ -16,13 +16,13 @@ The authentication process is as follows:
 4. After the user logs in, LinkedIn redirects the user back to the application, with the access token as a parameter at "/callback".
 5. The Callback saves the access token in the LinkedIn config file, and then the user can finally prompt to publish again, this time succesfully.
 
+The LinkedIn publisher class manages the LinkedIn API in order to publish posts. Posts can now contain an image. 
+For this, we first need to register the image as an asset, upload the asset, and use the asset resource identification to include it 
+in the post as an image.
+
+
 <h3> Configuration </h3>
 
-The configuration file is located in the `information/sources/linkedin` folder, and is named `config.json`. It contains the following parameters:
+The configuration file must be contained inside the `config` collection with the field `config_name`: `"linkedin"`. It contains the following parameters:
 
-* `client_id`: The client ID of the application. This is used to authenticate the user with LinkedIn.
-* `client_secret`: The client secret of the application. This is used to authenticate the user with LinkedIn.
-* `redirect_uri`: The redirect URI of the application. This is used to authenticate the user with LinkedIn.
-* `access_token`: The access token of the user. This is used to authenticate the user with LinkedIn.
-* `linkedin_id`: The LinkedIn ID of the page to post to. This is used to authenticate the user with LinkedIn.
 * `footer`: The footer to add to the post. This is used to add a footer to the post. I use it to specify that the post was posted automatically by an AI

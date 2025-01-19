@@ -1,72 +1,50 @@
-import logging
-import os
-import sys
-import time
+import base64
 from enum import Enum
-from typing import Type
-
-from src.core.constants import LOGGING_DIR, DEBUG
-from src.core.utils.logging import TruncateByTimeHandler
+from typing import Type, Optional, Any
+import requests
 
 
-def get_enum_from_value(value: str, enum_class: Type[Enum]) -> Enum:
+def get_enum_from_value(value: Any, enum_class: Type[Enum]) -> Enum:
+    """
+    Function that given the value of an enum object and the enum class. It gets you the actual enum object
+    :param value: Value that wants to get matched against an enum class
+    :param enum_class: Enum class
+
+    :return: Enum. The Enum object
+    """
     for member in enum_class:
         if member.value == value:
             return member
     raise ValueError(f"No matching enum for value: {value}")
 
-def sleep(days):
+
+def get_base64_from_url(url: str):
     """
-    Sleeps for the given number of days.
+    Fetches the content from a URL and returns its Base64-encoded bytes.
 
-    Args:
-        days (int): The number of days to sleep.
+    :param: url (str): The URL to fetch the content from.
+
+    :returns: str: Base64-encoded string of the content.
     """
-    for _ in range(24 * days):
-        time.sleep(60 * 60)
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raise an error for HTTP issues
+        base64_encoded = base64.b64encode(response.content).decode('utf-8')
+        return base64_encoded
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching URL: {e}")
+        return None
 
 
-def get_logger(dump_to: str = None):
-    logger = logging.getLogger(__name__)
-
-    if logger.hasHandlers():
-        if not DEBUG:
-            logger.handlers.clear()
-        else:
-            return logger
-
-    if not DEBUG and dump_to:
-        logger.setLevel(logging.INFO)
-        handler = logging.FileHandler(
-            filename=os.path.join(LOGGING_DIR, f'{dump_to}.log'),
-            encoding='utf-8',
-            mode='a+'
-        )
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(
-            logging.Formatter('%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s'))
-        logger.addHandler(handler)
-    else:
-        logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.DEBUG)
-        handler.setFormatter(
-            logging.Formatter('%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s'))
-        logger.addHandler(handler)
-
-    return logger
-
-
-def is_function(function_name, obj=None):
+def is_function(function_name: str, obj: Optional[object] = None) -> bool:
     """
     Checks if a function exists in the global scope or within a given object.
 
-    Parameters:
-        function_name (str): The name of the function to check.
-        obj (optional): The object (class or instance) to search for the function.
+    :param: function_name (str): The name of the function to check.
+    :param: obj (optional): The object (class or instance) to search for the function.
 
-    Returns:
-        bool: True if the function exists and is callable, False otherwise.
+    :returns: bool: True if the function exists and is callable, False otherwise.
     """
 
     return (function_name in globals() and callable(globals()[function_name])) or (
@@ -74,19 +52,16 @@ def is_function(function_name, obj=None):
     )
 
 
-def get_function_by_name(function_name, obj=None):
+def get_function_by_name(function_name: str, obj: Optional[object] = None) -> object:
     """
     Retrieves a function by name from the global scope or within a given object.
 
-    Parameters:
-        function_name (str): The name of the function to retrieve.
-        obj (optional): The object (class or instance) to search for the function.
+    :param: function_name (str): The name of the function to retrieve.
+    :param: obj (optional): The object (class or instance) to search for the function.
 
-    Returns:
-        function: The callable function object if found.
+    :returns: function: The callable function object if found.
 
-    Raises:
-        ValueError: If the function is not found or is not callable.
+    :raise: ValueError: If the function is not found or is not callable.
     """
 
     if function_name in globals() and callable(globals()[function_name]):
@@ -96,19 +71,17 @@ def get_function_by_name(function_name, obj=None):
     raise ValueError(f"Function '{function_name}' is not defined or not callable in the given object.")
 
 
-def boldify_unicode(text):
+def boldify_unicode(text: str) -> str:
     """
     Converts text enclosed within `**` to Unicode bold characters.
 
-    Args:
-        text (str): The input string containing text enclosed within `**`.
+    :param: text (str): The input string containing text enclosed within `**`.
 
-    Returns:
-        str: The input string with text within `**` converted to Unicode bold characters.
+    :returns: str: The input string with text within `**` converted to Unicode bold characters.
     """
     import re
 
-    def to_unicode_bold(s):
+    def to_unicode_bold(s: str) -> str:
         bold_chars = {
             'a': '\U0001d41a', 'b': '\U0001d41b', 'c': '\U0001d41c', 'd': '\U0001d41d', 'e': '\U0001d41e',
             'f': '\U0001d41f', 'g': '\U0001d420', 'h': '\U0001d421', 'i': '\U0001d422', 'j': '\U0001d423',
@@ -127,8 +100,7 @@ def boldify_unicode(text):
         }
         return ''.join(bold_chars.get(char, char) for char in s)
 
-    def replacer(match):
+    def replacer(match: re.Match) -> str:
         return to_unicode_bold(match.group(1))
 
     return re.sub(r'\*\*(.*?)\*\*', replacer, text)
-
