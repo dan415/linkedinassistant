@@ -55,6 +55,7 @@ class MediumSearchEngine(RapidSource):
             result["published_at"] = tmp_res.get("published_at", "")
             result["subtitle"] = tmp_res.get("subtitle", "")
             result["author"] = self.get_author(tmp_res.get("author", ""))
+            result["url"] = tmp_res.get("url", "")
         except Exception as e:
             self.logger.error(e)
             return result
