@@ -362,7 +362,7 @@ class BotsCommands:
     Commands take the form /command_name, where command_name is the name of the actual method that will be called.
 
     """
-
+    _MAX_LISTABLE = 40
     _COMMAND_DESCRIPTIONS = {
         "start": "Start the bot and initialize interaction.",
         "healthcheck": "Check if the bot is operational.",
@@ -492,19 +492,25 @@ class BotsCommands:
         :return: None
         """
         logger.info("List triggered")
-
-        lista = list(
-            map(
-                lambda element: f"{element[0]}: {element[1].get('title', '')}",
-                self.state.publications_manager.list(),
-            )
-        )
-        if len(lista) > 0:
-            logger.info("Suggestions:\n\n%s", "\n".join(lista))
+        lista = [
+                    f"{element[0]}: {element[1].get('title', '')}"
+                    for element in self.state.publications_manager.list()
+                    if element[1].get('title', '')
+                ]
+        cant_show_all = len(lista) > self._MAX_LISTABLE
+        lista_shortened = lista[:min(self._MAX_LISTABLE, len(lista))]
+        if len(lista_shortened) > 0:
+            logger.info("Suggestions:\n\n%s", "\n".join(lista_shortened))
             self.bot.send_message(
                 self.state.chat_id,
-                "Suggestions:\n\n{}".format("\n".join(lista)),
+                "Suggestions:\n\n{}".format("\n".join(lista_shortened)),
             )
+            if cant_show_all:
+                self.bot.send_message(
+                    self.state.chat_id,
+                    f"Showing only the first {self._MAX_LISTABLE} suggestions. "
+                    f"There's actually {len(lista)} suggestions.",
+                )
         else:
             logger.info("No suggestions to be listed")
             self.bot.send_message(self.state.chat_id, MSG_NO_SUGGESTIONS)
