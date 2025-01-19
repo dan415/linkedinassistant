@@ -47,23 +47,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,31 +94,15 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../telegram/rationale.html">Telegram Bot</a>
                 </li>
               </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../linkedin/rationale.html">LinkedIn</a>
+                </li>
+              </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">Windows Service</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Windows Service</a>
                 </li>
               </ul>
               <ul>
@@ -135,14 +142,22 @@
               
                 <h2> Windows Service </h2>
 
-<p>This module contains the code that is used to run the application as a Windows service. It uses the
-code on the main module to run the different services, and it also contains the code that is used
-to install the service, and to respond to the different signals that are sent to the service.</p>
+<p>The LinkedinAssistantService class is designed to run the LinkedIn Assistant as a Windows Service.</p>
+<p>This service ensures that the LinkedIn Assistant runs continuously in the background and 
+can be managed by the Windows Service Manager. 
+It includes methods for initializing the service, 
+handling accepted controls, 
+and running the service in a threaded environment. 
+The service can automatically restart on failure and perform cleanup operations when stopped.</p>
+<p>Basically, the service is a wrapper around the LinkedIn Assistant main module.</p>
+<p>This service is meant to be installed and executed as the user's account, and not with local system account, 
+as it requires accessing Windows Credential Manager to store and retrieve the Hashicorp Vault credentials
+(which cannot be accessed by the local system account).</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../telegram/rationale.html" class="btn btn-neutral float-left" title="Telegram Bot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../linkedin/rationale.html" class="btn btn-neutral float-left" title="LinkedIn"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../main/rationale.html" class="btn btn-neutral float-right" title="Main Component">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
@@ -166,7 +181,7 @@ to install the service, and to respond to the different signals that are sent to
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../telegram/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../linkedin/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../main/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>

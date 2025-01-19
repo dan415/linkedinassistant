@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/llm/colbert/rationale.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/core/pdf/rationale.html" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>ColBERT - LinkedIn Assistant</title>
+    <title>PDF Module - LinkedIn Assistant</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "ColBERT";
-        var mkdocs_page_input_path = "llm/colbert/rationale.md";
-        var mkdocs_page_url = "/llm/colbert/rationale.html";
+        var mkdocs_page_name = "PDF Module";
+        var mkdocs_page_input_path = "core/pdf/rationale.md";
+        var mkdocs_page_url = "/core/pdf/rationale.html";
       </script>
     
     <!--[if lt IE 9]>
@@ -47,23 +47,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="../../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../../information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../../information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../../information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,27 +94,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -124,7 +131,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../../index.html" class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">ColBERT</li>
+          <li class="breadcrumb-item">Core Components</li>
+      <li class="breadcrumb-item active">PDF Module</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -133,44 +141,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2> ColBERT Agent </h2>
+                <h3> PDF module </h3>
 
-<p>ColBERT is a <em>fast</em> and <em>accurate</em> retrieval model, enabling scalable BERT-based search over large text collections in tens of milliseconds.</p>
-<p>Our ColBERT agent is based on <a href="https://github.com/stanford-futuredata/ColBERT">colBERT V2</a>, version 0.2.0.
-They already include a very detailed documentation, so we will not go into detail here.</p>
-<p>When installing this program as a service, Deberta V2 by default will not compile as TorchScript requires the source code to be available.
-For this reason, I have added a patch in order to switch @torch.jit.script for @torch.jit._script_if_tracing. The model
-will supposedly be slower, but it will work. If you want to use the model in TorchScript, you can remove the patch from the code.</p>
-<p>On src/llm/ColBERT/modelling/hf_colbert.py:</p>
-<pre><code class="language-python">def script_method(fn, _rcb=None):
-    return fn
+<p>This module is used to get the pdf text file. In the prior version I used Adobe PDF Extractor API. However, more often than
+not, I would run into API usage limits, so I decided it was not worth it to use it and switched to PyPDF. Recently,
+Docling library was released, bringing great capabilities with advanced extraction formats with OCR, from table structures, etc. So 
+I wanted to include this as a brand-new option. Therefore, as of now, lightweight and straightforward Pypdf2 method and more complex
+and consuming Docling methods are supported.</p>
+<p>Arxiv and Manual PDFs search engines take the configuration field <code>pdf_extractor_provider</code> which 
+can take one of <code>pypdf</code> or <code>docling</code>.</p>
+<h3> Docling Configuration </h3>
 
-
-def script(obj, optimize=True, _frames_up=0, _rcb=None):
-    return obj
-
-
-import torch.jit
-script_method1 = torch.jit.script_method
-script1 = torch.jit.script_if_tracing
-torch.jit.script_method = script_method
-torch.jit.script = script
+<p>The Docling pdf extractor can be further customized in order to select specific functionalities of the library. The document is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"docling"</code>.</p>
+<pre><code class="language-json">  {
+  &quot;config_schema&quot;:&quot;docling&quot;,
+  &quot;do_table_structure&quot;:true,
+  &quot;do_ocr&quot;:false,
+  &quot;generate_picture_images&quot;:true,
+  &quot;table_former_mode&quot;:&quot;accurate&quot;
+}
 </code></pre>
-<h3> ColBERT Agent Configuration </h3>
-
-<p>The configuration file is located in the <code>llm/ColBERT</code> folder, and is named <code>config.json</code>. It contains the following parameters:</p>
 <ul>
-<li><code>k</code>: The number of documents to retrieve from the index.</li>
-<li><code>queries</code>: The queries to use for the query-document retrieval. This is a list of strings.</li>
-<li><code>kmeans_iters</code>: The number of iterations to use for the k-means clustering algorithm.</li>
-<li><code>document_max_length</code>: The maximum length of the document to index.</li>
+<li><code>do_table_structure</code>: If set to True, table structures are extracted</li>
+<li><code>table_former_mode</code>: can be either <code>accurate</code> or <code>fast</code>. If defines the method for extracting table structures </li>
+<li><code>do_ocr</code>: If set to True, OCR recognition will be performed in order to extract text from images. Useful for scanned pdfs</li>
+<li><code>generate_picture_images</code>: If set to True, images will be extracted and will be available to be selected for the post image</li>
 </ul>
+<p>All of these configurations affect content extraction performance and resource utilization. </p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../rationale.html" class="btn btn-neutral float-left" title="LLM Components"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../langchain_agent/rationale.html" class="btn btn-neutral float-right" title="Langchain Agent">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../llm/retrieval/rationale.html" class="btn btn-neutral float-left" title="Retrieval Workflow"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../publications/rationale.html" class="btn btn-neutral float-right" title="Publications">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -193,10 +196,10 @@ torch.jit.script = script
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../llm/retrieval/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../langchain_agent/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../publications/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

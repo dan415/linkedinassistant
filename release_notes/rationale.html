@@ -44,26 +44,57 @@
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">Release Notes</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Release Notes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#v200">v2.0.0</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#whats-changed">What's changed</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                 </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/publications/rationale.html">Publications</a>
+                  </li>
               </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,27 +102,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -133,24 +148,54 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2> Release Notes </h2>
-
-<h3> v1.0.3 </h3>
-
-<p>This release intends to solve some bugs that were not detected on the previous release, related to running the
-program as a Windows service.</p>
+                <h1 id="release-notes">Release Notes</h1>
+<h2 id="v200">v2.0.0</h2>
+<p>Welcome to <strong>v2.0.0</strong>—a transformative update that redefines the capabilities of the LinkedIn Gen AI Posting Creator Assistant. This major release introduces groundbreaking features, elevates functionality, and delivers seamless integration with modern cloud services. Here’s what’s new:</p>
+<h3 id="whats-changed">What's changed</h3>
 <ul>
-<li>Changed Couroutine approach to Stoppable thread approach for running the tasks. This is because the Couroutine approach
-  was not working as expected when running the program as a Windows service, and subprocesses created by the tasks were not being able to start.</li>
-<li>Added a new config parameter called "base_path" to <code>telegram/suggestions/config.json</code>. I had not realized this parameters was hardcoded in the previous version.</li>
-<li>Fixed bug when resolving absolute paths defined in configs when running the program as a Windows service.</li>
+<li><strong>External Configuration Management</strong>: All state configurations are now hosted externally, significantly boosting maintainability and portability.</li>
+<li><strong>MongoDB Atlas</strong>: Manages configurations, conversation histories, and publications (free up to 25GB).</li>
+<li><strong>Backblaze B2</strong>: Cloud storage for PDF files and images (free up to 10GB).</li>
+<li><strong>HashiCorp Vault</strong>: Secure storage for secrets and credentials used (free for static secrets). Hashicorp vault credentials are now stored in the system's keyring.</li>
+<li><strong>New available source</strong>: </li>
+<li>From YouTube urls: Simply pass YouTube URLs to the bot. The bot will extract transcripts, metadata, and thumbnails to craft compelling LinkedIn posts.</li>
+<li><strong>Improved PDF text extraction</strong>:</li>
+<li><strong>Docling</strong>: Enhanced PDF text extraction for more accurate and insightful post generation.</li>
+<li><strong>PyMuPDF</strong>: Added as lightweight PDF extraction alternative.</li>
+<li><strong>Extended LLM support</strong>:</li>
+<li><strong>Google Gen AI Studio Integration</strong>: Access to Google Gen AI Studio models, including latest Flash 2 model.</li>
+<li><strong>Groq</strong>: Integration with all Groq models</li>
+<li><strong>Deepseek</strong>: Integration with Deepseek models, including the latest Deepseek V3 model.</li>
+<li><strong>Custom models</strong>: Easily add custom models to the bot if compatible with the OpenAI API</li>
+<li><strong>Enhanced Post Generation</strong>:</li>
+<li><strong>AI-Generated Art</strong>: Create custom visuals using DALL-E 3’s powerful AI image generation.</li>
+<li><strong>Image Integration for Posts</strong>: Use YouTube video thumbnails, embedded source images, or manually uploaded images as post visuals.</li>
+<li><strong>Improved Retrieval Pipeline</strong>:</li>
+<li><strong>LangChain RAG workflow</strong>: Replaces the legacy ColBERT-based retrieval system, offering advanced vector search capabilities.</li>
+<li><strong>New Bot Commands</strong></li>
+<li><strong>Manual Uploads</strong>: Send PDF documents directly to the bot to add them to the queue</li>
+<li><strong>Image Management</strong>: Upload, list, and remove images for posts</li>
+<li><strong>YouTube Integration</strong>: Add YouTube URLs to the bot for post creation</li>
+<li><strong>Search Engine Activation</strong>: Enable or disable the search engine for post generation</li>
+<li><strong>Agent Boosted Capabilities</strong></li>
+<li><strong>Tool Usage</strong>: Access to all pre-built LangChain tools for enhanced post creation, like accessing the internet, generate images or 
+  acccess arxiv papers.</li>
+<li><strong>Easier installation</strong>:</li>
+<li>Only need to set up external services and vault secrets prior to installation.</li>
+<li><strong>Added Docker Support</strong>: Run the system with Docker for easy deployment and management.</li>
+<li>
+<p><strong>Insallation scripts</strong>: Added installation scripts for easy setup and configuration for both Linux and Windows</p>
+</li>
+<li>
+<p><strong>Improved Logging</strong>: Enhanced logging for better debugging and monitoring.</p>
+</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../index.html" class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../information/rationale.html" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../core/llm/conversation/rationale.html" class="btn btn-neutral float-right" title="Conversations Agent">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -176,7 +221,7 @@ program as a Windows service.</p>
       <span><a href="../index.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../information/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../core/llm/conversation/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

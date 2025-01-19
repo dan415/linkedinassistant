@@ -47,51 +47,58 @@
                 <li class="toctree-l1"><a class="reference internal" href="../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
     </ul>
                   </li>
               </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">Telegram Bot</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -142,32 +149,11 @@ discard drafts, and publish them.</p>
 <p>In order to be able to circle through conversation threads, the memory pickle of the LLM agents is actually the object that is stored
 on the pending for approval directory. These are loaded and maintained in a circular list of suggestions. The bot will then
 allow to move forward and backwards through the list of suggestions, and to approve, discard them or change them.</p>
-<h3> Suggestion Pool</h3>
+<h3> Publications Pool</h3>
 
-<p>The suggestion pool is a list of suggestions that are stored in the pending for approval directory. Each suggestion is composed
-by a memory pickle (path to it) and an index, specifying the index of the suggestion in the list of suggestions. This two fields are stored
-in a JSON file called <code>config.json</code> inside telegram/suggestions. It has the following format:</p>
-<pre><code class="language-json">{
-   &quot;base_path&quot;: &quot;absolute_path/to_pending_approval_publications_directory&quot;,
-  &quot;pool&quot;: [
-    {
-      &quot;id&quot;: 0,
-      &quot;path&quot;: &quot;absolute_path.pkl&quot;
-    },
-    {
-      &quot;id&quot;: 1,
-      &quot;path&quot;: &quot;absolute_path.pkl&quot;
-    }
-  ],
-  &quot;current&quot;: {
-        &quot;id&quot;: 5,
-        &quot;path&quot;: &quot;absolute_path.pkl&quot;
-    }
-}
-</code></pre>
-<p>The suggestions pool can be iterated through, and it stores the current suggestion index in the <code>current</code> field. The <code>current</code> field also updates
-when the user uses the <code>next</code> and <code>previous</code> commands. The suggestion pool also provide a <code>select</code> method, which allows to select a suggestion
-by its index. Please refer to the source code of <code>pool.py</code> for more detailed information about the methods for now.</p>
+<p>The bot has access to all publications in state <code>PENDING</code>, which means that they are eligible for review, posting or otherwise
+discarded. The posts are accessed with an iterator that retrieves the posts ordered by <code>creation_date</code>. The pool is circular, meaning
+that if commands <code>/last</code> or <code>/next</code> are called on an edge post in the list, the index is set to the contrary edge post in the list.</p>
 <H3> Algorithm </H3>
 
 <p>The algorithm is as follows:</p>
@@ -177,6 +163,10 @@ by its index. Please refer to the source code of <code>pool.py</code> for more d
    3. If suggestions are not blocked, update the suggestions and check if there are suggestions.
    4. If there are suggestions, send the current suggestion and block suggestions. Then the flow of the program
    is carried by the interaction with the user via Telegram.</p>
+<h3> About the messages</h3>
+
+<p>The bot is able to process text messages along with images. If you send a pdf file to the bot, the bot 
+will assume you want the pdf to be saved for the manual PDF extraction algorithm, and will be saved in BlackBlaze B2.</p>
 <h3> Bot State</h3>
 
 <p>This class is used to store the state of the bot. It is used to store the chat id, the current suggestion, and the
@@ -188,35 +178,54 @@ user has finished interacting with the bot. This is done by setting the <code>su
 finishes interacting with the bot, the <code>suggestions_blocked</code> field is set to False, and the bot will send a new suggestion
 if there is one available. Also, if the sending of suggestions fails,  suggestions get blocked in order to avoid the bot
 sending failing continuously.</p>
-<p>The Bot is now designed to respond to one person only. It obviosly could respond to whoever sent messages to it, but in order 
+<p>The Bot is now designed to respond to one person only. It obviously could respond to whoever sent messages to it, but in order 
 to send suggestions (which do not require interaction with the user) it needs to know the chat id of the user. This is why
-the bot is designed to respond to one person only. This is the purpose of the <code>chat_id</code> field.</p>
+the bot is designed to respond to one person only. This is the purpose of the <code>TELEGRAM_CHAT_ID</code> secret.
+It will be first set on <code>/start</code> command and it is to remain constant afterwards.</p>
+<p>Setting the chat id as a secret makes the solution more robust to unauthorized access to the bot.</p>
 <p>The suggestions are in order, so I can go to the next or previous suggestion. I can also select a suggestion by index.
 Also, this state also saves information about when to automatically make suggestions, which would be when no suggestion is
 selected and after some time after a publication is made. The stateful decorator is used to update the config file after
 a function is called, so the file is always updated with the object state.</p>
+<h3> About restricted access</h3>
+
+<p>Access is restricted to only one chat ID (<code>TELEGRAM_CHAT_ID</code>), set on <code>/start</code> command and stored in the vault for secrets.
+After that, only messages received from that chat will be attended This is handled with the <code>@restricted</code> decorator</p>
 <h3> Bot Commands</h3>
 
 <ul>
-<li><code>/start</code>: Starts the bot. It will send a welcome message and a suggestion if there is one available.</li>
+<li><code>/start</code>: Starts the bot. It will <strong>set the allowed chat_id if not already set</strong>, send a welcome message and a suggestion if there is one available.</li>
 <li><code>/next</code>: Sends the next suggestion (and changes the thread of conversation) if there is one available.</li>
 <li><code>/previous</code>: Sends the previous suggestion (and changes the thread of conversation) if there is one available.</li>
 <li><code>/select {index}</code>: Selects a suggestion by index. It will send the selected suggestion and change the thread of conversation.</li>
 <li><code>/list</code>: Lists the suggestions in the pool with their index.</li>
-<li><code>/publish</code>: Publishes the current suggestion. If not authenticated, it will send a message with the link to the authentication page.</li>
+<li><code>/publish</code>: Publishes the current suggestion to LinkedIn. If not authenticated, it will send a message with the link to the authentication page.</li>
 <li><code>/allow</code>: Allows the bot to send suggestions. </li>
 <li><code>/stop</code>: Blocks the bot from sending suggestions.</li>
 <li><code>/healthcheck</code>: Sends a message to the user (to see if the bot is alive).</li>
 <li><code>/clear</code>: Discards the current suggestion.</li>
-<li><code>/update</code>: Updates the suggestions pool. It reloads them from the pending for approval directory.</li>
+<li><code>/clear_image</code>: It will remove the current image for the post</li>
+<li><code>/set_image</code>: Used along with an image in the message, it will set the passed image for the post to be published </li>
+<li><code>/add_youtube {url}</code>: Adds a youtube url to the youtube url pool in order for the video to get processed into a new post</li>
+<li><code>/update</code>: Updates the current publication's content with the last message sent by the bot.</li>
 <li><code>/current</code>: Sends the current suggestion. This is what will get published if the user uses the <code>/publish</code> command.</li>
+<li><code>/activate_search_engine</code>: ables the search engine to execute</li>
+<li><code>/stop_search_engine</code>: disables the search engine to execute</li>
+<li><code>/images</code>: Lists the images available for the current post</li>
+</ul>
+<h3> Bot Configuration </h3>
+
+<p>The configuration file must be contained inside the <code>config</code> collection with the field <code>config_name</code>: <code>"telegram"</code>. It contains the following parameters:</p>
+<ul>
+<li><code>suggestion_period</code>: Nº of days to wait after a post has been published in order to start suggesting new posts again</li>
+<li><code>cool_off_time</code>: Time to wait in order to send a new publication to the user after the last one was published</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../pdf/rationale.html" class="btn btn-neutral float-left" title="PDF Handler"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../windows/rationale.html" class="btn btn-neutral float-right" title="Windows Service">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../information/sources/rapid/youtube/rationale.html" class="btn btn-neutral float-left" title="YouTube"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../linkedin/rationale.html" class="btn btn-neutral float-right" title="LinkedIn">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -239,10 +248,10 @@ a function is called, so the file is always updated with the object state.</p>
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../pdf/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../information/sources/rapid/youtube/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../windows/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../linkedin/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

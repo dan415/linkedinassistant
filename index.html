@@ -40,8 +40,66 @@
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="index.html">Home</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Home</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#components-overview">Components Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-1-set-up-hashicorp-secrets-vault">Step 1: Set Up HashiCorp Secrets Vault</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#step-1-set-up-hcp-account">Step 1: Set Up HCP Account</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-2-create-an-hcp-organization">Step 2: Create an HCP Organization</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-3-create-an-hcp-project">Step 3: Create an HCP Project</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-4-set-up-hcp-vault">Step 4: Set Up HCP Vault</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-5-create-an-application-in-hcp-vault">Step 5: Create an Application in HCP Vault</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#environment-variables">Environment Variables</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-2-set-up-mongodb-atlas">Step 2: Set Up MongoDB Atlas</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#step-1-create-a-mongodb-atlas-account">Step 1: Create a MongoDB Atlas Account</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-3-set-up-backblaze-b2-file-storage">Step 3: Set Up Backblaze B2 File Storage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-4-set-up-telegram-bot">Step 4: Set Up Telegram Bot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-5-configure-linkedin-api">Step 5: Configure LinkedIn API</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-6-set-up-rapid-api-optional-if-want-to-use-rapid-api-sources">Step 6: Set Up Rapid API (Optional, if want to use Rapid API sources)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-8-obtain-youtube-api-key-from-google-cloud-platform-optional-if-want-to-use-youtube-as-source">Step 8: Obtain Youtube API Key from Google Cloud Platform (Optional, if want to use Youtube as source)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#step-1-set-up-a-google-cloud-project">Step 1: Set Up a Google Cloud Project</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-2-enable-youtube-data-api-v3">Step 2: Enable YouTube Data API v3</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-3-create-api-credentials">Step 3: Create API Credentials</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#step-4-restrict-your-api-key-optional">Step 4: Restrict Your API Key (Optional)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-9-set-up-desired-llm-providers">Step 9: Set up desired LLM providers</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-10-install-c-build-tools-from-visual-studio-only-if-installing-as-windows-service">Step 10: Install C++ Build Tools from Visual Studio (Only if installing as Windows Service)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-11-install-the-service">Step 11: Install the service</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#author">Author</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -49,23 +107,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -73,27 +154,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -135,93 +200,114 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1>Linkedin GPT-based Posting Creator Assistant</h1>
-
-<p>I created this project because I wanted to create posts about cool articles and
-papers that would come up every week, but did not have the time for it. So I decided
-to create a program that would generate the posts for me, and I would only need to review them and post them.</p>
-<p>The program is based on the OpenAI's LLMs, through Langchain, but could be easily adapted to any other
-LLM model. All design decisions are based on the idea that this program is meant to be run as a Windows service locally.
-That's why all agents constantly update their status on a local file (so that if the laptop turns off abruptly, the status
-is not lost). As of now, I still need to implement the behaviour for the stop signal though.</p>
-<p>This program is comprised of 7 main components:
-- Information Searching: This component is in charge of searching for information on the internet. It is based on the
-  Google Search API, and it is implemented in the <code>searcher.py</code> file. It is a simple class that receives a query and
-  returns a list of results. It is meant to be used by the <code>search_agent.py</code> agent.
-- Telegram Bot: This component is in charge of communicating with the Telegram Bot API. It is implemented in the
-  <code>telegram_bot.py</code> file. It is a simple class that receives a message and sends it to the Telegram Bot API. It is meant
-  to be used by the <code>telegram_agent.py</code> agent.
-- Linkedn Component: This component is in charge of generating the posts. It is implemented in the <code>posting.py</code> file. It
-  is a simple class that receives a query and returns a list of results. It is meant to be used by the <code>posting_agent.py</code>
-  agent.
-- LLM Component: This component is in charge of generating the posts. It is implemented in the <code>llm.py</code> file. It is a
-  simple class that receives a query and returns a list of results. It is meant to be used by the <code>llm_agent.py</code> agent.
-- Windows Service: This component is in charge of running the program as a Windows service. It is implemented in the
-  <code>service.py</code> file. It is a simple class that receives a query and returns a list of results. It is meant to be used by
-  the <code>service_agent.py</code> agent.
-- Main: This component is in charge of running the program. It is implemented in the <code>main.py</code> file. It is a simple class
-  that receives a query and returns a list of results. It is meant to be used by the <code>main_agent.py</code> agent.</p>
-<h2>Installation</h2>
-
-<p>In order to install the program, you need to do the following:</p>
-<ul>
-<li>
-<h3 id="install-the-dependencies">Install the dependencies</h3>
-</li>
-</ul>
-<p>in conda:</p>
-<pre><code class="language-bash">  conda env create -f environment.yml
+                <h1 id="linkedin-gen-ai-driven-posting-creator-assistant">LinkedIn Gen AI Driven Posting Creator Assistant</h1>
+<p><a href="https://doi.org/10.5281/zenodo.10578028"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.10578028.svg" /></a>
+<a href="https://linkedinassistant.readthedocs.io/en/latest/"><img alt="readthedocs" src="https://readthedocs.org/projects/linkedinassistant/badge/?version=latest" /></a>
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a></p>
+<p>This project was created to simplify the process of sharing posts about fascinating articles and papers that surface every week. The program generates drafts for these posts, allowing the user to focus only on reviewing and publishing.</p>
+<p>write the md to import an image</p>
+<p><img alt="LinkedIn Assistant" src="linkedin_assistant.svg" /></p>
+<h2 id="components-overview">Components Overview</h2>
+<p>This program comprises the following components:
+- <strong>Core</strong>: Implements shared utilities like configuration management and Vault secrets handling.
+- <strong>Information</strong>: Handles raw information scraping and generates initial publication drafts.
+- <strong>Telegram</strong>: Acts as the user interface via a Telegram bot.
+- <strong>LinkedIn</strong>: Manages LinkedIn API interactions and OAuth server functionalities.</p>
+<hr />
+<h2 id="installation">Installation</h2>
+<hr />
+<h3 id="step-1-set-up-hashicorp-secrets-vault">Step 1: Set Up HashiCorp Secrets Vault</h3>
+<h4 id="step-1-set-up-hcp-account">Step 1: Set Up HCP Account</h4>
+<ol>
+<li><strong>Sign Up/Login</strong>: Visit the <a href="https://cloud.hashicorp.com/">HashiCorp Cloud Platform</a> and log in or create an account.</li>
+<li><strong>Billing</strong>: Add billing details.</li>
+</ol>
+<h4 id="step-2-create-an-hcp-organization">Step 2: Create an HCP Organization</h4>
+<ol>
+<li>Navigate to <strong>Organizations</strong> and create one.</li>
+<li>Save the <strong>Organization Name</strong> as <code>HCP_ORGANIZATION</code>.</li>
+</ol>
+<h4 id="step-3-create-an-hcp-project">Step 3: Create an HCP Project</h4>
+<ol>
+<li>In your organization, navigate to <strong>Projects</strong> and create one.</li>
+<li>Save the <strong>Project Name</strong> as <code>HCP_PROJECT</code>.</li>
+</ol>
+<h4 id="step-4-set-up-hcp-vault">Step 4: Set Up HCP Vault</h4>
+<ol>
+<li>Go to <strong>HashiCorp Vault</strong> and create a Vault cluster.</li>
+<li>Save the cluster details.</li>
+</ol>
+<h4 id="step-5-create-an-application-in-hcp-vault">Step 5: Create an Application in HCP Vault</h4>
+<ol>
+<li>Go to <strong>Access Control</strong> and create an application. Save the <strong>App Name</strong> as <code>HCP_APP</code>.</li>
+<li>Generate a <strong>Client ID</strong> and <strong>Client Secret</strong>, saving them as <code>HCP_CLIENT_ID</code> and <code>HCP_CLIENT_SECRET</code>.</li>
+</ol>
+<h4 id="environment-variables">Environment Variables</h4>
+<p>Create a <code>.env</code> file at the root project level:</p>
+<pre><code>HCP_ORGANIZATION=your_organization
+HCP_PROJECT=your_project
+HCP_APP=your_app
+HCP_CLIENT_ID=your_client_id
+HCP_CLIENT_SECRET=your_client_secret
 </code></pre>
-<ul>
-<li>
-<h3 id="create-a-telegram-bot-and-get-the-api-key">Create a Telegram Bot and get the API key.</h3>
-</li>
-<li>Step 1. Open the Telegram app on your computer/phone
-  To create a Telegram bot, you'll need to have the Telegram app installed on your computer. If you don't have it already, you can download it from the Telegram website.</li>
-<li>Step 2. Connect to BotFather
-    BotFather is a bot created by Telegram that allows you to create and manage your own bots. To connect to BotFather, search for "@BotFather" in the Telegram app and click on the result to start a conversation.</li>
-<li>Step 3. Select the New Bot option
-    In the conversation with BotFather, select the "New Bot" option to start creating your new bot. BotFather will guide you through the rest of the process.</li>
-<li>Step 4. Add a bot name
-  Next, BotFather will ask you to provide a name for your bot. Choose a name that accurately reflects the purpose of your bot and is easy to remember.</li>
-<li>Step 5. Choose a username for your bot</li>
-<li>Step 6. BotFather will ask you to choose a username for your bot. This username will be used to create a unique URL that people can use to access your bot. Choose a username that is easy to remember and related to your bot's purpose.</li>
-</ul>
-<p>At the end of the process, you should have given a bot token by @botFather. You need to save that information, and other information such as the bot name that you chose on
-the Telegram Bot config file on ./telegram/config.json:</p>
-<pre><code class="language-json">
-{
-    &quot;bot_name&quot;: &quot;@whatever_bot_username&quot;,
-    &quot;name&quot;: &quot;Your_Bot_Name(what appears on top)&quot;,
-    &quot;token&quot;: &quot;Token given by BotFather&quot;
+<p><em>Note: This environment variables will only be needed up until installation is completed. After that, they will have 
+been loaded into the system's keyring or into Dockerized environment</em></p>
+<hr />
+<h3 id="step-2-set-up-mongodb-atlas">Step 2: Set Up MongoDB Atlas</h3>
+<h4 id="step-1-create-a-mongodb-atlas-account">Step 1: Create a MongoDB Atlas Account</h4>
+<ol>
+<li>Visit <a href="https://www.mongodb.com/cloud/atlas">MongoDB Atlas</a> and sign up.</li>
+<li>Deploy a free M0 Sandbox cluster.</li>
+<li>Obtain the connection string and save it as <code>MONGO_URI</code>.</li>
+</ol>
+<p>All necessary collections and documents will be created at start time. Necessary configs reside inside 
+<em>res/json/default_configs.json</em>.</p>
+<hr />
+<h3 id="step-3-set-up-backblaze-b2-file-storage">Step 3: Set Up Backblaze B2 File Storage</h3>
+<ol>
+<li>Sign up at <a href="https://www.backblaze.com/">Backblaze</a>.</li>
+<li>Create a B2 Cloud Storage bucket named <code>linkedin-assistant</code>.</li>
+<li>Generate application keys and save them as <code>BLACBLAZE_API_KEY</code> and <code>BLACBLAZE_KEY_ID</code>.</li>
+</ol>
+<hr />
+<h3 id="step-4-set-up-telegram-bot">Step 4: Set Up Telegram Bot</h3>
+<ol>
+<li>Connect to <a href="https://t.me/BotFather">BotFather</a>.</li>
+<li>Create a bot and save the token as <code>TELEGRAM_BOT_TOKEN</code>.</li>
+<li>Store the bot configuration in MongoDB:</li>
+</ol>
+<pre><code class="language-json">{
+  &quot;bot_name&quot;: &quot;@your_bot_username&quot;,
+  &quot;name&quot;: &quot;Your Bot Name&quot;,
+  &quot;token&quot;: &quot;your_bot_token&quot;
 }
-
 </code></pre>
+<hr />
+<h3 id="step-5-configure-linkedin-api">Step 5: Configure LinkedIn API</h3>
 <ul>
-<li>
-<h3 id="configure-ngrok-to-have-a-persistant-domain">Configure Ngrok to have a persistant domain</h3>
+<li>Step 1: Go to Linkedin Developers: https://www.linkedin.com/developers/login and login with your Linkedin account.</li>
+<li>Step 2. Go to "My Apps" and click on "Create App"</li>
+<li>Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.</li>
+<li>Step 4: On you newly created app, go to Auth. </li>
+<li>Step 5: Save these in your Vault as <code>LINKEDIN_CLIENT_ID</code> and <code>LINKEDIN_CLIENT_SECRET</code>.</li>
+<li>Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):<ul>
+<li>openid</li>
+<li>email</li>
+<li>w_member_social</li>
+<li>profile</li>
+</ul>
+</li>
+<li>Step 6: Copy the persistant URL that we generated before with Ngrok without the HTTP schema and set it in your vault as <code>NGROK_DOMAIN</code></li>
+<li>Step 8. Go to the Products Tab, and request access for the following products:<ul>
+<li>Share on Linkedin</li>
+<li>Sign In with LinkedIn using OpenID Connect</li>
+</ul>
 </li>
 </ul>
-<p>Create an account on Ngrok
-    - Step 1. On https://dashboard.ngrok.com/get-started/setup/windows, copy the authtoken and paste
-      it onto the the Telegram Bot config file. same as before, on ./telegram/config.json:
-    - Step 2: Go to "Domains" on the left menu, and create a new domain.
-    - Step 3: Copy the domain name and token that you generated and paste it into the Telegram Bot config file. same as before, on ./telegram/config.json:</p>
-<pre><code>    ```json
-
-    {
-      "ngrok_token": "Token given by Ngrok",
-      "domain": "Domain given by Ngrok"
-    }
-
-    ```
-</code></pre>
-<p>Keep in mind that with the free version you can only have one domain.</p>
-<ul>
-<li>
-<h3 id="configure-you-rapidapi-sources">Configure you RapidAPI sources</h3>
-</li>
-</ul>
+<p>After this, if you did not have the necessasry OAuth 2.0 Scope permissions, you should have them now.
+  - Step 9. Go to the Team Members Tab, and make sure you appear as Team member. If you do not, add yourself as a team member.</p>
+<hr />
+<h3 id="step-6-set-up-rapid-api-optional-if-want-to-use-rapid-api-sources">Step 6: Set Up Rapid API (Optional, if want to use Rapid API sources)</h3>
 <p>Create an account on RapidAPI: 
     - Step 1. Go to https://rapidapi.com/ and search for the following APIs:
         - Google Search API
@@ -229,139 +315,88 @@ the Telegram Bot config file on ./telegram/config.json:</p>
     Go to https://rapidapi.com/nishujain199719-vgIfuFHZxVZ/api/medium2 and click on subscribe.
     - Step 3. Subscribe to the Google API:
     Go to https://rapidapi.com/rphrp1985/api/google-api31/ and click on subscribe.
-    - Step 4. Copy the key that it shows after subscribing to the API on the API Key Header, ans paste into the config.json inside ./information/sources/rapid/news/config.json and ./information/sources/rapid/medium/config.json:</p>
-<pre><code>    ```json
-
-    {
-      "api_key": "Key given by RapidAPI"
-    }
-
-    ```
-</code></pre>
+    - Step 4: Subscribe to Youtube Transcribe API: 
+      Go to https://rapidapi.com/ and click subscribe
+    - Step 5. Copy the key that it shows after subscribing to the API on the API Key Header, and set it in you vault 
+      as <code>RAPID_API_KEY</code></p>
+<hr />
+<h3 id="step-8-obtain-youtube-api-key-from-google-cloud-platform-optional-if-want-to-use-youtube-as-source">Step 8: Obtain Youtube API Key from Google Cloud Platform (Optional, if want to use Youtube as source)</h3>
+<h4 id="step-1-set-up-a-google-cloud-project">Step 1: Set Up a Google Cloud Project</h4>
 <ul>
+<li>Log in to Google Cloud Console</li>
 <li>
-<h3 id="configure-your-adobe-pdf-api">Configure your Adobe PDF API</h3>
+<p>Go to Google Cloud Console.</p>
 </li>
+<li>
+<p>Create a New Project</p>
+</li>
+<li>
+<p>Click on the "Select a project" dropdown in the top navigation bar.</p>
+</li>
+<li>Click New Project.</li>
+<li>Enter a Project Name, choose your Billing Account (if prompted), and click Create.</li>
 </ul>
-<p>Create an account on Adobe PDF
-    - Step 1. Go to the Adobe Developer Console at https://developer.adobe.com/console/home 
-    - Step 2. Click on "Create Project"
-    - Step 2. Click on add API
-    - Step 3. Select the "Adobe PDF Services API"
-    - Step 4. Select OAuth Server to Server as the authentication method
-    - Step 5. Check the Adobe PDF Services box
-    - Step 6. Once created, you should see an OAuth API Key, and a button to generate an access token. Click on the credential. Now you should also 
-  see an Organization ID at the bottom
-    - Step 7. Click on generate access token, 
-    - Step 9. Copy  OAuth API Key, Organization ID and the Access Token into the config.json inside ./pdf/config.json:</p>
-<pre><code>    ```json
-
-    {
-      "client_id": "OAuth API Key given by Adobe",
-      "client_secret": "Access Token given by Adobe",
-      "service_principal_credentials": {
-        "organization_id": "Organization ID given by Adobe"
-       }
-    }
-
-    ```
-</code></pre>
+<h4 id="step-2-enable-youtube-data-api-v3">Step 2: Enable YouTube Data API v3</h4>
 <ul>
+<li>Navigate to the APIs &amp; Services Dashboard</li>
+<li>In the left-hand menu, click APIs &amp; Services &gt; Library.</li>
 <li>
-<h3 id="create-you-linkedin-page-and-get-the-api-key">Create you LinkedIn page and get the API key</h3>
+<p>Search for YouTube Data API v3</p>
 </li>
 <li>
-<p>Step 1. Go to Linkedin Developers: https://www.linkedin.com/developers/login and login with your Linkedin account.</p>
+<p>In the search bar, type YouTube Data API v3.</p>
 </li>
-<li>Step 2. Go to "My Apps" and click on "Create App"</li>
-<li>Step 3. Fill in all the information required, if you do not have a Linkedin page. You will need to do this as well.</li>
-<li>Step 4: On you newly created app, go to Auth. </li>
-<li>Step 5: Copy your Client ID and Client Secret into the ./linkedin/config.json inside ./linkedin/config.json. You might need to click on generate first.</li>
+<li>Click on the API from the search results.</li>
+<li>
+<p>Enable the API</p>
+</li>
+<li>
+<p>Click the Enable button to activate the YouTube Data API for your project.</p>
+</li>
 </ul>
-<p>```json</p>
-<pre><code>    {
-      "client_id": "Client ID given by Linkedin",
-      "client_secret": "Client Secret given by Linkedin"
-    }
-</code></pre>
-<p>```
-  - Step 6: Check the OAuth 2.0 Scope permissions. For this project, you need to have these scope permissions (at least):
-    - openid
-    - email
-    - w_member_social
-    - profile</p>
+<h4 id="step-3-create-api-credentials">Step 3: Create API Credentials</h4>
 <ul>
-<li>Step 7: Copy the persistant URL that we generated before with Ngrok, and paste it into the Authorized Redirect URLs section, adding /callback at the end:
-    https://whatever_domain_you_generated/callback</li>
-<li>Step 8. Go to the Products Tab, and request access for the following products:<ul>
-<li>Share on Linkedin</li>
-<li>Sign In with LinkedIn using OpenID Connect
-  After this, if you did not have the necessasry OAuth 2.0 Scope permissions, you should have them now.</li>
+<li>Go to the Credentials Page</li>
+<li>In the left-hand menu, click APIs &amp; Services &gt; Credentials.</li>
+<li>Click "Create Credentials"</li>
+<li>In the top toolbar, click the "Create Credentials" button.</li>
+<li>Select API Key from the dropdown.</li>
+<li>
+<p>Copy the API Key</p>
+</li>
+<li>
+<p>After creation, a pop-up will display your new API key.</p>
+</li>
+<li>Click the Copy icon and save the key somewhere secure.</li>
 </ul>
-</li>
-<li>
-<p>Step 9. Go to the Team Members Tab, and make sure you appear as Team member. If you do not, add yourself as a team member.</p>
-</li>
-<li>
-<h3 id="configure-your-openai-api">Configure your OpenAI API</h3>
-<p>Create an account on OpenAI
-- Step 1. Go to https://beta.openai.com/ and login with your OpenAI account.
-  - Step 2. Go to "My Account" and copy your API key.
-    - Step 3. Paste your API key into the ./llm/langchain_agent/config.json file</p>
-<pre><code>  ```json
-
-           {
-            "environment": {
-              "OPENAI_API_KEY": "apikey"
-            }
-          }
-
-  ```
-</code></pre>
+<h4 id="step-4-restrict-your-api-key-optional">Step 4: Restrict Your API Key (Optional)</h4>
 <ul>
-<li>
-<p>Step 5. If instead of using the OpenAI API, you want to use the OpenAI, you are accessing OpenAI through service, like Azure, you also need to add some more information:
-       ```json</p>
-<pre><code>   {
-    "environment": {
-      "OPENAI_API_KEY": "apikey",
-      "OPENAI_API_TYPE": "type: for example azure",
-      "OPENAI_API_VERSION": "version: for example: 2023-09-15-preview",
-      "OPENAI_API_BASE": "your api base endpoint"
-    }
-</code></pre>
-<p>}</p>
-<p><code>- Step 6. Configure the OpenAI parameters. If using the OpenAI APIl only the model_name is necesssary. If using it from Open AI studio, you need to add the deployment_id as well.</code>json
-   {
-      "openai_configs": {
-         "deployment_id": "",
-         "model_name": "gpt-4",
-         "max_tokens": 8192
-       }
-   }
-       ```</p>
-</li>
+<li>To ensure security, restrict how and where your API key can be used:</li>
+<li>Edit API Key Restrictions</li>
+<li>On the Credentials page, click the Edit icon next to your API key.</li>
+<li>Set Application Restrictions</li>
+<li>Under Application restrictions, select HTTP referrers (web sites).</li>
+<li>Add the URL of your website or application.</li>
+<li>Set API Restrictions</li>
+<li>Under API restrictions, select Restrict key.</li>
+<li>Select the YouTube Data API v3 from the dropdown.</li>
+<li>Click Save.</li>
 </ul>
-</li>
-<li>
-<h3 id="configure-service-configuration-files">Configure service configuration files:</h3>
-</li>
-</ul>
-<p>Some configuration files require you to define some directories where the program will store files related to the publication creation process.
-You need to define the following directories:</p>
+<hr />
+<h3 id="step-9-set-up-desired-llm-providers">Step 9: Set up desired LLM providers</h3>
+<p>Available supported providers are:</p>
 <ul>
-<li><code>publications_directory</code>: The directory where the publications are stored. You need to define this directory in the <code>information</code> config file.</li>
-<li><code>publications_pending_approval_directory</code>: The directory where the publications pending approval are stored.  You need to define this directory in the <code>information</code> config file.</li>
-<li><code>base_path</code>: This needs to be set to the same path as the <code>publications_pending_approval_directory</code> in the <code>suggestions</code> config file. This is where the suggestion pool will get loaded from.</li>
-<li><code>input_directory</code>: This directory is where the Manual pdf search engine will look for pdfs to add extract information from. You need to define this directory in the <code>information/sources/manual_pdfs</code> config file.</li>
-<li><code>output_directory</code>: This directory is where the Manual pdf search engine will store the pdfs that it processes. You need to define this directory in the <code>information/sources/manual_pdfs</code> config file.</li>
+<li>OpenAI</li>
+<li>Groq</li>
+<li>Google Gen AI</li>
+<li>Deepseek</li>
 </ul>
-<p>Note: These directories need to be absolute paths</p>
-<ul>
-<li>
-<h3 id="install-c-build-tools-from-visual-studio">Install C++ Build Tools from Visual Studio</h3>
-</li>
-</ul>
+<p>You can obtain the API keys for these providers and set them in your Vault as <code>OPENAI_API_KEY</code>,
+<code>GROQ_API_KEY</code>, <code>GOOGLE_GEN_AI_API_KEY</code>, and <code>DEEPSEEK_API_KEY</code> respectively.</p>
+<p><strong>Note: OpenAI is the only image model provider available at the moment. Therefore, it is mandatory to set the <code>OPENAI_API_KEY</code> in your Vault,
+if you want to use the image generation tool</strong>.</p>
+<hr />
+<h3 id="step-10-install-c-build-tools-from-visual-studio-only-if-installing-as-windows-service">Step 10: Install C++ Build Tools from Visual Studio (Only if installing as Windows Service)</h3>
 <p>Torch requires C++ Build Tools from Visual Studio to be installed.</p>
 <p>For this you can: 
 1. Install Visual Studio (I installed 2022)
@@ -370,61 +405,34 @@ You need to define the following directories:</p>
 4. Add the path to the C++ compiler to your PATH environment variable
 5. Run <code>C:\Program Files\Microsoft Visual Studio xx.x\VC\vcvarsall.bat</code> (where xx.x is the version of Visual Studio you installed) to set up the environment variables for the C++ compiler</p>
 <p>For my architecture and Windows SDK version (gets installed with the C++ Build Tools) I ran <code>\"Program Files"\"Microsoft Visual Studio"\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat X64 10.0.22621.0</code></p>
+<hr />
+<h3 id="step-11-install-the-service">Step 11: Install the service</h3>
+<p>If using Windows:</p>
+<hr />
+<ol>
+<li>Open root project folder on CMD Terminal with Admin Privileges and run</li>
+<li>Run .\install.bat  (If you want to rebuild the EXE file run with argument --rebuild)</li>
+</ol>
+<p>The program will ask for your user password in order to install the service with your account (It will not validate
+it but installation will fail at the end if incorrectly provided)</p>
+<hr />
+<p>If using Unix, on terminal, run:</p>
+<pre><code class="language-bash">sudo ./install.sh
+</code></pre>
+<hr />
+<h2 id="author">Author</h2>
+<p><strong>Daniel Cabrera Rodríguez</strong></p>
 <ul>
-<li>
-<h3 id="install-the-windows-service">Install the Windows Service</h3>
-</li>
+<li><strong>GitHub</strong>: <a href="https://github.com/dan415">@dan415</a></li>
+<li><strong>Email</strong>: danicr2515@gmail.com</li>
 </ul>
-<p>Activate the environment:</p>
-<p>Open a CMD or Anaconda Prompt as Administrator, next steps will need to run on this session:</p>
-<p>If using conda: </p>
-<pre><code class="language-bash">conda activate linkedinassistant
-</code></pre>
-<p>Now, run the script <code>configurate.cmd</code> to configure the service.
-This will create a data folder in <code>C:ProgramData/LinkedinAssistant</code> and copy the config files there.
-You need to go back to the root folder of the project, and run the script:</p>
-<pre><code class="language-bash">cd .. 
-configurate.cmd
-</code></pre>
-<p>When you run this program as a Windows Service, all logs and config files will be stored in <code>C:ProgramData/LinkedinAssistant</code> folder.</p>
-<p>Then, you need to create the EXE file with pyinstaller:
-Some popup error might appear, as long as it is related to torchvison or torchaudio, it is controlled and will be fine, just accept them and let it continue.    </p>
-<pre><code class="language-bash">pyinstaller --hidden-import win32timezone  --hidden-import torch --hidden-import torchvision --hidden-import torchaudio --collect-data torch --copy-metadata torch --collect-data torchvision --collect-data langchain --copy-metadata langchain --copy-metadata torchvision --collect-data torchaudio --copy-metadata torchaudio --copy-metadata packaging --copy-metadata safetensors --copy-metadata regex --copy-metadata huggingface-hub --copy-metadata tokenizers --copy-metadata filelock --copy-metadata datasets --copy-metadata numpy --copy-metadata tqdm --copy-metadata requests --copy-metadata pyyaml --clean --noconfirm src\windows\service.py
-</code></pre>
-<p>This will create the necessary EXE and dependencies in <code>dist</code> folder. </p>
-<p>After that: </p>
-<pre><code class="language-bash">  .\dist\service\service.exe install
-</code></pre>
-<p>If this works, you have done everything correctly.</p>
-<p>Optionally, you can set the service to start automatically when the computer starts:</p>
-<pre><code class="language-bash">  sc config linkedin_assistant start=delayed-auto
-</code></pre>
-<p>Finally, start the service:</p>
-<pre><code class="language-bash"> .\dist\service\service.exe start
-</code></pre>
-<h2> Author </h2>
-<p>Daniel Cabrera Rodríguez</p>
-<p>Github: @dan415</p>
-<p>Email: danicr2515@gmail.com</p>
-<p>Please, do not hesitate to contact if you have any questions or suggestions.</p>
-<h2> License </h2>
-
-<p>MIT License
-Copyright (c) 2024 Daniel Cabrera Rodriguez</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining 
-a copy of this software and associated documentation files (the "Software"), 
-to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be 
-included in all copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR 
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<p>Feel free to reach out with questions or suggestions!</p>
+<hr />
+<h2 id="license">License</h2>
+<p>MIT License © 2024 Daniel Cabrera Rodríguez</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
               
             </div>
           </div><footer>
@@ -472,6 +480,6 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 </html>
 
 <!--
-MkDocs version : 1.5.3
-Build Date UTC : 2024-01-28 16:28:21.904073+00:00
+MkDocs version : 1.6.1
+Build Date UTC : 2025-01-19 21:39:33.872242+00:00
 -->

@@ -47,23 +47,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="../../../../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../../../rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../../sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../../arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,27 +94,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../../../../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -136,12 +143,12 @@
                 <h2> Google News </h2>
 
 <p>This Content Search Engine is based on the <a href="https://rapidapi.com/">Rapid API</a>.</p>
-<p>This Content Search Engine is used to retrieve information from Google News.</p>
+<p>This Content Search Engine is used to retrieve information from 
+Google News.</p>
 <h3> Configuration </h3>
 
-<p>The configuration file is located in the <code>information/sources/rapid/news</code> folder, and is named <code>config.json</code>. It contains the following parameters:</p>
+<p>The configuration is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"information-sources-rapid-google_news"</code>. It contains the following parameters:</p>
 <ul>
-<li><code>api_key</code>: The API key for the Rapid API source.</li>
 <li><code>limit</code>: The maximum number of results to retrieve from the API.</li>
 <li><code>period</code>: The period of time to search for in days.</li>
 <li><code>url</code>: The URL of the Rapid API source.</li>
@@ -151,6 +158,51 @@
 <li><code>count_requests</code>: An integer counter that keeps track of the number of requests made to the API. This is used to keep track of the number of requests made to the API, and to disable the source when the limit is reached.</li>
 <li><code>topics</code>: A list of topics to search for. Every topic is a "normal" passed to medium's search engine.</li>
 </ul>
+<h3> Algorithm </h3>
+
+<ol>
+<li><strong>Initialization</strong>:</li>
+<li>Start with a list of topics to search.</li>
+<li>
+<p>Prepare an empty list to store all results.</p>
+</li>
+<li>
+<p><strong>Iterate Over Topics</strong>:</p>
+</li>
+<li>
+<p>For each topic:</p>
+<ul>
+<li>Create a payload with search parameters (e.g., topic text, region, and maximum results).</li>
+<li>Make an API request to fetch Google News results.</li>
+</ul>
+</li>
+<li>
+<p><strong>Process Each Result</strong>:</p>
+</li>
+<li>
+<p>For each result in the API response:</p>
+<ul>
+<li>Extract and format key fields (e.g., summary, link).</li>
+<li>Use the <code>get_text</code> method to fetch and extract the full article content from the result's URL.</li>
+<li>Enrich the result with additional metadata (e.g., information source).</li>
+</ul>
+</li>
+<li>
+<p><strong>Save Processed Results</strong>:</p>
+</li>
+<li>
+<p>If a <code>save_callback</code> function is provided:</p>
+<ul>
+<li>Validate the processed result.</li>
+<li>Save the result using the callback.</li>
+</ul>
+</li>
+<li>
+<p><strong>Return Results</strong>:</p>
+</li>
+<li>Combine all successfully processed results into a single list.</li>
+<li>Return the list of results.</li>
+</ol>
               
             </div>
           </div><footer>

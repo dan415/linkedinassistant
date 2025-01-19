@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/information/sources/rapid/medium/rationale.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/information/sources/rapid/youtube/rationale.html" />
       <link rel="shortcut icon" href="../../../../img/favicon.ico" />
-    <title>Medium - LinkedIn Assistant</title>
+    <title>YouTube - LinkedIn Assistant</title>
     <link rel="stylesheet" href="../../../../css/theme.css" />
     <link rel="stylesheet" href="../../../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Medium";
-        var mkdocs_page_input_path = "information/sources/rapid/medium/rationale.md";
-        var mkdocs_page_url = "/information/sources/rapid/medium/rationale.html";
+        var mkdocs_page_name = "YouTube";
+        var mkdocs_page_input_path = "information/sources/rapid/youtube/rationale.md";
+        var mkdocs_page_url = "/information/sources/rapid/youtube/rationale.html";
       </script>
     
     <!--[if lt IE 9]>
@@ -84,9 +84,9 @@
                 </li>
                 <li class="toctree-l3"><a class="" href="../google_news/rationale.md">Google News</a>
                 </li>
-                <li class="toctree-l3 current"><a class="reference internal current" href="#">Medium</a>
+                <li class="toctree-l3"><a class="reference internal" href="../medium/rationale.html">Medium</a>
                 </li>
-                <li class="toctree-l3"><a class="reference internal" href="../youtube/rationale.html">YouTube</a>
+                <li class="toctree-l3 current"><a class="reference internal current" href="#">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -134,7 +134,7 @@
           <li class="breadcrumb-item">Information Components</li>
           <li class="breadcrumb-item">Sources</li>
           <li class="breadcrumb-item">Rapid</li>
-      <li class="breadcrumb-item active">Medium</li>
+      <li class="breadcrumb-item active">YouTube</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -143,66 +143,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2> Medium </h2>
+                <h2> Google News </h2>
 
 <p>This Content Search Engine is based on the <a href="https://rapidapi.com/">Rapid API</a>.</p>
-<p>This Content Search Engine is used to retrieve information from Medium articles.</p>
+<p>This Content Search Engine is used to retrieve information from Google News.</p>
 <h3> Configuration </h3>
 
-<p>The configuration file is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"information-sources-rapid-medium"</code>. It contains the following parameters:</p>
+<p>The configuration file is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"information-sources-rapid-youtube"</code>. It contains the following parameters:</p>
 <ul>
 <li><code>limit</code>: The maximum number of results to retrieve from the API.</li>
 <li><code>period</code>: The period of time to search for in days.</li>
 <li><code>url</code>: The URL of the Rapid API source.</li>
 <li><code>host</code>: The host of the Rapid API source.</li>
-<li><code>max_results</code>: The maximum number of results to retrieve from the API.</li>
 <li><code>minimum_length</code>: The minimum length of the contents. Papers with content less than this number of characters are filtered out</li>
 <li><code>count_requests</code>: An integer counter that keeps track of the number of requests made to the API. This is used to keep track of the number of requests made to the API, and to disable the source when the limit is reached.</li>
-<li><code>topics</code>: A list of topics to search for. Every topic is a "normal" passed to medium's search engine.</li>
 </ul>
 <h3> Algorithm </h3>
 
+<p>The URL pool is made of urls sent by the user through the bot. Whenever the
+searching algorithm starts, it executes:</p>
 <ol>
-<li><strong>Initialization</strong>:</li>
-<li>Start with a list of topics to search.</li>
-<li>
-<p>Prepare an empty list to store all results.</p>
+<li>Start with the URL pool.</li>
+<li>For each URL:<ol>
+<li>Retrieve video metadata. </li>
+<li>Fetch the transcript using an API.</li>
+<li>Download a thumbnail (if possible).</li>
+<li>Organize this data into a structured format.</li>
+<li>Save the result (if required).</li>
+<li>Pop URL from pool</li>
+</ol>
 </li>
-<li>
-<p><strong>Iterate Over Topics</strong>:</p>
-</li>
-<li>
-<p>For each topic:</p>
-<ul>
-<li>Call the <code>research_topic</code> method to fetch related Medium articles.</li>
-</ul>
-</li>
-<li>
-<p><strong>Research a Topic</strong>:</p>
-</li>
-<li>Query Medium's API with the topic to retrieve a list of articles.</li>
-<li>
-<p>For each article:</p>
-<ul>
-<li>Retrieve article metadata using <code>get_article_info</code> (e.g., title, subtitle, author, publication date).</li>
-<li>Fetch the article's content using <code>get_article_content</code>.</li>
-<li>Enrich the article with additional metadata (e.g., information source).</li>
-<li>Append the processed article to the results list.</li>
-<li>If a <code>save_callback</code> is provided, validate and save the processed article.</li>
-</ul>
-</li>
-<li>
-<p><strong>Return Results</strong>:</p>
-</li>
-<li>Combine all results from processed topics into a single list.</li>
-<li>Return the list of results.</li>
+<li>Continue until all URLs in the pool are processed.</li>
 </ol>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../rationale.html" class="btn btn-neutral float-left" title="About"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../youtube/rationale.html" class="btn btn-neutral float-right" title="YouTube">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../medium/rationale.html" class="btn btn-neutral float-left" title="Medium"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../../../telegram/rationale.html" class="btn btn-neutral float-right" title="Telegram Bot">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -225,10 +203,10 @@
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../medium/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../youtube/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../../../../telegram/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

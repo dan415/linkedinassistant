@@ -47,51 +47,58 @@
                 <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../../rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Sources</a>
     <ul class="current">
                 <li class="toctree-l2"><a class="reference internal" href="../arxiv/rationale.html">Arxiv</a>
                 </li>
-                <li class="toctree-l2 current"><a class="reference internal current" href="rationale.html">Manual PDF Input</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../rapid/medium/rationale.html">Medium</a>
                 </li>
+                <li class="toctree-l3"><a class="reference internal" href="../rapid/youtube/rationale.html">YouTube</a>
+                </li>
     </ul>
                 </li>
     </ul>
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../../../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -147,21 +154,60 @@ to keep the input directory clean, and to avoid processing the same pdfs over an
 a method to keep track of the pdfs that have been processed.</p>
 <h3> Configuration </h3>
 
-<p>The configuration file is located in the <code>information/sources/manual_pdfs</code> folder, and is named <code>config.json</code>. It contains the following parametes:</p>
+<p>The configuration file is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"information-sources-manual_pdf"</code>. It contains the following parametes:</p>
 <ul>
 <li><code>minimum_length</code>: The minimum length of the contents. Papers with content less than this number of characters are filtered out</li>
 <li><code>paragraph_min_length</code>: The minimum length of the paragraphs. Paragraphs with content less than this number of characters are filtered out</li>
-<li><code>colbert_max_total</code>: The maximum number of results to retrieve from the API when using the ColBERT model.</li>
-<li><code>colbert_queries</code>: A list of queries to search for when using the ColBERT model. The queries are used to make the searches against the indexes created by ColBert</li>
-<li><code>input_directory</code>: The directory where the PDFs to be processed are located.</li>
-<li><code>output_directory</code>: The directory where the PDFs that have been processed are moved to.</li>
+<li><code>input_directory</code>: The directory in BlackBlaze B2 where the PDFs to be processed are located. Defaults to <code>Information/Sources/Manual/Input</code></li>
+<li><code>output_directory</code>: The directory in BlackBlaze B2 where the PDFs that have been processed are moved to. Defaults to <code>Information/Sources/Manual/Output</code></li>
+<li><code>provider</code>: Right now it can only be <code>Langchain-RAG</code>. This defines the RAG agent used to extract the context that will be used in order to generate publications. ColBert has been deprecated and as of now only Langchain-RAG is supported</li>
+<li><code>pdf_extractor_provider</code>: Can be either <code>docling</code> or <code>pypdf</code>. More detailed information on the different pdf extractor providers on the pdf section.</li>
 </ul>
+<h3> Algorithm </h3>
+
+<ol>
+<li><strong>Initialization</strong>:</li>
+<li>Authenticate with the B2 storage service using the <code>pdf_manager</code>.</li>
+<li>Retrieve a list of files from the <code>input_directory</code> in BlackBlaze B2</li>
+<li>
+<p>Filter the files to identify PDFs.</p>
+</li>
+<li>
+<p><strong>Iterate Over PDFs</strong>:</p>
+</li>
+<li>
+<p>For each PDF in the filtered list:</p>
+<ol>
+<li><strong>Download Content</strong>:<ul>
+<li>Use the <code>get_pdf_content</code> method to download the PDF content as raw bytes.</li>
+</ul>
+</li>
+<li><strong>Extract Information</strong>:<ul>
+<li>Use the <code>extract_pdf_info</code> method to extract metadata and relevant content from the PDF.</li>
+</ul>
+</li>
+<li><strong>Save Valid Content</strong>:<ul>
+<li>If a <code>save_callback</code> is provided, validate and save the extracted information.</li>
+</ul>
+</li>
+<li><strong>Move Processed PDF</strong>:<ul>
+<li>Move the processed PDF file from the <code>input_directory</code> to the <code>output_directory</code>. (Located in BlackBlaze B2)</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>Return Results</strong>:</p>
+</li>
+<li>Combine all successfully processed and extracted content into a single list.</li>
+<li>Return the list of extracted results.</li>
+</ol>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../arxiv/rationale.html" class="btn btn-neutral float-left" title="Arxiv"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../rapid/medium/rationale.html" class="btn btn-neutral float-right" title="Medium">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../rapid/rationale.html" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -187,7 +233,7 @@ a method to keep track of the pdfs that have been processed.</p>
       <span><a href="../arxiv/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../rapid/medium/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../rapid/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

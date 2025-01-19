@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/linkedin/rationale.html" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Rationale - LinkedIn Assistant</title>
+    <title>LinkedIn - LinkedIn Assistant</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Rationale";
+        var mkdocs_page_name = "LinkedIn";
         var mkdocs_page_input_path = "linkedin/rationale.md";
         var mkdocs_page_url = "/linkedin/rationale.html";
       </script>
@@ -47,23 +47,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../information/rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../information/sources_handler/rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../information/producer/rationale.html">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../information/sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../information/sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../information/sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,27 +94,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../information/publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -124,7 +131,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html" class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Rationale</li>
+      <li class="breadcrumb-item active">LinkedIn</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -145,20 +152,22 @@
 3. After the user is redirected to the LinkedIn Authentication page, the user needs to log in with an account that is member of the page.
 4. After the user logs in, LinkedIn redirects the user back to the application, with the access token as a parameter at "/callback".
 5. The Callback saves the access token in the LinkedIn config file, and then the user can finally prompt to publish again, this time succesfully.</p>
+<p>The LinkedIn publisher class manages the LinkedIn API in order to publish posts. Posts can now contain an image. 
+For this, we first need to register the image as an asset, upload the asset, and use the asset resource identification to include it 
+in the post as an image.</p>
 <h3> Configuration </h3>
 
-<p>The configuration file is located in the <code>information/sources/linkedin</code> folder, and is named <code>config.json</code>. It contains the following parameters:</p>
+<p>The configuration file must be contained inside the <code>config</code> collection with the field <code>config_name</code>: <code>"linkedin"</code>. It contains the following parameters:</p>
 <ul>
-<li><code>client_id</code>: The client ID of the application. This is used to authenticate the user with LinkedIn.</li>
-<li><code>client_secret</code>: The client secret of the application. This is used to authenticate the user with LinkedIn.</li>
-<li><code>redirect_uri</code>: The redirect URI of the application. This is used to authenticate the user with LinkedIn.</li>
-<li><code>access_token</code>: The access token of the user. This is used to authenticate the user with LinkedIn.</li>
-<li><code>linkedin_id</code>: The LinkedIn ID of the page to post to. This is used to authenticate the user with LinkedIn.</li>
 <li><code>footer</code>: The footer to add to the post. This is used to add a footer to the post. I use it to specify that the post was posted automatically by an AI</li>
 </ul>
               
             </div>
           </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../telegram/rationale.html" class="btn btn-neutral float-left" title="Telegram Bot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../windows/rationale.html" class="btn btn-neutral float-right" title="Windows Service">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
@@ -180,6 +189,10 @@
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
+      <span><a href="../telegram/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../windows/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/information/sources_handler/rationale.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://linkedin_assistant.readthedocs.io/information/producer/rationale.html" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Sources Handler - LinkedIn Assistant</title>
+    <title>Publications Producer - LinkedIn Assistant</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Sources Handler";
-        var mkdocs_page_input_path = "information/sources_handler/rationale.md";
-        var mkdocs_page_url = "/information/sources_handler/rationale.html";
+        var mkdocs_page_name = "Publications Producer";
+        var mkdocs_page_input_path = "information/producer/rationale.md";
+        var mkdocs_page_url = "/information/producer/rationale.html";
       </script>
     
     <!--[if lt IE 9]>
@@ -47,23 +47,46 @@
                 <li class="toctree-l1"><a class="reference internal" href="../../release_notes/rationale.html">Release Notes</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Core Components</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >LLMs</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../core/llm/conversation/rationale.html">Conversations Agent</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../core/llm/model_providers/rationale.html">Model Providers</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../core/llm/retrieval/rationale.html">Retrieval Workflow</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../core/pdf/rationale.html">PDF Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../core/publications/rationale.html">Publications</a>
+                  </li>
+              </ul>
               <p class="caption"><span class="caption-text">Information Components</span></p>
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../rationale.html">About</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="rationale.html">Sources Handler</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../searcher/rationale.html">Content Searcher</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sources</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Publications Producer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Sources</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../sources/arxiv/rationale.html">Arxiv</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../sources/manual_pdfs/rationale.html">Manual PDF Input</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="#">Rapid</a>
+                <li class="toctree-l2"><a class="reference internal" >Rapid</a>
     <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../sources/rapid/rationale.html">About</a>
+                </li>
                 <li class="toctree-l3"><a class="" href="../sources/rapid/google_news/rationale.md">Google News</a>
                 </li>
                 <li class="toctree-l3"><a class="reference internal" href="../sources/rapid/medium/rationale.html">Medium</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../sources/rapid/youtube/rationale.html">YouTube</a>
                 </li>
     </ul>
                 </li>
@@ -71,27 +94,11 @@
                   </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../publications_handler/rationale.html">Publications Handler</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../llm/rationale.html">LLM Components</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../llm/colbert/rationale.html">ColBERT</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../llm/langchain_agent/rationale.html">Langchain Agent</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../pdf/rationale.html">PDF Handler</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../../telegram/rationale.html">Telegram Bot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../linkedin/rationale.html">LinkedIn</a>
                 </li>
               </ul>
               <ul>
@@ -125,7 +132,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../../index.html" class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Information Components</li>
-      <li class="breadcrumb-item active">Sources Handler</li>
+      <li class="breadcrumb-item active">Publications Producer</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -134,30 +141,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2> Sources Handler</h2>
+                <h2>Publications Handler</h2>
 
-<p>The Sources Handler class is responsible for handling the sources. It is responsible for the following:</p>
+<p>This class is responsible for handling the publications. It is responsible for the following:</p>
 <ol>
-<li>Run search engines for each source asynchronously and concurrently.</li>
-<li>Sleep for a specified amount of time between searches.</li>
+<li>Walk the publications_directory</li>
+<li>Process the publication, generating a publication idea using the LLM Module.</li>
+<li>Save the publication inside <code>publications</code> collection with state <code>DRAFT</code></li>
 </ol>
-<p>Supported information sources are loaded from the config.json file. Sources defined in the confif file need
-to exist as Enum Items of InformationSource class inside information/sources/information_source.py.
-The Enum string value is used in order to load the sources from:</p>
-<pre><code class="language-json">{    
-  &quot;active_sources&quot;: [
-        &quot;medium&quot;, &quot;arxiv&quot;, &quot;google_news&quot;, &quot;manual&quot;
-    ]
-}
-</code></pre>
-<p>Changing this list will change the sources that are loaded.</p>
-<p>The output from sources may vary from source to source, but retrieved information is always stored as json inside the publications_directory.
-Once they get processed by the Publications handler, they get moved to the pending approval directory.</p>
+<p>It uses the <code>information</code> config document in the <code>config</code> collection in MongoDB</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../rationale.html" class="btn btn-neutral float-left" title="About"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../searcher/rationale.html" class="btn btn-neutral float-left" title="Content Searcher"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../sources/arxiv/rationale.html" class="btn btn-neutral float-right" title="Arxiv">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
@@ -181,7 +178,7 @@ Once they get processed by the Publications handler, they get moved to the pendi
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../searcher/rationale.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../sources/arxiv/rationale.html" style="color: #fcfcfc">Next &raquo;</a></span>
