@@ -11,17 +11,18 @@ from src.core.constants import SERVICE_NAME
 from src.core.exceptions import (
     VaultError,
     AuthenticationError,
-    ConfigurationError, RateLimitExceeded,
+    ConfigurationError,
+    RateLimitExceeded,
 )
 from src.core.utils.logging import ServiceLogger
 
 logger = ServiceLogger(__name__)
 
-HCP_ORGANIZATION = 'HCP_ORGANIZATION'
-HCP_PROJECT = 'HCP_PROJECT'
-HCP_APP = 'HCP_APP'
-HCP_CLIENT_ID = 'HCP_CLIENT_ID'
-HCP_CLIENT_SECRET = 'HCP_CLIENT_SECRET'
+HCP_ORGANIZATION = "HCP_ORGANIZATION"
+HCP_PROJECT = "HCP_PROJECT"
+HCP_APP = "HCP_APP"
+HCP_CLIENT_ID = "HCP_CLIENT_ID"
+HCP_CLIENT_SECRET = "HCP_CLIENT_SECRET"
 
 
 @dataclass
@@ -41,7 +42,7 @@ class VaultConfig:
             project=os.getenv(HCP_PROJECT),
             app=os.getenv(HCP_APP),
             hcp_client_id=os.getenv(HCP_CLIENT_ID),
-            hcp_client_secret=os.getenv(HCP_CLIENT_SECRET)
+            hcp_client_secret=os.getenv(HCP_CLIENT_SECRET),
         )
 
     @classmethod
@@ -51,9 +52,13 @@ class VaultConfig:
         project = keyring.get_password(SERVICE_NAME, HCP_PROJECT)
         app = keyring.get_password(SERVICE_NAME, HCP_APP)
         hcp_client_id = keyring.get_password(SERVICE_NAME, HCP_CLIENT_ID)
-        hcp_client_secret = keyring.get_password(SERVICE_NAME, HCP_CLIENT_SECRET)
+        hcp_client_secret = keyring.get_password(
+            SERVICE_NAME, HCP_CLIENT_SECRET
+        )
 
-        if not all([organization, project, app, hcp_client_id, hcp_client_secret]):
+        if not all(
+            [organization, project, app, hcp_client_id, hcp_client_secret]
+        ):
             logger.error("Missing required keyring credentials")
             raise ConfigurationError(
                 "Missing required keyring credentials. Please ensure all required variables are set in keyring: "
@@ -65,7 +70,7 @@ class VaultConfig:
             project=project,
             app=app,
             hcp_client_id=hcp_client_id,
-            hcp_client_secret=hcp_client_secret
+            hcp_client_secret=hcp_client_secret,
         )
 
     def save_on_keyring(self):
@@ -76,7 +81,9 @@ class VaultConfig:
         keyring.set_password(SERVICE_NAME, HCP_PROJECT, self.project)
         keyring.set_password(SERVICE_NAME, HCP_APP, self.app)
         keyring.set_password(SERVICE_NAME, HCP_CLIENT_ID, self.hcp_client_id)
-        keyring.set_password(SERVICE_NAME, HCP_CLIENT_SECRET, self.hcp_client_secret)
+        keyring.set_password(
+            SERVICE_NAME, HCP_CLIENT_SECRET, self.hcp_client_secret
+        )
         logger.info(f"Saved vault config on keyring for service {SERVICE_NAME}")
 
 
@@ -104,7 +111,10 @@ class VaultClient:
             return
 
         if config is None:
-            logger.info("No config provided, attempting to load from keyring with service name '%s'", SERVICE_NAME)
+            logger.info(
+                "No config provided, attempting to load from keyring with service name '%s'",
+                SERVICE_NAME,
+            )
             config = VaultConfig.from_keyring()
 
         self.config = config
@@ -112,20 +122,33 @@ class VaultClient:
         # Cache configuration using cachetools
         self._cache = TTLCache(maxsize=100, ttl=86400)  # Cache for a day
 
-        if not all([self.config.organization, self.config.project, self.config.app, self.config.hcp_client_id,
-                    self.config.hcp_client_secret]):
+        if not all(
+            [
+                self.config.organization,
+                self.config.project,
+                self.config.app,
+                self.config.hcp_client_id,
+                self.config.hcp_client_secret,
+            ]
+        ):
             logger.error("Missing required configuration fields")
             raise ConfigurationError(
                 "Missing required configuration fields. Please ensure all required fields are provided: "
                 "organization, project, app, hcp_client_id, hcp_client_secret"
             )
 
-        logger.info("Initializing VaultClient with organization: %s, project: %s, app: %s",
-                    self.config.organization, self.config.project, self.config.app)
-        self.endpoint = (f"https://api.cloud.hashicorp.com/secrets/"
-                         f"{self._HCP_API_VERSION}/organizations/"
-                         f"{self.config.organization}/projects/"
-                         f"{self.config.project}/apps/{self.config.app}")
+        logger.info(
+            "Initializing VaultClient with organization: %s, project: %s, app: %s",
+            self.config.organization,
+            self.config.project,
+            self.config.app,
+        )
+        self.endpoint = (
+            f"https://api.cloud.hashicorp.com/secrets/"
+            f"{self._HCP_API_VERSION}/organizations/"
+            f"{self.config.organization}/projects/"
+            f"{self.config.project}/apps/{self.config.app}"
+        )
 
         self._initialized = True
         self.authenticate()
@@ -141,7 +164,12 @@ class VaultClient:
         logger.info("Clearing secret cache")
         self._cache.clear()
 
-    @retry((AuthenticationError, RateLimitExceeded), tries=_RETRY_TRIES, delay=_RETRY_DELAY, logger=logger)
+    @retry(
+        (AuthenticationError, RateLimitExceeded),
+        tries=_RETRY_TRIES,
+        delay=_RETRY_DELAY,
+        logger=logger,
+    )
     def get_secret(self, key: str) -> Any:
         """
         Get a secret from Vault with caching.
@@ -164,24 +192,43 @@ class VaultClient:
         # If not in cache or expired, fetch from vault
         endpoint = f"{self.endpoint}/secrets/{key}:open"
 
-        response = requests.get(endpoint, headers={
-            "Authorization": f"Bearer {self.config.access_token}"
-        }, timeout=self._REQUEST_TIMEOUT)
+        response = requests.get(
+            endpoint,
+            headers={"Authorization": f"Bearer {self.config.access_token}"},
+            timeout=self._REQUEST_TIMEOUT,
+        )
 
         if response.status_code == 401:
-            logger.warning("Authentication failed while fetching secret: %s", key)
+            logger.warning(
+                "Authentication failed while fetching secret: %s", key
+            )
             self.authenticate()
             raise AuthenticationError("Authentication failed", response)
         elif response.status_code != 200:
-            logger.error("Failed to get secret %s: %s - %s", key, response.status_code, response.text)
+            logger.error(
+                "Failed to get secret %s: %s - %s",
+                key,
+                response.status_code,
+                response.text,
+            )
             raise VaultError.from_status(response.status_code)
 
-        value = response.json().get("secret", {}).get("static_version", {}).get("value")
+        value = (
+            response.json()
+            .get("secret", {})
+            .get("static_version", {})
+            .get("value")
+        )
         self._cache[key] = value
         logger.info("Successfully fetched and cached secret for key: %s", key)
         return value
 
-    @retry((AuthenticationError, RateLimitExceeded), tries=_RETRY_TRIES, delay=_RETRY_DELAY, logger=logger)
+    @retry(
+        (AuthenticationError, RateLimitExceeded),
+        tries=_RETRY_TRIES,
+        delay=_RETRY_DELAY,
+        logger=logger,
+    )
     def create_or_update_secret(self, key: str, value: Any) -> bool:
         """
         Create or update a secret in the vault.
@@ -202,22 +249,25 @@ class VaultClient:
             endpoint,
             headers={
                 "Authorization": f"Bearer {self.config.access_token}",
-                "content-type": "application/json"
-
+                "content-type": "application/json",
             },
-            json={
-                "name": key,
-                "value": str(value)
-            },
-            timeout=self._REQUEST_TIMEOUT
+            json={"name": key, "value": str(value)},
+            timeout=self._REQUEST_TIMEOUT,
         )
 
         if response.status_code == 401:
-            logger.error("Authentication failed while creating/updating secret: %s", key)
+            logger.error(
+                "Authentication failed while creating/updating secret: %s", key
+            )
             self.authenticate()
             raise AuthenticationError("Authentication failed", response)
         elif response.status_code != 200:
-            logger.error("Failed to get secret %s: %s - %s", key, response.status_code, response.text)
+            logger.error(
+                "Failed to get secret %s: %s - %s",
+                key,
+                response.status_code,
+                response.text,
+            )
             raise VaultError.from_status(response.status_code)
 
         # Clear the cache entry for this key
@@ -240,17 +290,21 @@ class VaultClient:
         logger.info("Retrieving HCP access token")
         if not self.config.hcp_client_id or not self.config.hcp_client_secret:
             logger.error("Missing HCP client credentials")
-            raise ConfigurationError("HCP_CLIENT_ID and HCP_CLIENT_SECRET environment variables must be set")
+            raise ConfigurationError(
+                "HCP_CLIENT_ID and HCP_CLIENT_SECRET environment variables must be set"
+            )
 
         data = {
             "grant_type": "client_credentials",
             "client_id": self.config.hcp_client_id,
             "client_secret": self.config.hcp_client_secret,
-            "audience": "https://api.hashicorp.cloud"
+            "audience": "https://api.hashicorp.cloud",
         }
 
         try:
-            response = requests.post(self._HCP_AUTH_URL, data=data, timeout=self._REQUEST_TIMEOUT)
+            response = requests.post(
+                self._HCP_AUTH_URL, data=data, timeout=self._REQUEST_TIMEOUT
+            )
             response.raise_for_status()
         except Timeout:
             logger.warning("Request to HCP timed out")
@@ -263,7 +317,11 @@ class VaultClient:
             logger.error("Invalid client credentials")
             raise AuthenticationError("Invalid client credentials", response)
         elif response.status_code != 200:
-            logger.error("Failed to get secret %s: %s - %s", response.status_code, response.text)
+            logger.error(
+                "Failed to get secret %s: %s - %s",
+                response.status_code,
+                response.text,
+            )
             raise VaultError.from_status(response.status_code)
 
         token = response.json().get("access_token")

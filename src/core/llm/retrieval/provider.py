@@ -10,10 +10,15 @@ class Retriever(Enum):
 
 class DocumentRetrieverProvider:
     """Provides a content search engine. This is just a class that returns a search
-     engine for a given information source, just for abstraction purposes"""
+    engine for a given information source, just for abstraction purposes"""
 
     @classmethod
-    def get_document_retriever_provider(cls, provider: str, logger: logging.Logger = ServiceLogger(__name__), document_name: str = ""):
+    def get_document_retriever_provider(
+        cls,
+        provider: str,
+        logger: logging.Logger = ServiceLogger(__name__),
+        document_name: str = "",
+    ):
         """Get a content search engine for the information source.
 
         :param: provider: String value identifier for the provider. Right now only langchain is supported :)

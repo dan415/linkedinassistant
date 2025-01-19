@@ -8,7 +8,9 @@ from src.core.utils.logging import ServiceLogger
 class DocumentInformationRetrieval(ABC):
     _CONFIG_SCHEMA = None  # Forces to implement this constant
 
-    def __init__(self, document_name, logger: logging.Logger = ServiceLogger(__name__)):
+    def __init__(
+        self, document_name, logger: logging.Logger = ServiceLogger(__name__)
+    ):
         self.document_name = document_name
         self.logger = logger
 
@@ -20,7 +22,9 @@ class DocumentInformationRetrieval(ABC):
         pass
 
     @abstractmethod
-    def search(self, paragraphs: list[str], queries: list[str] = None) -> Tuple[str, str]:
+    def search(
+        self, paragraphs: list[str], queries: list[str] = None
+    ) -> Tuple[str, str]:
         """
         Execute the retrieval workflow to process input text and dynamically generate questions and answers.
 

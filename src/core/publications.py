@@ -6,7 +6,11 @@ from typing import Optional, Iterator, Dict, Any
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
-from src.core.constants import PublicationState, SecretKeys, PUBLICATIONS_COLLECTION
+from src.core.constants import (
+    PublicationState,
+    SecretKeys,
+    PUBLICATIONS_COLLECTION,
+)
 from src.core.utils.logging import ServiceLogger
 from src.core.vault.hashicorp import VaultClient
 
@@ -16,11 +20,12 @@ from src.core.vault.hashicorp import VaultClient
 class PublicationIterator:
     """Iterator class for filtering and iterating through publications based on their state."""
 
-    def __init__(self,
-                 state_filter: Optional[PublicationState] = None,
-                 do_format=True,
-                 logger: logging.Logger = ServiceLogger(__name__)
-                 ):
+    def __init__(
+        self,
+        state_filter: Optional[PublicationState] = None,
+        do_format=True,
+        logger: logging.Logger = ServiceLogger(__name__),
+    ):
         """Initialize the publication iterator.
 
         Args:
@@ -28,8 +33,12 @@ class PublicationIterator:
         """
         self.logger = logger
         vault_client = VaultClient()
-        client: MongoClient = MongoClient(vault_client.get_secret(SecretKeys.MONGO_URI))
-        self.db: Database = client.get_database(vault_client.get_secret(SecretKeys.MONGO_DATABASE))
+        client: MongoClient = MongoClient(
+            vault_client.get_secret(SecretKeys.MONGO_URI)
+        )
+        self.db: Database = client.get_database(
+            vault_client.get_secret(SecretKeys.MONGO_DATABASE)
+        )
         self.client: Collection = self.db[PUBLICATIONS_COLLECTION]
         self.state_filter = state_filter
         self._cursor = None
@@ -80,7 +89,9 @@ class PublicationIterator:
         Returns:
             Optional[Dict[str, Any]]: The publication document if found, None otherwise.
         """
-        return self._format(self.client.find_one({"publication_id": publication_id}))
+        return self._format(
+            self.client.find_one({"publication_id": publication_id})
+        )
 
     def get_content(self, publication_id: str) -> Optional[str]:
         """Retrieve the content field of a specific publication.
@@ -123,7 +134,9 @@ class PublicationIterator:
         self.reset_iterator()
         try:
             self.current_index = n
-            self.logger.debug(f"Current index: {self.current_index} out of {len(self)}")
+            self.logger.debug(
+                f"Current index: {self.current_index} out of {len(self)}"
+            )
             return self._format(next(self._cursor.skip(n)))
         except StopIteration:
             self.logger.debug("Iterator reset")
@@ -131,7 +144,9 @@ class PublicationIterator:
             self.current_index = last_index
             return None
 
-    def _update_publication(self, publication_id: str, update: Dict[str, Any]) -> bool:
+    def _update_publication(
+        self, publication_id: str, update: Dict[str, Any]
+    ) -> bool:
         """Update a publication with new values.
 
         Args:
@@ -142,7 +157,9 @@ class PublicationIterator:
             bool: True if the update was successful, False otherwise.
         """
         update["last_updated"] = datetime.datetime.now()
-        result = self.client.update_one({"publication_id": publication_id}, {"$set": update})
+        result = self.client.update_one(
+            {"publication_id": publication_id}, {"$set": update}
+        )
         return result.modified_count > 0
 
     def update_content(self, publication_id: str, content: str) -> bool:
@@ -167,9 +184,13 @@ class PublicationIterator:
         Returns:
             bool: True if the image was updated, False otherwise.
         """
-        return self._update_publication(publication_id, {"image": base64.b64encode(image).decode("utf-8")})
+        return self._update_publication(
+            publication_id, {"image": base64.b64encode(image).decode("utf-8")}
+        )
 
-    def update_state(self, publication_id: str, state: PublicationState) -> bool:
+    def update_state(
+        self, publication_id: str, state: PublicationState
+    ) -> bool:
         """Update the state of a publication.
 
         Args:
@@ -194,7 +215,11 @@ class PublicationIterator:
         publication["state"] = PublicationState.DRAFT.value
         result = self.client.insert_one(publication)
         self._total_count = None  # Reset cache
-        return publication["publication_id"] if result.inserted_id is not None else None
+        return (
+            publication["publication_id"]
+            if result.inserted_id is not None
+            else None
+        )
 
     def last(self) -> Optional[Dict[str, Any]]:
         """Retrieve the previous publication in the iterator with circular behavior.
@@ -210,7 +235,9 @@ class PublicationIterator:
             return None
 
         self.current_index = (current_index - 1 + total_count) % total_count
-        self.logger.warning(f"Current index: {self.current_index} out of {len(self)}")
+        self.logger.warning(
+            f"Current index: {self.current_index} out of {len(self)}"
+        )
         publication = self._cursor.skip(self.current_index)
 
         return self._format(next(publication, None))
@@ -226,7 +253,9 @@ class PublicationIterator:
         for index, publication in enumerate(self._cursor):
             if publication.get("publication_id") == publication_id:
                 self.current_index = index
-                self.logger.warning(f"Current index: {self.current_index} out of {len(self)}")
+                self.logger.warning(
+                    f"Current index: {self.current_index} out of {len(self)}"
+                )
                 return True
 
         return False
@@ -242,7 +271,9 @@ class PublicationIterator:
         """
         It creates the cursor object with the state filter
         """
-        state_filter = {"state": self.state_filter.value} if self.state_filter else {}
+        state_filter = (
+            {"state": self.state_filter.value} if self.state_filter else {}
+        )
         return self.client.find(state_filter).sort("creation_date", 1)
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
@@ -261,7 +292,9 @@ class PublicationIterator:
         :returns: int: The number of matching publications.
         """
         if self._total_count is None:
-            state_filter = {"state": self.state_filter.value} if self.state_filter else {}
+            state_filter = (
+                {"state": self.state_filter.value} if self.state_filter else {}
+            )
             self._total_count = self.client.count_documents(state_filter)
         return self._total_count
 
@@ -280,8 +313,10 @@ class PublicationIterator:
             self.logger.debug("Iterator reset")
             raise StopIteration("No publications available.")
 
-        self.current_index = (self.current_index + 1)
-        self.logger.warning(f"Current index: {self.current_index} out of {len(self)}")
+        self.current_index = self.current_index + 1
+        self.logger.warning(
+            f"Current index: {self.current_index} out of {len(self)}"
+        )
         if self.current_index >= total_count:
             self.reset_iterator()
         return self._format(next(self._cursor))

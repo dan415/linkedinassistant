@@ -27,7 +27,9 @@ MSG_INVALID_URL = "Invalid YouTube URL"
 MSG_IMAGE_GENERATING = "Generating image..."
 MSG_IMAGE_CLEARED = "Image cleared"
 MSG_CONV_ID_NOT_SET = "Conversation ID must be set"
-MSG_IMAGE_NOT_PASSED = "In order to set an image you need to pass an image in the message"
+MSG_IMAGE_NOT_PASSED = (
+    "In order to set an image you need to pass an image in the message"
+)
 MSG_PROVIDE_INSTRUCTIONS = "Please provide instructions for the image change"
 MSG_COMMAND_NOT_FOUND = "Command not found"
 MSG_SEARCH_ENGINE_ACTIVATED = "Search engine activated successfully"
@@ -38,8 +40,8 @@ MSG_NO_IMAGES_FOR_PUBLICATION = "There are no images for this publication"
 MSG_ERROR = "Something went wrong, try later :("
 MSG_FILE_RECEIVED_SUCCESS = "File received successfully!"
 MSG_IMAGE_RECEIVED_SUCCESS = "Image updated successfully"
-MSG_ERROR_YOUTUBE = 'Error processing YouTube URL. Please try again.'
-MSG_ERROR_COMMAND_BIND = 'Command failed to bind arguments!'
+MSG_ERROR_YOUTUBE = "Error processing YouTube URL. Please try again."
+MSG_ERROR_COMMAND_BIND = "Command failed to bind arguments!"
 MSG_ERROR_LOADING_SUGGESTION = "Error loading next suggestion"
 MSG_SAME_SUGGESTION_SELECTED = "You selected the same suggestion"
 MSG_ERROR_SELECTING_SUGGESTION = "Error selecting suggestion"

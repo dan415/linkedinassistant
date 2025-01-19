@@ -1,6 +1,4 @@
 import logging
-
-from chromadb.utils.embedding_functions import create_langchain_embedding
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
@@ -19,10 +17,16 @@ class ProcessingState(TypedDict, total=False):
     # Define the structure of the state that flows through the workflow.
     text: Required[str]  # Input text to be processed
     chunks: NotRequired[List[str]]  # List of text chunks after splitting
-    documents: NotRequired[List[Document]]  # List of documents created from chunks
+    documents: NotRequired[
+        List[Document]
+    ]  # List of documents created from chunks
     summary: NotRequired[str]  # Summary of the documents
-    terms_or_questions_list: NotRequired[List[str]]  # List of terms or questions generated
-    vectorstore: NotRequired[Optional[Chroma]]  # Vectorstore for similarity search
+    terms_or_questions_list: NotRequired[
+        List[str]
+    ]  # List of terms or questions generated
+    vectorstore: NotRequired[
+        Optional[Chroma]
+    ]  # Vectorstore for similarity search
     relevant_chunks: NotRequired[List[str]]  # List of relevant chunks retrieved
     answers: NotRequired[List[str]]  # List of answers generated for questions
     formatted_dialog: NotRequired[str]  # Formatted Q&A dialog
@@ -32,17 +36,19 @@ class ProcessingState(TypedDict, total=False):
 class RetrieverWorkflow:
     """Encapsulates the workflow setup and execution for a retriever."""
 
-    def __init__(self, chunk_size,
-                 chunk_overlap,
-                 model_provider,
-                 embeddings_provider,
-                 n_chunk_results,
-                 query_expansion_prompt,
-                 answer_prompt,
-                 title_extraction_prompt,
-                 has_title=False,
-                 logger: logging.Logger = ServiceLogger(__name__)
-                 ):
+    def __init__(
+        self,
+        chunk_size,
+        chunk_overlap,
+        model_provider,
+        embeddings_provider,
+        n_chunk_results,
+        query_expansion_prompt,
+        answer_prompt,
+        title_extraction_prompt,
+        has_title=False,
+        logger: logging.Logger = ServiceLogger(__name__),
+    ):
         # Initialize parameters for chunking, LLM provider, embeddings, and result limits.
         self.logger = logger
         self.chunk_size = chunk_size
@@ -68,9 +74,9 @@ class RetrieverWorkflow:
         """
         self.logger.info("Creating documents from chunks.")
         try:
-            state['documents'] = [
-                Document(page_content=chunk, metadata={'chunk_order': idx})
-                for idx, chunk in enumerate(state['chunks'])
+            state["documents"] = [
+                Document(page_content=chunk, metadata={"chunk_order": idx})
+                for idx, chunk in enumerate(state["chunks"])
             ]
             self.logger.info(f"Created {len(state['documents'])} documents.")
         except Exception as e:
@@ -89,9 +95,11 @@ class RetrieverWorkflow:
         """
         self.logger.info("Formatting Q&A dialog.")
         try:
-            state['formatted_dialog'] = "\n\n".join(
+            state["formatted_dialog"] = "\n\n".join(
                 f"Q: {q}\nA: {a}"
-                for q, a in zip(state['terms_or_questions_list'], state['answers'])
+                for q, a in zip(
+                    state["terms_or_questions_list"], state["answers"]
+                )
             )
             self.logger.info("Dialog formatting completed.")
         except Exception as e:
@@ -110,7 +118,9 @@ class RetrieverWorkflow:
         workflow.add_node("summarize_documents", self.summarize_documents)
         workflow.add_node("generate_terms", self.generate_terms)
         workflow.add_node("create_vectorstore", self.create_vectorstore)
-        workflow.add_node("retrieve_relevant_chunks", self.retrieve_relevant_chunks)
+        workflow.add_node(
+            "retrieve_relevant_chunks", self.retrieve_relevant_chunks
+        )
         workflow.add_node("answer_questions", self.answer_questions)
         workflow.add_node("format_dialog", self.format_dialog)
 
@@ -151,7 +161,7 @@ class RetrieverWorkflow:
             splitter = RecursiveCharacterTextSplitter(
                 chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
             )
-            state['chunks'] = splitter.split_text(state['text'])
+            state["chunks"] = splitter.split_text(state["text"])
             self.logger.info(f"Text split into {len(state['chunks'])} chunks.")
         except Exception as e:
             self.logger.error(f"Error splitting text: {e}")
@@ -174,10 +184,12 @@ class RetrieverWorkflow:
         try:
             chain = load_summarize_chain(self.llm, chain_type="stuff")
             summaries = [
-                chain.invoke(state['documents'][i:i + self.chunk_size])
-                for i in range(0, len(state['documents']), self.chunk_size)
+                chain.invoke(state["documents"][i : i + self.chunk_size])
+                for i in range(0, len(state["documents"]), self.chunk_size)
             ]
-            state['summary'] = "\n".join(s.get("output_text", "") for s in summaries)
+            state["summary"] = "\n".join(
+                s.get("output_text", "") for s in summaries
+            )
             self.logger.info("Summarization completed.")
         except Exception as e:
             self.logger.error(f"Error summarizing documents: {e}")
@@ -198,12 +210,21 @@ class RetrieverWorkflow:
         """
         self.logger.info("Generating terms or questions from summary.")
         try:
-            chain = PromptTemplate(
-                input_variables=["summary"], template=self.query_expansion_prompt
-            ) | self.llm | StrOutputParser()
+            chain = (
+                PromptTemplate(
+                    input_variables=["summary"],
+                    template=self.query_expansion_prompt,
+                )
+                | self.llm
+                | StrOutputParser()
+            )
 
-            state['terms_or_questions_list'] = chain.invoke({"summary": state['summary']}).strip().split("\n")
-            self.logger.info(f"Generated terms/questions: {state['terms_or_questions_list']}")
+            state["terms_or_questions_list"] = (
+                chain.invoke({"summary": state["summary"]}).strip().split("\n")
+            )
+            self.logger.info(
+                f"Generated terms/questions: {state['terms_or_questions_list']}"
+            )
         except Exception as e:
             self.logger.error(f"Error generating terms: {e}")
             raise
@@ -224,12 +245,12 @@ class RetrieverWorkflow:
         """
         self.logger.info("Creating vector store from documents.")
         try:
-            state['vectorstore'] = Chroma.from_texts(
-                [doc.page_content for doc in state['documents']],
+            state["vectorstore"] = Chroma.from_texts(
+                [doc.page_content for doc in state["documents"]],
                 embedding=self.embedding_model,
-                metadatas=[doc.metadata for doc in state['documents']],
+                metadatas=[doc.metadata for doc in state["documents"]],
                 collection_name="retrieval_state",
-                persist_directory=None
+                persist_directory=None,
             )
             self.logger.info("Vectorstore created.")
         except Exception as e:
@@ -254,17 +275,22 @@ class RetrieverWorkflow:
         try:
             results = [
                 chunk
-                for term in state['terms_or_questions_list']
-                for chunk in state['vectorstore'].similarity_search(term, k=self.n_chunk_results)
+                for term in state["terms_or_questions_list"]
+                for chunk in state["vectorstore"].similarity_search(
+                    term, k=self.n_chunk_results
+                )
             ]
             # We sort the retrieved documents to facilitate understanding
             results.sort(key=lambda page: page.metadata["chunk_order"])
             # We removed duplicated returned chunks
             results = {page.metadata["chunk_order"]: page for page in results}
             # Take just the strings
-            state['relevant_chunks'] = [page.page_content for page in
-                                        results.values()]  # Preserve order while ensuring uniqueness.
-            self.logger.info(f"Retrieved {len(state['relevant_chunks'])} relevant chunks.")
+            state["relevant_chunks"] = [
+                page.page_content for page in results.values()
+            ]  # Preserve order while ensuring uniqueness.
+            self.logger.info(
+                f"Retrieved {len(state['relevant_chunks'])} relevant chunks."
+            )
         except Exception as e:
             self.logger.error(f"Error retrieving relevant chunks: {e}")
             raise
@@ -285,14 +311,23 @@ class RetrieverWorkflow:
         """
         self.logger.info("Answering questions.")
         try:
-            chain = PromptTemplate(
-                input_variables=["context", "question"],
-                template=self.answer_prompt
-            ) | self.llm | StrOutputParser()
+            chain = (
+                PromptTemplate(
+                    input_variables=["context", "question"],
+                    template=self.answer_prompt,
+                )
+                | self.llm
+                | StrOutputParser()
+            )
 
-            state['answers'] = [
-                chain.invoke({"context": "\n".join(state['relevant_chunks']), "question": question})
-                for question in state['terms_or_questions_list']
+            state["answers"] = [
+                chain.invoke(
+                    {
+                        "context": "\n".join(state["relevant_chunks"]),
+                        "question": question,
+                    }
+                )
+                for question in state["terms_or_questions_list"]
             ]
             self.logger.info("Questions answered.")
         except Exception as e:
@@ -310,11 +345,18 @@ class RetrieverWorkflow:
         """
         self.logger.info("Extracting document title.")
         try:
-            chain = PromptTemplate(
-                input_variables=["text"], template=self.title_extraction_prompt
-            ) | self.llm | StrOutputParser()
+            chain = (
+                PromptTemplate(
+                    input_variables=["text"],
+                    template=self.title_extraction_prompt,
+                )
+                | self.llm
+                | StrOutputParser()
+            )
 
-            state['title'] = chain.invoke({"text": state['text'][:min(len(state['text']), 2000)]}).strip()
+            state["title"] = chain.invoke(
+                {"text": state["text"][: min(len(state["text"]), 2000)]}
+            ).strip()
             self.logger.info(f"Extracted title: {state['title']}")
         except Exception as e:
             self.logger.error(f"Error extracting title: {e}")
@@ -324,12 +366,17 @@ class RetrieverWorkflow:
 
 class LangChainRetriever(DocumentInformationRetrieval):
     """Main class orchestrating retrieval workflows."""
+
     _CONFIG_SCHEMA = "llm-retrieval-langchain"
 
-    def __init__(self, document_name="", logger: logging.Logger = ServiceLogger(__name__)):
+    def __init__(
+        self, document_name="", logger: logging.Logger = ServiceLogger(__name__)
+    ):
         # Initialize the retriever with the document name and other properties.
         super().__init__(document_name, logger=logger)
-        self.logger.debug(f"Initializing LangChainRetriever with document_name: {document_name}")
+        self.logger.debug(
+            f"Initializing LangChainRetriever with document_name: {document_name}"
+        )
         self.chunk_size = None
         self.chunk_overlap = None
         self.model_provider = None
@@ -355,7 +402,7 @@ class LangChainRetriever(DocumentInformationRetrieval):
             answer_prompt=self.answer_prompt,
             query_expansion_prompt=self.query_expansion_prompt,
             title_extraction_prompt=self.title_extraction_prompt,
-            has_title=self.document_name != ""
+            has_title=self.document_name != "",
         )
         self.workflow = self.workflow_manager.setup_workflow()
         return self
@@ -378,8 +425,12 @@ class LangChainRetriever(DocumentInformationRetrieval):
         """
         self.logger.info("Starting search process.")
         if queries:
-            self.logger.warning("This retriever dynamically generates queries; input queries are ignored.")
+            self.logger.warning(
+                "This retriever dynamically generates queries; input queries are ignored."
+            )
 
         initial_state = {"text": " ".join(paragraphs)}
         result = self.workflow.compile().invoke(initial_state)
-        return result.get("formatted_dialog", "No dialog generated"), result.get("title", "Untitled Document")
+        return result.get(
+            "formatted_dialog", "No dialog generated"
+        ), result.get("title", "Untitled Document")

@@ -10,7 +10,10 @@ from googleapiclient.discovery import build
 from src.core.utils.logging import ServiceLogger
 from src.core.vault.hashicorp import VaultClient
 from src.core.constants import SecretKeys
-from src.information.sources.base import requires_valid_period, InformationSource
+from src.information.sources.base import (
+    requires_valid_period,
+    InformationSource,
+)
 from src.information.sources.rapid.base import RapidSource
 from src.information.sources.rapid.youtube.pool import YoutubeUrlPool
 
@@ -20,23 +23,28 @@ class YoutubeTranscriptRetriever(RapidSource):
     Retrieves transcripts and metadata from YouTube videos using RapidAPI and pytube
     """
 
-    _PARTS = ["snippet"]  # Could retrieve more information like views and stuff but don really need it tbh
-    _METADATA_KEYS = ["publishedAt", 'title', "description", "channelTitle"]
+    _PARTS = [
+        "snippet"
+    ]  # Could retrieve more information like views and stuff but don really need it tbh
+    _METADATA_KEYS = ["publishedAt", "title", "description", "channelTitle"]
     _SCHEME = "https://"
     _REQUEST_TIMEOUT = 10
     _THUMBNAIL_OPTIONS = [
         "maxresdefault.jpg",
         "hqdefault.jpg",
         "mqdefault.jpg",
-        "default.jpg"
+        "default.jpg",
     ]
 
     def __init__(self):
         super().__init__(ServiceLogger(__name__))
         self.information_source = InformationSource.YOUTUBE
         self.url_pool = YoutubeUrlPool()
-        self.yt_client = build('youtube', 'v3',
-                               developerKey=VaultClient().get_secret(SecretKeys.YOUTUBE_API_KEY))
+        self.yt_client = build(
+            "youtube",
+            "v3",
+            developerKey=VaultClient().get_secret(SecretKeys.YOUTUBE_API_KEY),
+        )
 
     @staticmethod
     def _extract_video_id(url):
@@ -49,17 +57,21 @@ class YoutubeTranscriptRetriever(RapidSource):
 
     def _execute_metadata_request(self, video_id):
         try:
-            metadata = self.yt_client.videos().list(
-                part=",".join(self._PARTS),
-                id=video_id
-            ).execute().get("items", [])
+            metadata = (
+                self.yt_client.videos()
+                .list(part=",".join(self._PARTS), id=video_id)
+                .execute()
+                .get("items", [])
+            )
 
             if metadata:
                 return metadata[0]
             self.logger.warning(f"Metadata for video {video_id} empty")
             return None
         except Exception as e:
-            self.logger.error(f"Error getting metadata for {video_id}: {str(e)}")
+            self.logger.error(
+                f"Error getting metadata for {video_id}: {str(e)}"
+            )
             return None
 
     def _extract_from_metadata(self, metadata_dict):
@@ -80,16 +92,21 @@ class YoutubeTranscriptRetriever(RapidSource):
         return None
 
     def download_youtube_thumbnail(self, video_id):
-        base_thumbnail_url = f'https://img.youtube.com/vi/{video_id}/'
+        base_thumbnail_url = f"https://img.youtube.com/vi/{video_id}/"
 
         for option in self._THUMBNAIL_OPTIONS:
             thumbnail_url = base_thumbnail_url + option
-            response = requests.get(thumbnail_url, timeout=self._REQUEST_TIMEOUT, stream=True)
+            response = requests.get(
+                thumbnail_url, timeout=self._REQUEST_TIMEOUT, stream=True
+            )
             if response.status_code == 200:
-                self.logger.info(f'Thumbnail downloaded for video {video_id} and quality {option}')
+                self.logger.info(
+                    f"Thumbnail downloaded for video {video_id} and quality {option}"
+                )
                 return response.content
             self.logger.warning(
-                f'Could not download thumbnail for video {video_id} and quality {option}. Response: {str(response)}')
+                f"Could not download thumbnail for video {video_id} and quality {option}. Response: {str(response)}"
+            )
         return None
 
     def get_transcript(self, url):
@@ -97,23 +114,29 @@ class YoutubeTranscriptRetriever(RapidSource):
         self.logger.info("Fetching transcript for URL: %s", url)
 
         try:
-            encoded_url = quote(url, safe='')
+            encoded_url = quote(url, safe="")
             self.logger.info("Making API request to %s", self.host)
 
-            response = self.execute_rapid_request(f"{self.url}?url={encoded_url}&flat_text=true",
-                                                  extra_headers={
-                                                      "Accept": "application/json",
-                                                      "Content-Type": "application/json"
-                                                  }
-                                                  )
+            response = self.execute_rapid_request(
+                f"{self.url}?url={encoded_url}&flat_text=true",
+                extra_headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                },
+            )
             response.raise_for_status()
             data = response.json()
             transcript = data.get("transcript", "")
-            self.logger.info("Successfully retrieved transcript of length %d characters", len(transcript))
+            self.logger.info(
+                "Successfully retrieved transcript of length %d characters",
+                len(transcript),
+            )
             return transcript
 
         except Exception as e:
-            self.logger.error(f"Error retrieving transcript for {url}: {str(e)}")
+            self.logger.error(
+                f"Error retrieving transcript for {url}: {str(e)}"
+            )
             return None
 
     def process_url(self, url):
@@ -150,22 +173,32 @@ class YoutubeTranscriptRetriever(RapidSource):
         return material
 
     @requires_valid_period
-    def search(self, save_callback=None, stop_event: threading.Event = None) -> list:
+    def search(
+        self, save_callback=None, stop_event: threading.Event = None
+    ) -> list:
         """Search for content in the URL pool and process each URL"""
-        self.logger.info("Starting search for content in %s", self.information_source)
+        self.logger.info(
+            "Starting search for content in %s", self.information_source
+        )
         all_results = []
 
         for url in self.url_pool:
 
             if stop_event and stop_event.is_set():
-                self.url_pool.add_url(url)  # Urls get popped out of the queue when iterating
-                self.logger.info("Stop event called in the middle of procesing the topics")
+                self.url_pool.add_url(
+                    url
+                )  # Urls get popped out of the queue when iterating
+                self.logger.info(
+                    "Stop event called in the middle of procesing the topics"
+                )
                 break
 
             self.logger.info("Processing URL: %s", url)
             material = self.process_url(url)
             if material:
-                self.logger.info("Successfully processed material for: %s", material["title"])
+                self.logger.info(
+                    "Successfully processed material for: %s", material["title"]
+                )
                 all_results.append(material)
                 if save_callback:
                     self.save_if_valid(save_callback, material)

@@ -4,8 +4,14 @@ from enum import Enum
 from pathlib import Path
 
 PWD = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.abspath(os.path.join(PWD, '..', '..'))
-DATA_DIR = PROJECT_DIR if sys.platform != 'win32' else os.path.join(str(Path.home()), "AppData", "Local", "linkedin_assistant")
+PROJECT_DIR = os.path.abspath(os.path.join(PWD, "..", ".."))
+DATA_DIR = (
+    PROJECT_DIR
+    if sys.platform != "win32"
+    else os.path.join(
+        str(Path.home()), "AppData", "Local", "linkedin_assistant"
+    )
+)
 
 LOGGING_DIR = os.path.join(DATA_DIR, "logs")
 HTML_DIR = os.path.join(DATA_DIR, "html")
@@ -18,27 +24,12 @@ PUBLICATIONS_COLLECTION = "publications"
 YOUTUBE_COLLECTION = "youtube-pool"
 SERVICE_NAME = "linkedin_assistant"
 COLLECTIONS_AND_INDICES = {
-    CONFIGS_COLLECTION: [
-        {
-            "config_name": 1,
-            "unique": True
-        }
-    ],
-    YOUTUBE_COLLECTION: [
-        {
-            "timestamp": 1
-        }
-    ],
+    CONFIGS_COLLECTION: [{"config_name": 1, "unique": True}],
+    YOUTUBE_COLLECTION: [{"timestamp": 1}],
     PUBLICATIONS_COLLECTION: [
-        {
-            "publication_id": 1,
-            "unique": True
-        },
-        {
-            "state": 1,
-            "creationDate": -1
-        }
-    ]
+        {"publication_id": 1, "unique": True},
+        {"state": 1, "creationDate": -1},
+    ],
 }
 
 

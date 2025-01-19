@@ -2,8 +2,12 @@ from src.information.sources.arxiv import ArxivSearchEngine
 from src.information.sources.base import InformationSource
 from src.information.sources.manual_pdfs import ManualSourceEngine
 from src.information.sources.rapid.medium import MediumSearchEngine
-from src.information.sources.rapid.google_news import GoogleNewsInformationEngine
-from src.information.sources.rapid.youtube.retriever import YoutubeTranscriptRetriever
+from src.information.sources.rapid.google_news import (
+    GoogleNewsInformationEngine,
+)
+from src.information.sources.rapid.youtube.retriever import (
+    YoutubeTranscriptRetriever,
+)
 
 
 class ContentSearchEngineProvider:
@@ -20,7 +24,9 @@ class ContentSearchEngineProvider:
     }
 
     @classmethod
-    def get_content_search_engine(cls, information_source: InformationSource) -> object:
+    def get_content_search_engine(
+        cls, information_source: InformationSource
+    ) -> object:
         """Retrieve the appropriate content search engine for the specified information source.
         Args:
             information_source (InformationSource): Enum value representing the information source.
@@ -34,6 +40,8 @@ class ContentSearchEngineProvider:
         search_engine_class = cls.SEARCH_ENGINE_MAP.get(information_source)
 
         if search_engine_class is None:
-            raise ValueError(f"Information source {information_source} is not supported.")
+            raise ValueError(
+                f"Information source {information_source} is not supported."
+            )
 
         return search_engine_class()

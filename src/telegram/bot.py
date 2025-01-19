@@ -19,12 +19,45 @@ from src.linkedin.publisher import LinkedinPublisher
 from pyngrok import ngrok
 import requests
 from src.core.llm.conversation.agent import LangChainGPT
-from src.telegram.constants import *
 import io
 import datetime
 import threading
 from typing import Optional
 import src.core.utils.functions as F
+from src.telegram.constants import (
+    MSG_START,
+    MSG_HEALTHCHECK,
+    MSG_CLEARED,
+    MSG_ERROR_CLEAR,
+    MSG_NO_SUGGESTIONS,
+    MSG_SAME_SUGGESTION_SELECTED,
+    MSG_INVALID_INDEX,
+    MSG_ERROR_SELECTING_SUGGESTION,
+    MSG_NO_CURRENT_SUGGESTION,
+    MSG_SEARCH_ENGINE_ACTIVATED,
+    MSG_SEARCH_ENGINE_ACTIVATED_ERR,
+    MSG_SEARCH_ENGINE_STOPPED,
+    MSG_SEARCH_ENGINE_STOPPED_ERR,
+    MSG_ERROR_LOADING_SUGGESTION,
+    CONFIG_SCHEMA,
+    MSG_ERROR_PUBLISH,
+    MSG_PUBLISH_SUCCESS,
+    MSG_CONV_ID_NOT_SET,
+    MSG_IMAGE_NOT_PASSED,
+    MSG_IMAGE_RECEIVED_SUCCESS,
+    MSG_NO_IMAGES_FOR_PUBLICATION,
+    MSG_ERROR,
+    MSG_INVALID_URL,
+    MSG_COMMAND_NOT_FOUND,
+    MSG_ERROR_COMMAND_BIND,
+    NGROK_ADDRESS,
+    MSG_ERROR_SENDING,
+    MSG_ERROR_COMMAND,
+    NGROK_PROTOCOL,
+    MSG_FILE_RECEIVED_SUCCESS,
+    MSG_ERROR_YOUTUBE,
+)
+
 
 logger = ServiceLogger(__name__)
 
@@ -64,10 +97,12 @@ def restricted(func):
     @wraps(func)
     def wrapper(self, message: Message, *args, **kwargs):
         if self.state.chat_id and message.chat.id != self.state.chat_id:
-            logger.warning(f"""Unauthorized access to the bot for message with chat_id {message.chat.id}, which is \
+            logger.warning(
+                f"""Unauthorized access to the bot for message with chat_id {message.chat.id}, which is \
             different from {self.state.chat_id}.
             Message: {str(message)}
-            """)
+            """
+            )
             return
         return func(self, message, *args, **kwargs)
 
@@ -103,8 +138,8 @@ class OrigamiBotExtended(OrigamiBot):
         url = f"https://api.telegram.org/bot{self.token}/getFile?file_id={file_id}"
         response = requests.get(url, timeout=self._REQUEST_TIMEOUT)
         result = response.json()
-        if result['ok']:
-            return result['result']['file_path']
+        if result["ok"]:
+            return result["result"]["file_path"]
         else:
             raise FetchFileException(result)
 
@@ -145,7 +180,9 @@ class OrigamiBotExtended(OrigamiBot):
             logger.error(str(ex))
             return None
 
-    def process_pdf(self, document: Document, save_folder: str) -> Optional[str]:
+    def process_pdf(
+        self, document: Document, save_folder: str
+    ) -> Optional[str]:
         """
         Process a PDF document and upload it to the specified folder.
 
@@ -158,7 +195,9 @@ class OrigamiBotExtended(OrigamiBot):
         """
         file_bytes = self.get_file(document)
         if file_bytes:
-            return self.file_manager.upload_from_bytes(file_bytes, f"{save_folder}/{document.file_name}")
+            return self.file_manager.upload_from_bytes(
+                file_bytes, f"{save_folder}/{document.file_name}"
+            )
         return None
 
     def process_image(self, image: Document) -> bytes:
@@ -219,14 +258,18 @@ class BotState:
             self.llm_agent.conversation_id = self.conversation_id
 
         try:
-            self.chat_id = self.vault_client.get_secret(SecretKeys.TELEGRAM_CHAT_ID)
+            self.chat_id = self.vault_client.get_secret(
+                SecretKeys.TELEGRAM_CHAT_ID
+            )
             if self.chat_id == "":
                 self.chat_id = None
             else:
                 self.chat_id = int(self.chat_id)
         except InvalidPath:
             self.chat_id = None
-        self.publications_manager = PublicationIterator(PublicationState.PENDING_APPROVAL, logger=logger)
+        self.publications_manager = PublicationIterator(
+            PublicationState.PENDING_APPROVAL, logger=logger
+        )
 
     @stateful
     def set_conversation_id(self, conversation_id):
@@ -256,7 +299,9 @@ class BotState:
         logger.info("Setting chat id")
         with self.mutex:
             self.chat_id = chat_id
-            self.vault_client.create_or_update_secret(SecretKeys.TELEGRAM_CHAT_ID, self.chat_id)
+            self.vault_client.create_or_update_secret(
+                SecretKeys.TELEGRAM_CHAT_ID, self.chat_id
+            )
 
     def get_cool_off_time(self) -> Optional[str]:
         """
@@ -335,10 +380,15 @@ class BotsCommands:
         "help": "List all available bot commands (including this one).",
         "images": "Retrieve and display images associated with the current publication.",
         "add_youtube": "Add a YouTube URL for transcript processing. E.g ''/add_youtube https://youtube...''",
-        "update": "Updates the current publication with the last message sent by the bot"
+        "update": "Updates the current publication with the last message sent by the bot",
     }
 
-    def __init__(self, bot: OrigamiBotExtended, publisher: LinkedinPublisher, bot_state: BotState):
+    def __init__(
+        self,
+        bot: OrigamiBotExtended,
+        publisher: LinkedinPublisher,
+        bot_state: BotState,
+    ):
         """
         Initialize the BotsCommands instance.
 
@@ -364,8 +414,7 @@ class BotsCommands:
         if self.state.chat_id is None and message.chat.id:
             self.state.set_chat_id(message.chat.id)
         self.bot.send_message(
-            self.state.chat_id,
-            MSG_START.format(message.chat.id)
+            self.state.chat_id, MSG_START.format(message.chat.id)
         )
 
     def help(self, message: Message):
@@ -377,7 +426,10 @@ class BotsCommands:
         """
 
         response = "\nUsage:\n" + "\n".join(
-            [f"/{cmd} - {desc}" for cmd, desc in self._COMMAND_DESCRIPTIONS.items()]
+            [
+                f"/{cmd} - {desc}"
+                for cmd, desc in self._COMMAND_DESCRIPTIONS.items()
+            ]
         )
 
         self.bot.send_message(self.state.chat_id, response)
@@ -399,7 +451,9 @@ class BotsCommands:
         if messages:
             last_message = messages[-1].content
             formatted_publication = F.boldify_unicode(last_message)
-            self.state.publications_manager.update_content(self.state.conversation_id, formatted_publication)
+            self.state.publications_manager.update_content(
+                self.state.conversation_id, formatted_publication
+            )
             self.current(message)
 
     def healthcheck(self, message: Message):
@@ -422,7 +476,8 @@ class BotsCommands:
         logger.info("Clear triggered")
         try:
             self.state.publications_manager.update_state(
-                self.state.conversation_id, PublicationState.DISCARDED)
+                self.state.conversation_id, PublicationState.DISCARDED
+            )
             self.state.reset()
             self.bot.send_message(self.state.chat_id, MSG_CLEARED)
         except Exception as e:
@@ -439,10 +494,17 @@ class BotsCommands:
         logger.info("List triggered")
 
         lista = list(
-            map(lambda element: f"{element[0]}: {element[1].get('title', '')}", self.state.publications_manager.list()))
+            map(
+                lambda element: f"{element[0]}: {element[1].get('title', '')}",
+                self.state.publications_manager.list(),
+            )
+        )
         if len(lista) > 0:
             logger.info("Suggestions:\n\n%s", "\n".join(lista))
-            self.bot.send_message(self.state.chat_id, "Suggestions:\n\n{}".format("\n".join(lista)))
+            self.bot.send_message(
+                self.state.chat_id,
+                "Suggestions:\n\n{}".format("\n".join(lista)),
+            )
         else:
             logger.info("No suggestions to be listed")
             self.bot.send_message(self.state.chat_id, MSG_NO_SUGGESTIONS)
@@ -459,7 +521,9 @@ class BotsCommands:
         try:
             current = self.state.publications_manager.select(index)
             if current["publication_id"] == self.state.conversation_id:
-                self.bot.send_message(self.state.chat_id, MSG_SAME_SUGGESTION_SELECTED)
+                self.bot.send_message(
+                    self.state.chat_id, MSG_SAME_SUGGESTION_SELECTED
+                )
             elif current:
                 self.state.set_conversation_id(current["publication_id"])
                 self.bot.send_publication(self.state.chat_id, current)
@@ -467,7 +531,9 @@ class BotsCommands:
                 self.bot.send_message(self.state.chat_id, MSG_INVALID_INDEX)
         except Exception as e:
             logger.error("Error selecting suggestion: %s", e)
-            self.bot.send_message(self.state.chat_id, MSG_ERROR_SELECTING_SUGGESTION)
+            self.bot.send_message(
+                self.state.chat_id, MSG_ERROR_SELECTING_SUGGESTION
+            )
 
     def previous(self, message: Message):
         """
@@ -479,14 +545,21 @@ class BotsCommands:
         logger.info("Previous triggered")
         try:
             current = self.state.publications_manager.last()
-            if current["publication_id"] == self.state.conversation_id or not current:
+            if (
+                current["publication_id"] == self.state.conversation_id
+                or not current
+            ):
                 self.bot.send_message(self.state.chat_id, MSG_NO_SUGGESTIONS)
             else:
                 self.state.set_conversation_id(current["publication_id"])
                 self.bot.send_publication(self.state.chat_id, current)
         except Exception as e:
-            logger.error(f"Error loading previous suggestion: {type(e).__name__} - {e}.")
-            self.bot.send_message(self.state.chat_id, "Error loading previous suggestion")
+            logger.error(
+                f"Error loading previous suggestion: {type(e).__name__} - {e}."
+            )
+            self.bot.send_message(
+                self.state.chat_id, "Error loading previous suggestion"
+            )
 
     def next(self, message: Message):
         """
@@ -498,14 +571,21 @@ class BotsCommands:
         logger.info("Next triggered")
         try:
             current = next(self.state.publications_manager, None)
-            if current["publication_id"] == self.state.conversation_id or not current:
+            if (
+                current["publication_id"] == self.state.conversation_id
+                or not current
+            ):
                 self.bot.send_message(self.state.chat_id, MSG_NO_SUGGESTIONS)
             else:
                 self.state.set_conversation_id(current["publication_id"])
                 self.bot.send_publication(self.state.chat_id, current)
         except Exception as e:
-            logger.error(f"Error loading next suggestion: {type(e).__name__} - {e}.")
-            self.bot.send_message(self.state.chat_id, MSG_ERROR_LOADING_SUGGESTION)
+            logger.error(
+                f"Error loading next suggestion: {type(e).__name__} - {e}."
+            )
+            self.bot.send_message(
+                self.state.chat_id, MSG_ERROR_LOADING_SUGGESTION
+            )
 
     def clear_image(self, message: Message):
         """
@@ -516,7 +596,9 @@ class BotsCommands:
         """
         try:
             self.state.llm_agent.image = None
-            self.state.publications_manager.update_image(self.state.conversation_id, None)
+            self.state.publications_manager.update_image(
+                self.state.conversation_id, None
+            )
             self.bot.send_message(self.state.chat_id, "Image cleared")
         except Exception as e:
             logger.error("Error clearing image: %s", e)
@@ -531,7 +613,9 @@ class BotsCommands:
         """
 
         if self.state.conversation_id:
-            current = self.state.publications_manager.get(self.state.conversation_id)
+            current = self.state.publications_manager.get(
+                self.state.conversation_id
+            )
             if current:
                 self.bot.send_publication(self.state.chat_id, current)
                 return
@@ -546,11 +630,17 @@ class BotsCommands:
         :param message: The message object received from the chat.
         :return: None
         """
-        result = self.state.config_client.update_config_key(SourcesHandler.CONFIG_SCHEMA, key="active", value=True)
+        result = self.state.config_client.update_config_key(
+            SourcesHandler.CONFIG_SCHEMA, key="active", value=True
+        )
         if result:
-            self.bot.send_message(self.state.chat_id, MSG_SEARCH_ENGINE_ACTIVATED)
+            self.bot.send_message(
+                self.state.chat_id, MSG_SEARCH_ENGINE_ACTIVATED
+            )
         else:
-            self.bot.send_message(self.state.chat_id, MSG_SEARCH_ENGINE_ACTIVATED_ERR)
+            self.bot.send_message(
+                self.state.chat_id, MSG_SEARCH_ENGINE_ACTIVATED_ERR
+            )
 
     def stop_search_engine(self, message: Message):
         """
@@ -559,11 +649,15 @@ class BotsCommands:
         :param message: The message object received from the chat.
         :return: None
         """
-        result = self.state.config_client.update_config_key(SourcesHandler.CONFIG_SCHEMA, key="active", value=False)
+        result = self.state.config_client.update_config_key(
+            SourcesHandler.CONFIG_SCHEMA, key="active", value=False
+        )
         if result:
             self.bot.send_message(self.state.chat_id, MSG_SEARCH_ENGINE_STOPPED)
         else:
-            self.bot.send_message(self.state.chat_id, MSG_SEARCH_ENGINE_STOPPED_ERR)
+            self.bot.send_message(
+                self.state.chat_id, MSG_SEARCH_ENGINE_STOPPED_ERR
+            )
 
     def publish(self, message: Message):
         """
@@ -579,15 +673,19 @@ class BotsCommands:
         if self.publisher.needs_auth():
             self.bot.send_message(
                 self.state.chat_id,
-                f"You need to authenticate first. Please click on this link: {self.state.auth_address}"
+                f"You need to authenticate first. Please click on this link: {self.state.auth_address}",
             )
             return
 
         try:
-            current = self.state.publications_manager.get(self.state.conversation_id)
+            current = self.state.publications_manager.get(
+                self.state.conversation_id
+            )
 
             if not current:
-                self.bot.send_message(self.state.chat_id, MSG_NO_CURRENT_SUGGESTION)
+                self.bot.send_message(
+                    self.state.chat_id, MSG_NO_CURRENT_SUGGESTION
+                )
                 self.state.reset()
                 return
 
@@ -595,7 +693,8 @@ class BotsCommands:
             image = current.get("image", None)
             self.publisher.publish(publication, image)
             self.state.publications_manager.update_state(
-                self.state.conversation_id, PublicationState.PUBLISHED)
+                self.state.conversation_id, PublicationState.PUBLISHED
+            )
 
             self.bot.send_message(self.state.chat_id, MSG_PUBLISH_SUCCESS)
             self.state.reset()
@@ -603,7 +702,9 @@ class BotsCommands:
 
         except Exception as e:
             logger.error(f"Failed to publish: {e}")
-            self.bot.send_message(self.state.chat_id, MSG_ERROR_PUBLISH.format(str(e)))
+            self.bot.send_message(
+                self.state.chat_id, MSG_ERROR_PUBLISH.format(str(e))
+            )
 
     def set_image(self, message: Message):
         """
@@ -615,15 +716,25 @@ class BotsCommands:
         """
         if not message.photo:
             self.bot.send_message(self.state.chat_id, MSG_IMAGE_NOT_PASSED)
-        elif not self.state.conversation_id or not self.state.publications_manager.get(
-                self.state.conversation_id):
+        elif (
+            not self.state.conversation_id
+            or not self.state.publications_manager.get(
+                self.state.conversation_id
+            )
+        ):
             self.bot.send_message(self.state.chat_id, MSG_CONV_ID_NOT_SET)
             return
         else:
-            encoded_bytes = self.bot.process_image(message.photo[-1])  # version of highest resolution available
-            result = self.state.publications_manager.update_image(self.state.conversation_id,
-                                                                  encoded_bytes)
-            self.bot.send_message(self.state.chat_id, MSG_IMAGE_RECEIVED_SUCCESS if result else MSG_ERROR)
+            encoded_bytes = self.bot.process_image(
+                message.photo[-1]
+            )  # version of highest resolution available
+            result = self.state.publications_manager.update_image(
+                self.state.conversation_id, encoded_bytes
+            )
+            self.bot.send_message(
+                self.state.chat_id,
+                MSG_IMAGE_RECEIVED_SUCCESS if result else MSG_ERROR,
+            )
 
     def images(self, message: Message):
         """
@@ -636,11 +747,15 @@ class BotsCommands:
         if not self.state.conversation_id:
             self.bot.send_message(self.state.chat_id, MSG_CONV_ID_NOT_SET)
             return
-        folder = "/".join([FileManagedFolders.IMAGES_FOLDER, self.state.conversation_id])
+        folder = "/".join(
+            [FileManagedFolders.IMAGES_FOLDER, self.state.conversation_id]
+        )
         images = self.bot.file_manager.list_folder_contents(folder)
 
         if not images:
-            self.bot.send_message(self.state.chat_id, MSG_NO_IMAGES_FOR_PUBLICATION)
+            self.bot.send_message(
+                self.state.chat_id, MSG_NO_IMAGES_FOR_PUBLICATION
+            )
             return
 
         for image in images:
@@ -657,13 +772,19 @@ class BotsCommands:
         """
         try:
             # Enhanced validation for YouTube URL
-            if not re.match(r'^(https?://)?(www\.)?(youtube\.com|youtu\.be)/.+$', youtube_url):
+            if not re.match(
+                r"^(https?://)?(www\.)?(youtube\.com|youtu\.be)/.+$",
+                youtube_url,
+            ):
                 self.bot.send_message(self.state.chat_id, MSG_INVALID_URL)
                 return
 
             # Add URL to the pool
             self.youtube_url_pool.add_url(youtube_url)
-            self.bot.send_message(self.state.chat_id, f'YouTube video added to processing queue: {youtube_url}')
+            self.bot.send_message(
+                self.state.chat_id,
+                f"YouTube video added to processing queue: {youtube_url}",
+            )
 
         except Exception as e:
             logger.error(f"Error processing YouTube URL: {str(e)}")
@@ -675,7 +796,10 @@ class MessageListener(Listener):
     This class is used to listen to messages. It is used to listen to messages and send them to the LLMChain agent.
     They get added to the conversation thread and the response is sent back to the user.
     """
-    _commands = list(filter(lambda x: not x.startswith("__"), BotsCommands.__dict__.keys()))
+
+    _commands = list(
+        filter(lambda x: not x.startswith("__"), BotsCommands.__dict__.keys())
+    )
 
     def __init__(self, bot, state):
         self.bot = bot
@@ -694,8 +818,9 @@ class MessageListener(Listener):
         self.bot.send_message(chat_id, response)
 
         if self.state.llm_agent.image:
-            self.state.publications_manager.update_image(self.state.conversation_id,
-                                                         self.state.llm_agent.image)
+            self.state.publications_manager.update_image(
+                self.state.conversation_id, self.state.llm_agent.image
+            )
             photo = io.BytesIO(self.state.llm_agent.image)
             photo.seek(0)
             self.bot.send_photo(chat_id, photo)
@@ -720,20 +845,31 @@ class MessageListener(Listener):
                 self.bot.send_message(self.state.chat_id, MSG_COMMAND_NOT_FOUND)
             return
 
-        elif message.document and message.document.mime_type == 'application/pdf':
-            result = self.bot.process_pdf(message.document, FileManagedFolders.INPUT_PDF_FOLDER)
-            self.bot.send_message(self.state.chat_id, MSG_FILE_RECEIVED_SUCCESS if result else MSG_ERROR)
+        elif (
+            message.document and message.document.mime_type == "application/pdf"
+        ):
+            result = self.bot.process_pdf(
+                message.document, FileManagedFolders.INPUT_PDF_FOLDER
+            )
+            self.bot.send_message(
+                self.state.chat_id,
+                MSG_FILE_RECEIVED_SUCCESS if result else MSG_ERROR,
+            )
             return
         elif message.photo:
             encoded_images.append(self.bot.process_image(message.photo[-1]))
 
         # Prevent loading of suggestions and that kind of thing while the bot is processing the message
         with self.state.mutex:
-            response = self.state.llm_agent.call(message.text, images=encoded_images)
+            response = self.state.llm_agent.call(
+                message.text, images=encoded_images
+            )
 
         self.respond(self.state.chat_id, response)
 
-    def on_command_failure(self, message: Message, err=None):  # When command fails
+    def on_command_failure(
+        self, message: Message, err=None
+    ):  # When command fails
         """
         On command failure. This is used to send a message to the user when a command fails.
         :param message: Message from the user
@@ -744,7 +880,9 @@ class MessageListener(Listener):
         if err is None:
             self.bot.send_message(self.state.chat_id, MSG_ERROR_COMMAND_BIND)
         else:
-            self.bot.send_message(self.state.chat_id, MSG_ERROR_COMMAND.format(err))
+            self.bot.send_message(
+                self.state.chat_id, MSG_ERROR_COMMAND.format(err)
+            )
 
 
 class TeleLinkedinBot:
@@ -783,7 +921,9 @@ class TeleLinkedinBot:
         self.reload_config()
         ngrok.set_auth_token(self.ngrok_token)
         logger.info("Opening connection with Ngrok")
-        self.http_tunnel = ngrok.connect(addr=NGROK_ADDRESS, proto=NGROK_PROTOCOL, domain=self.domain)
+        self.http_tunnel = ngrok.connect(
+            addr=NGROK_ADDRESS, proto=NGROK_PROTOCOL, domain=self.domain
+        )
 
         return self
 
@@ -798,7 +938,7 @@ class TeleLinkedinBot:
         if exc_type is not None:
             logger.error(
                 f"Exiting with exception: {exc_type.__name__}: {exc_value}",
-                exc_info=(exc_type, exc_value, traceback)
+                exc_info=(exc_type, exc_value, traceback),
             )
         else:
             logger.info("Exiting context manager normally.")
@@ -825,11 +965,13 @@ class TeleLinkedinBot:
         self.bot = OrigamiBotExtended(self.token)
         logger.info("Setting up state")
         self.state = BotState()
-        self.state.auth_address = f'https://{self.domain}'
+        self.state.auth_address = f"https://{self.domain}"
         logger.info("Attaching listener")
         self.bot.add_listener(MessageListener(self.bot, self.state))
         logger.info("Attaching commands")
-        self.bot.add_commands(BotsCommands(self.bot, self.publisher, self.state))
+        self.bot.add_commands(
+            BotsCommands(self.bot, self.publisher, self.state)
+        )
         logger.info("Starting bot")
         self.bot.start()
         logger.info("Bot Started")
@@ -842,9 +984,16 @@ class TeleLinkedinBot:
 
         :return: boolean: If new publications can be proposed to the user
         """
-        return not self.state.conversation_id and (not self.state.cool_off_time or (
-                datetime.datetime.now() > (datetime.datetime.fromisoformat(self.state.cool_off_time) +
-                                           datetime.timedelta(days=self.state.suggestion_period))))
+        return not self.state.conversation_id and (
+            not self.state.cool_off_time
+            or (
+                datetime.datetime.now()
+                > (
+                    datetime.datetime.fromisoformat(self.state.cool_off_time)
+                    + datetime.timedelta(days=self.state.suggestion_period)
+                )
+            )
+        )
 
     def run(self, stop_event: threading.Event = None):
         """
@@ -872,7 +1021,9 @@ class TeleLinkedinBot:
             self.state.release_cool_off_time()
             try:
                 if self.state.conversation_id:
-                    self.state.publications_manager.center_iterator(self.state.conversation_id)
+                    self.state.publications_manager.center_iterator(
+                        self.state.conversation_id
+                    )
                 else:
                     self.state.publications_manager.reset_iterator()
                 current = next(self.state.publications_manager, None)
@@ -903,13 +1054,13 @@ def run(stop_event: threading.Event = None):
         bot.run(stop_event)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         run()
         logger.info("Exiting Run function")
-    except Exception as ex:
+    except Exception:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         logger.error(
             f"Exiting with exception: {exc_type.__name__}: {exc_value}",
-            exc_info=(exc_type, exc_value, exc_traceback)
+            exc_info=(exc_type, exc_value, exc_traceback),
         )

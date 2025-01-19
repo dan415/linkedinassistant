@@ -22,7 +22,9 @@ def ensure_authenticated(method):
     def wrapper(self, *args, **kwargs):
         if not self.api or not self.bucket:
             if not self.authenticate():
-                logger.error("Authentication failed. Cannot proceed with the operation.")
+                logger.error(
+                    "Authentication failed. Cannot proceed with the operation."
+                )
                 return False
         return method(self, *args, **kwargs)
 
@@ -40,18 +42,18 @@ class B2Handler:
         LifecycleRule(
             fileNamePrefix=FileManagedFolders.INPUT_PDF_FOLDER,
             daysFromHidingToDeleting=1,
-            daysFromUploadingToHiding=60
+            daysFromUploadingToHiding=60,
         ),
         LifecycleRule(
             fileNamePrefix=FileManagedFolders.OUTPUT_PDF_FOLDER,
             daysFromHidingToDeleting=1,
-            daysFromUploadingToHiding=30
+            daysFromUploadingToHiding=30,
         ),
         LifecycleRule(
             fileNamePrefix=FileManagedFolders.IMAGES_FOLDER,
             daysFromHidingToDeleting=1,
-            daysFromUploadingToHiding=30
-        )
+            daysFromUploadingToHiding=30,
+        ),
     ]
 
     def __init__(self):
@@ -71,8 +73,12 @@ class B2Handler:
         """
         try:
             logger.info("Retrieving B2 credentials from Vault.")
-            key_id = self.vault_client.get_secret(SecretKeys.B2_APPLICATION_KEY_ID_KEY)
-            key = self.vault_client.get_secret(SecretKeys.B2_APPLICATION_KEY_KEY)
+            key_id = self.vault_client.get_secret(
+                SecretKeys.B2_APPLICATION_KEY_ID_KEY
+            )
+            key = self.vault_client.get_secret(
+                SecretKeys.B2_APPLICATION_KEY_KEY
+            )
 
             if not key_id or not key:
                 logger.error("No B2 credentials found in Vault.")
@@ -107,7 +113,7 @@ class B2Handler:
                 self.bucket = self.api.create_bucket(
                     self._BUCKET_NAME,
                     bucket_type=self._BUCKET_TYPE,
-                    lifecycle_rules=self._LIFECYCLE_RULES
+                    lifecycle_rules=self._LIFECYCLE_RULES,
                 )
             logger.info("Successfully authenticated with B2.")
             return True
@@ -120,7 +126,9 @@ class B2Handler:
 
     @retry(B2Error, delay=RETRY_DELAY, tries=RETRY_TRIES, logger=logger)
     @ensure_authenticated
-    def upload_from_bytes(self, content: bytes, file_path: str) -> Optional[str]:
+    def upload_from_bytes(
+        self, content: bytes, file_path: str
+    ) -> Optional[str]:
         """
         Upload content directly to B2.
 
@@ -130,10 +138,12 @@ class B2Handler:
         :returns: Optional[str]: B2 file ID if successful, None otherwise.
         """
 
-        file_path = file_path.lstrip('/')
+        file_path = file_path.lstrip("/")
 
         logger.info(f"Uploading file to B2: {file_path}")
-        file_info = self.bucket.upload_bytes(data_bytes=content, file_name=file_path)
+        file_info = self.bucket.upload_bytes(
+            data_bytes=content, file_name=file_path
+        )
 
         logger.info(f"File uploaded successfully: {file_info.file_name}")
         return file_info.id_
@@ -153,7 +163,7 @@ class B2Handler:
         b2_path = b2_path if b2_path else os.path.basename(file_path)
 
         logger.info(f"Reading file for upload: {file_path}")
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             content = f.read()
             return self.upload_from_bytes(content, b2_path)
 
@@ -172,7 +182,9 @@ class B2Handler:
 
     @retry(B2Error, delay=RETRY_DELAY, tries=RETRY_TRIES, logger=logger)
     @ensure_authenticated
-    def list_folder_contents(self, folder_path: str = "") -> List[Dict[str, Union[str, int]]]:
+    def list_folder_contents(
+        self, folder_path: str = ""
+    ) -> List[Dict[str, Union[str, int]]]:
         """
         List contents of a B2 folder.
 
@@ -184,15 +196,19 @@ class B2Handler:
         logger.info(f"Listing folder contents in B2: {folder_path}")
         items = []
         for file_version, _ in self.bucket.ls(folder_path):
-            items.append({
-                'id': file_version.id_,
-                'name': os.path.basename(file_version.file_name),
-                'path': file_version.file_name,
-                'type': 'file',
-                'size': file_version.size
-            })
+            items.append(
+                {
+                    "id": file_version.id_,
+                    "name": os.path.basename(file_version.file_name),
+                    "path": file_version.file_name,
+                    "type": "file",
+                    "size": file_version.size,
+                }
+            )
 
-        logger.info(f"Folder contents listed successfully: {len(items)} items found.")
+        logger.info(
+            f"Folder contents listed successfully: {len(items)} items found."
+        )
         return items
 
     @retry(B2Error, delay=RETRY_DELAY, tries=RETRY_TRIES, logger=logger)
@@ -206,7 +222,7 @@ class B2Handler:
         :returns: bool: True if the deletion is successful, False otherwise.
         """
 
-        file_path = file_path.lstrip('/')
+        file_path = file_path.lstrip("/")
 
         logger.info(f"Deleting file in B2: {file_path}")
         file_version = self.bucket.get_file_info_by_name(file_path)

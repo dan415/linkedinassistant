@@ -13,6 +13,7 @@ class YoutubeUrlPool:
     """
     Singleton class to manage the pool of YouTube URLs to be processed using MongoDB
     """
+
     _instance = None
     _lock = threading.Lock()
 
@@ -28,8 +29,12 @@ class YoutubeUrlPool:
         if self._initialized:
             return
         vault_client = VaultClient()
-        client: MongoClient = MongoClient(vault_client.get_secret(SecretKeys.MONGO_URI))
-        self.db: Database = client.get_database(vault_client.get_secret(SecretKeys.MONGO_DATABASE))
+        client: MongoClient = MongoClient(
+            vault_client.get_secret(SecretKeys.MONGO_URI)
+        )
+        self.db: Database = client.get_database(
+            vault_client.get_secret(SecretKeys.MONGO_DATABASE)
+        )
         self.client: Collection = self.db[YOUTUBE_COLLECTION]
         self.mutex = threading.Lock()
         self._initialized = True
@@ -40,10 +45,9 @@ class YoutubeUrlPool:
             # Check if URL already exists
             if not self.client.find_one({"url": url}):
                 self.logger.info(f"Inserting url {url}")
-                self.client.insert_one({
-                    "url": url,
-                    "timestamp": datetime.datetime.utcnow()
-                })
+                self.client.insert_one(
+                    {"url": url, "timestamp": datetime.datetime.utcnow()}
+                )
             else:
                 self.logger.info(f"Url {url} already exists in database")
 

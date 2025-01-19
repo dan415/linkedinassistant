@@ -21,9 +21,9 @@ class MongoDBSaver(BaseCheckpointSaver):
     db: MongoDatabase
 
     def __init__(
-            self,
-            client: MongoClient,
-            db_name: str,
+        self,
+        client: MongoClient,
+        db_name: str,
     ) -> None:
         super().__init__()
         self.client = client
@@ -32,7 +32,7 @@ class MongoDBSaver(BaseCheckpointSaver):
     @classmethod
     @contextmanager
     def from_conn_info(
-            cls, *, host: str, port: int, db_name: str
+        cls, *, host: str, port: int, db_name: str
     ) -> Iterator["MongoDBSaver"]:
         client = None
         try:
@@ -49,8 +49,12 @@ class MongoDBSaver(BaseCheckpointSaver):
             thread_id (str): Thread id to delete checkpoints for
 
         """
-        self.client[self.db.name].checkpoints.delete_many({"thread_id": thread_id})
-        self.client[self.db.name].checkpoint_writes.delete_many({"thread_id": thread_id})
+        self.client[self.db.name].checkpoints.delete_many(
+            {"thread_id": thread_id}
+        )
+        self.client[self.db.name].checkpoint_writes.delete_many(
+            {"thread_id": thread_id}
+        )
 
     def get_tuple(self, config: RunnableConfig) -> Optional[CheckpointTuple]:
         """Get a checkpoint tuple from the database.
@@ -77,14 +81,21 @@ class MongoDBSaver(BaseCheckpointSaver):
         else:
             query = {"thread_id": thread_id, "checkpoint_ns": checkpoint_ns}
 
-        result = self.db["checkpoints"].find(query).sort("checkpoint_id", -1).limit(1)
+        result = (
+            self.db["checkpoints"]
+            .find(query)
+            .sort("checkpoint_id", -1)
+            .limit(1)
+        )
         for doc in result:
             config_values = {
                 "thread_id": thread_id,
                 "checkpoint_ns": checkpoint_ns,
                 "checkpoint_id": doc["checkpoint_id"],
             }
-            checkpoint = self.serde.loads_typed((doc["type"], doc["checkpoint"]))
+            checkpoint = self.serde.loads_typed(
+                (doc["type"], doc["checkpoint"])
+            )
             serialized_writes = self.db["checkpoint_writes"].find(config_values)
             pending_writes = [
                 (
@@ -113,12 +124,12 @@ class MongoDBSaver(BaseCheckpointSaver):
             )
 
     def list(
-            self,
-            config: Optional[RunnableConfig],
-            *,
-            additional_filter: Optional[Dict[str, Any]] = None,
-            before: Optional[RunnableConfig] = None,
-            limit: Optional[int] = None,
+        self,
+        config: Optional[RunnableConfig],
+        *,
+        additional_filter: Optional[Dict[str, Any]] = None,
+        before: Optional[RunnableConfig] = None,
+        limit: Optional[int] = None,
     ) -> Iterator[CheckpointTuple]:
         """List checkpoints from the database.
 
@@ -139,7 +150,9 @@ class MongoDBSaver(BaseCheckpointSaver):
         if config is not None:
             query = {
                 "thread_id": config["configurable"]["thread_id"],
-                "checkpoint_ns": config["configurable"].get("checkpoint_ns", ""),
+                "checkpoint_ns": config["configurable"].get(
+                    "checkpoint_ns", ""
+                ),
             }
 
         if additional_filter:
@@ -147,14 +160,18 @@ class MongoDBSaver(BaseCheckpointSaver):
                 query[f"metadata.{key}"] = value
 
         if before is not None:
-            query["checkpoint_id"] = {"$lt": before["configurable"]["checkpoint_id"]}
+            query["checkpoint_id"] = {
+                "$lt": before["configurable"]["checkpoint_id"]
+            }
 
         result = self.db["checkpoints"].find(query).sort("checkpoint_id", -1)
 
         if limit is not None:
             result = result.limit(limit)
         for doc in result:
-            checkpoint = self.serde.loads_typed((doc["type"], doc["checkpoint"]))
+            checkpoint = self.serde.loads_typed(
+                (doc["type"], doc["checkpoint"])
+            )
             yield CheckpointTuple(
                 {
                     "configurable": {
@@ -179,11 +196,11 @@ class MongoDBSaver(BaseCheckpointSaver):
             )
 
     def put(
-            self,
-            config: RunnableConfig,
-            checkpoint: Checkpoint,
-            metadata: CheckpointMetadata,
-            new_versions: ChannelVersions,
+        self,
+        config: RunnableConfig,
+        checkpoint: Checkpoint,
+        metadata: CheckpointMetadata,
+        new_versions: ChannelVersions,
     ) -> RunnableConfig:
         """Save a checkpoint to the database.
 
@@ -215,7 +232,9 @@ class MongoDBSaver(BaseCheckpointSaver):
             "checkpoint_id": checkpoint_id,
         }
         # Perform your operations here
-        self.db["checkpoints"].update_one(upsert_query, {"$set": doc}, upsert=True)
+        self.db["checkpoints"].update_one(
+            upsert_query, {"$set": doc}, upsert=True
+        )
         return {
             "configurable": {
                 "thread_id": thread_id,
@@ -225,10 +244,10 @@ class MongoDBSaver(BaseCheckpointSaver):
         }
 
     def put_writes(
-            self,
-            config: RunnableConfig,
-            writes: Sequence[Tuple[str, Any]],
-            task_id: str,
+        self,
+        config: RunnableConfig,
+        writes: Sequence[Tuple[str, Any]],
+        task_id: str,
     ) -> None:
         """Store intermediate writes linked to a checkpoint.
 

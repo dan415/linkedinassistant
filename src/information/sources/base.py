@@ -10,6 +10,7 @@ from src.core.config.manager import ConfigManager
 
 class InformationSource(Enum):
     """Enum representing the available information sources."""
+
     ARXIV = "arxiv"
     MEDIUM = "medium"
     GOOGLE_NEWS = "google_news"
@@ -52,9 +53,13 @@ class ContentSearchEngine(ABC):
 
     def __init__(self, logger: logging.Logger):
         """Initialize the search engine with the specified information source."""
-        self.information_source = None  # Source of information (e.g., ARXIV, YOUTUBE)
+        self.information_source = (
+            None  # Source of information (e.g., ARXIV, YOUTUBE)
+        )
         self.period = 1  # Define the period length in days
-        self.period_datetime = None  # Track the start time of the current period
+        self.period_datetime = (
+            None  # Track the start time of the current period
+        )
         self.minimum_length = None  # Minimum retrieved content length
         self.logger = logger
         self.config_client = ConfigManager()  # Manage configuration files
@@ -62,12 +67,15 @@ class ContentSearchEngine(ABC):
     def is_period_valid(self):
         """Check if the current period is still valid."""
         if self.period_datetime:
-            return (datetime.datetime.now() - datetime.timedelta(days=self.period)
-                    ) >= datetime.datetime.fromisoformat(self.period_datetime)
+            return (
+                datetime.datetime.now() - datetime.timedelta(days=self.period)
+            ) >= datetime.datetime.fromisoformat(self.period_datetime)
         return True
 
     @abstractmethod
-    def search(self, save_callback: Callable, stop_event: threading.Event = None) -> list:
+    def search(
+        self, save_callback: Callable, stop_event: threading.Event = None
+    ) -> list:
         """Perform a search in the information source and return results.
         This method must be implemented by subclasses to define specific
         search functionality.
@@ -81,12 +89,19 @@ class ContentSearchEngine(ABC):
     def filter(self, content: list) -> list:
         """Filter the content based on minimum length requirements"""
         self.logger.info("Filtering %d content items", len(content))
-        filtered = list(filter(lambda x: len(x.get("content", "")) > self.minimum_length, content))
+        filtered = list(
+            filter(
+                lambda x: len(x.get("content", "")) > self.minimum_length,
+                content,
+            )
+        )
         self.logger.info("%d items passed length filter", len(filtered))
         return filtered
 
     def reset(self):
-        self.period_datetime = datetime.datetime.now()  # Reset period start time
+        self.period_datetime = (
+            datetime.datetime.now()
+        )  # Reset period start time
         self.save_config()
 
     def reload_config(self):
@@ -97,12 +112,18 @@ class ContentSearchEngine(ABC):
             config = self.config_client.load_config(self.config_schema)
             for key in config.keys():
                 if key != "count_requests":  # Skip updating request count
-                    self.__setattr__(key, config[key])  # Dynamically update object attributes
+                    self.__setattr__(
+                        key, config[key]
+                    )  # Dynamically update object attributes
         except FileNotFoundError:
-            self.logger.error(f"Configuration file for {self.information_source.value} not found.")
+            self.logger.error(
+                f"Configuration file for {self.information_source.value} not found."
+            )
             raise
         except Exception as e:
-            self.logger.error(f"An error occurred while loading the configuration: {e}")
+            self.logger.error(
+                f"An error occurred while loading the configuration: {e}"
+            )
             raise
 
     def save_config(self):
@@ -111,12 +132,16 @@ class ContentSearchEngine(ABC):
             # Load the existing configuration for modification
             config = self.config_client.load_config(self.config_schema)
             for key in config.keys():
-                config[key] = getattr(self, key)  # Update config values from object attributes
+                config[key] = getattr(
+                    self, key
+                )  # Update config values from object attributes
 
             # Save the modified configuration back to the file
             self.config_client.save_config(self.config_schema, config)
         except Exception as e:
-            self.logger.error(f"An error occurred while saving the configuration: {e}")
+            self.logger.error(
+                f"An error occurred while saving the configuration: {e}"
+            )
             raise
 
     def save_if_valid(self, save, result):

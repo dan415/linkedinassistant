@@ -6,7 +6,13 @@ These exceptions are used to handle specific error cases when interacting with t
 
 class VaultError(Exception):
     def __init__(
-            self, message=None, errors=None, method=None, url=None, text=None, json=None
+        self,
+        message=None,
+        errors=None,
+        method=None,
+        url=None,
+        text=None,
+        json=None,
     ):
         if errors:
             message = ", ".join(errors)
@@ -36,7 +42,9 @@ class VaultError(Exception):
             503: VaultDown,
         }
 
-        return _STATUS_EXCEPTION_MAP.get(status_code, UnexpectedError)(*args, **kwargs)
+        return _STATUS_EXCEPTION_MAP.get(status_code, UnexpectedError)(
+            *args, **kwargs
+        )
 
 
 class InvalidRequest(VaultError):
@@ -94,7 +102,7 @@ class ParamValidationError(VaultError):
 class AuthenticationError(VaultError):
     """
     Raised when authentication with the vault fails.
-    
+
     This can happen when:
     - The access token is invalid or expired
     - The client credentials are incorrect
@@ -103,15 +111,16 @@ class AuthenticationError(VaultError):
 
     def __init__(self, message: str = None, response=None):
         super().__init__(
-            message or "Failed to authenticate with the vault. Please check your credentials.",
-            response
+            message
+            or "Failed to authenticate with the vault. Please check your credentials.",
+            response,
         )
 
 
 class ConfigurationError(VaultError):
     """
     Raised when there are issues with the vault configuration.
-    
+
     This can happen when:
     - Required environment variables are missing
     - Configuration values are invalid
@@ -120,7 +129,8 @@ class ConfigurationError(VaultError):
 
     def __init__(self, message: str = None):
         super().__init__(
-            message or "Invalid vault configuration. Please check your environment variables and settings."
+            message
+            or "Invalid vault configuration. Please check your environment variables and settings."
         )
 
 

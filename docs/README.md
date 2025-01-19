@@ -7,8 +7,6 @@
 This project was created to simplify the process of sharing posts about fascinating articles and papers that surface every week. The program generates drafts for these posts, allowing the user to focus only on reviewing and publishing.
 
 
-write the md to import an image
-
 ![LinkedIn Assistant](./linkedin_assistant.svg)
 
 ## Components Overview

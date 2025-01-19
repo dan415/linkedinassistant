@@ -12,8 +12,10 @@ def configure_keyring():
     try:
         vault_config = VaultConfig.from_keyring()
     except ConfigurationError:
-        print("Necessary Vault keys not found on keyring, attempting loading from environment to save them"
-              "on the keyring")
+        print(
+            "Necessary Vault keys not found on keyring, attempting loading from environment to save them"
+            "on the keyring"
+        )
     if vault_config:
         print("Vault config keys found on keyring")
         return
@@ -27,7 +29,7 @@ def configure_keyring():
         raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Configuring keyring")
     configure_keyring()
     print("Keyring configured successfully")

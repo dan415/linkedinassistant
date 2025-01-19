@@ -2,7 +2,11 @@ import logging
 import os
 import sys
 import time
-from src.core.constants import LINKEDIN_ASSISTANT_LOGGING_LEVEL, LOGGING_DIR, LOGGING_ONLY_CONSOLE
+from src.core.constants import (
+    LINKEDIN_ASSISTANT_LOGGING_LEVEL,
+    LOGGING_DIR,
+    LOGGING_ONLY_CONSOLE,
+)
 
 
 class TruncateByTimeHandler(logging.FileHandler):
@@ -14,7 +18,9 @@ class TruncateByTimeHandler(logging.FileHandler):
             cls._instances[filename] = instance
         return cls._instances[filename]
 
-    def __init__(self, filename, mode='a', encoding='utf-8', interval_seconds=3600):
+    def __init__(
+        self, filename, mode="a", encoding="utf-8", interval_seconds=3600
+    ):
         """
         Initializes the custom logging handler.
 
@@ -24,8 +30,12 @@ class TruncateByTimeHandler(logging.FileHandler):
         :param: interval_seconds: Time interval (in seconds) after which the log file will be truncated.
         """
         super().__init__(filename=filename, mode=mode, encoding=encoding)
-        self.interval_seconds = interval_seconds  # Interval for truncating the log file.
-        self.last_truncate_time = time.time()  # Tracks the last time the file was truncated.
+        self.interval_seconds = (
+            interval_seconds  # Interval for truncating the log file.
+        )
+        self.last_truncate_time = (
+            time.time()
+        )  # Tracks the last time the file was truncated.
 
     def emit(self, record):
         """
@@ -39,13 +49,17 @@ class TruncateByTimeHandler(logging.FileHandler):
         # Check if the interval since the last truncation has passed.
         if current_time - self.last_truncate_time > self.interval_seconds:
             self._truncate_file()  # Truncate the log file.
-            self.last_truncate_time = current_time  # Update the last truncation time.
+            self.last_truncate_time = (
+                current_time  # Update the last truncation time.
+            )
 
     def _truncate_file(self):
         """
         Truncates the log file to clear its contents.
         """
-        with open(self.baseFilename, 'r+') as file:  # Open the file in read/write mode.
+        with open(
+            self.baseFilename, "r+"
+        ) as file:  # Open the file in read/write mode.
             file.truncate()  # Clear the contents of the file.
 
 
@@ -61,12 +75,13 @@ class ServiceLogger(logging.Logger):
     automatically use the thread-specific logger instance.
     """
 
-    def __init__(self,
-                 name: str,
-                 main=False,
-                 noconsole=False,
-                 formatter='%(asctime)s - %(pathname)s - %(funcName)s - %(thread)d - %(levelname)s - %(message)s'
-                 ):
+    def __init__(
+        self,
+        name: str,
+        main=False,
+        noconsole=False,
+        formatter="%(asctime)s - %(pathname)s - %(funcName)s - %(thread)d - %(levelname)s - %(message)s",
+    ):
         super().__init__(name)
         self.filename = "Main" if main else self.name
         self.noconsole = noconsole
@@ -79,29 +94,27 @@ class ServiceLogger(logging.Logger):
         try:
             os.makedirs(LOGGING_DIR, exist_ok=True)
             filehandler = TruncateByTimeHandler(
-                filename=os.path.join(LOGGING_DIR, f'{self.filename}.log'),
-                encoding='utf-8',
-                mode='a+'
+                filename=os.path.join(LOGGING_DIR, f"{self.filename}.log"),
+                encoding="utf-8",
+                mode="a+",
             )
             filehandler.setLevel(log_level)
-            filehandler.setFormatter(
-                logging.Formatter(self.formatter)
-            )
+            filehandler.setFormatter(logging.Formatter(self.formatter))
             self.addHandler(filehandler)
 
         except OSError as ex:
             self.error(f"Error adding handler to file {ex}")
 
     def _init_handlers(self):
-        log_level = logging.getLevelNamesMapping().get(os.environ.get(LINKEDIN_ASSISTANT_LOGGING_LEVEL, "INFO"))
+        log_level = logging.getLevelNamesMapping().get(
+            os.environ.get(LINKEDIN_ASSISTANT_LOGGING_LEVEL, "INFO")
+        )
         self.setLevel(log_level)
 
         if not self.noconsole or os.environ.get(LOGGING_ONLY_CONSOLE, False):
             stdhandler = logging.StreamHandler(sys.stdout)
             stdhandler.setLevel(log_level)
-            stdhandler.setFormatter(
-                logging.Formatter(self.formatter)
-            )
+            stdhandler.setFormatter(logging.Formatter(self.formatter))
             self.addHandler(stdhandler)
 
         if not os.environ.get(LOGGING_ONLY_CONSOLE, False):
@@ -132,7 +145,7 @@ class StreamToLogger:
     def __init__(self, logger, level):
         self.logger = logger
         self.level = level
-        self.linebuf = ''
+        self.linebuf = ""
 
     def write(self, buf):
         for line in buf.rstrip().splitlines():

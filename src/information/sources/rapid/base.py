@@ -2,11 +2,9 @@ import logging
 from abc import ABC
 from functools import wraps
 import requests
-
-from logging import getLogger as logger
 from src.core.constants import SecretKeys
 from src.core.exceptions import VaultError
-from src.information.sources.base import ContentSearchEngine, InformationSource
+from src.information.sources.base import ContentSearchEngine
 from src.core.vault.hashicorp import VaultClient
 
 
@@ -29,7 +27,9 @@ def rate_limited_operation(func):
         self.reload_config()
 
         if self.limit and self.count_requests >= self.limit:
-            self.logger.info(f"Limit reached: {self.count_requests}/{self.limit}")
+            self.logger.info(
+                f"Limit reached: {self.count_requests}/{self.limit}"
+            )
             raise Exception("Limit reached")
 
         self.increment_request_count()
@@ -83,11 +83,16 @@ class RapidSource(ContentSearchEngine, ABC):
             return VaultClient().get_secret(SecretKeys.RAPID_API_KEY)
         except VaultError as e:
             self.logger.error(f"Failed to retrieve the API key: {e}")
-            raise RuntimeError("Could not retrieve the RapidAPI key. Please check the vault configuration.")
+            raise RuntimeError(
+                "Could not retrieve the RapidAPI key. Please check the vault configuration."
+            )
 
     @property
     def config_schema(self):
-        return super().config_schema.rsplit("-", 1)[0] + f"-rapid-{self.information_source.value}"
+        return (
+            super().config_schema.rsplit("-", 1)[0]
+            + f"-rapid-{self.information_source.value}"
+        )
 
     def increment_request_count(self):
         self.count_requests += 1
@@ -100,7 +105,9 @@ class RapidSource(ContentSearchEngine, ABC):
         super().reset()
 
     @rate_limited_operation
-    def execute_rapid_request(self, url, params=None, payload=None, extra_headers=None):
+    def execute_rapid_request(
+        self, url, params=None, payload=None, extra_headers=None
+    ):
         """
         Execute a request to a RapidAPI endpoint with optional payload and headers.
 
@@ -117,9 +124,16 @@ class RapidSource(ContentSearchEngine, ABC):
         if extra_headers:
             headers.update(extra_headers)
         if payload:
-            return requests.post(url, headers=headers, json=payload, timeout=self.request_timeout)
+            return requests.post(
+                url, headers=headers, json=payload, timeout=self.request_timeout
+            )
         else:
-            return requests.get(url, params=params, headers=headers, timeout=self.request_timeout)
+            return requests.get(
+                url,
+                params=params,
+                headers=headers,
+                timeout=self.request_timeout,
+            )
 
     def get_headers(self):
         """
@@ -129,8 +143,8 @@ class RapidSource(ContentSearchEngine, ABC):
             dict: Headers including the API key and host information.
         """
         return {
-            'x-rapidapi-key': self.get_api_key(),
-            'x-rapidapi-host': self.host
+            "x-rapidapi-key": self.get_api_key(),
+            "x-rapidapi-host": self.host,
         }
 
     def filter(self, results):
@@ -144,6 +158,11 @@ class RapidSource(ContentSearchEngine, ABC):
             list: Filtered results containing only entries with valid titles and content exceeding the minimum length.
         """
         return list(
-            filter(lambda x: x.get("title", "") != "",
-                   filter(lambda x: len(x.get("content", "")) > self.minimum_length, results))
+            filter(
+                lambda x: x.get("title", "") != "",
+                filter(
+                    lambda x: len(x.get("content", "")) > self.minimum_length,
+                    results,
+                ),
+            )
         )

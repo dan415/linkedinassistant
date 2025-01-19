@@ -3,7 +3,10 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.core.utils.logging import ServiceLogger
-from src.information.sources.base import requires_valid_period, InformationSource
+from src.information.sources.base import (
+    requires_valid_period,
+    InformationSource,
+)
 from src.information.sources.rapid.base import RapidSource
 import src.core.utils.functions as F
 
@@ -23,7 +26,7 @@ class GoogleNewsInformationEngine(RapidSource):
             response.raise_for_status()
             self.logger.info("Extracting content from %s", url)
 
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response.text, "html.parser")
 
             article_content = soup.get_text(strip=True)
             self.logger.info("Extracted content from %s", url)
@@ -32,14 +35,18 @@ class GoogleNewsInformationEngine(RapidSource):
         finally:
             return article_content
 
-    def process_topic(self, results, save_callback=None, stop_event: threading.Event = None):
+    def process_topic(
+        self, results, save_callback=None, stop_event: threading.Event = None
+    ):
         for result in results:
 
             if stop_event and stop_event.is_set():
-                self.logger.info("Stop event called in the middle of procesing the results of a topic")
+                self.logger.info(
+                    "Stop event called in the middle of procesing the results of a topic"
+                )
                 break
 
-            result["summary"] = result.pop('body', "")
+            result["summary"] = result.pop("body", "")
             result["link"] = result.pop("url", "")
             result["content"] = self.get_text(result["link"])
             result["information_source"] = self.information_source.value
@@ -54,7 +61,9 @@ class GoogleNewsInformationEngine(RapidSource):
                 self.save_if_valid(save_callback, result)
 
     @requires_valid_period
-    def search(self, save_callback=None, stop_event: threading.Event = None) -> list:
+    def search(
+        self, save_callback=None, stop_event: threading.Event = None
+    ) -> list:
         """
         Search for content in the information source.
         This method generates a dictionary with Google News results for each topic.
@@ -69,18 +78,22 @@ class GoogleNewsInformationEngine(RapidSource):
         for topic in self.topics:
 
             if stop_event and stop_event.is_set():
-                self.logger.info("Stop event called in the middle of procesing the topics")
+                self.logger.info(
+                    "Stop event called in the middle of procesing the topics"
+                )
                 break
 
             payload = {
                 "text": topic,
                 "region": "wt-wt",
-                "max_results": self.max_results
+                "max_results": self.max_results,
             }
             try:
                 response = self.execute_rapid_request(self.url, payload=payload)
                 results = response.json().get("news", [])
-                self.logger.info("Found %s results for topic %s", len(results), topic)
+                self.logger.info(
+                    "Found %s results for topic %s", len(results), topic
+                )
                 self.process_topic(results)
                 all_results.extend(results)
             except Exception as e:

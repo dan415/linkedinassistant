@@ -26,17 +26,23 @@ class ConfigManager:
         return cls._instance
 
     def __init__(self):
-        if not hasattr(self, '_initialized'):
+        if not hasattr(self, "_initialized"):
             with self._instance_lock:
-                if not hasattr(self, '_initialized'):
+                if not hasattr(self, "_initialized"):
                     logger.debug("Initializing ConfigManager")
                     vault_client = VaultClient()
-                    client: MongoClient = MongoClient(vault_client.get_secret(SecretKeys.MONGO_URI))
-                    self.db: Database = client.get_database(vault_client.get_secret(SecretKeys.MONGO_DATABASE))
+                    client: MongoClient = MongoClient(
+                        vault_client.get_secret(SecretKeys.MONGO_URI)
+                    )
+                    self.db: Database = client.get_database(
+                        vault_client.get_secret(SecretKeys.MONGO_DATABASE)
+                    )
                     self.db_client: Collection = self.db[CONFIGS_COLLECTION]
                     self._initialized = True
 
-    def save_config(self, config_name: str, config_data: Dict[str, Any]) -> bool:
+    def save_config(
+        self, config_name: str, config_data: Dict[str, Any]
+    ) -> bool:
         """
         Save a configuration to MongoDB in a thread-safe manner.
 
@@ -49,22 +55,30 @@ class ConfigManager:
         with self._operation_lock:
             try:
                 logger.debug(f"Saving config '{config_name}'")
-                existing_config = self.db_client.find_one({'config_name': config_name})
+                existing_config = self.db_client.find_one(
+                    {"config_name": config_name}
+                )
 
                 if existing_config:
                     logger.debug(f"Updating existing config '{config_name}'")
-                    return self.db_client.update_one({'config_name': config_name},
-                                                     {"$set": config_data}).modified_count > 0
+                    return (
+                        self.db_client.update_one(
+                            {"config_name": config_name}, {"$set": config_data}
+                        ).modified_count
+                        > 0
+                    )
                 else:
                     logger.debug(f"Creating new config '{config_name}'")
-                    config_data['config_name'] = config_name
+                    config_data["config_name"] = config_name
                     self.db_client.insert_one(config_data)
                     return True
             except Exception as e:
                 logger.error(f"Error saving config '{config_name}': {str(e)}")
                 return False
 
-    def load_config(self, config_name: str, return_id: bool = False) -> Optional[Dict[str, Any]]:
+    def load_config(
+        self, config_name: str, return_id: bool = False
+    ) -> Optional[Dict[str, Any]]:
         """
         Load a configuration from MongoDB in a thread-safe manner.
 
@@ -77,11 +91,11 @@ class ConfigManager:
         with self._operation_lock:
             try:
                 logger.debug(f"Loading config '{config_name}'")
-                config = self.db_client.find_one({'config_name': config_name})
+                config = self.db_client.find_one({"config_name": config_name})
 
                 if config:
                     logger.debug(f"Config '{config_name}' found")
-                    del config['config_name']
+                    del config["config_name"]
                     if not return_id:
                         del config["_id"]
                 else:
@@ -103,7 +117,9 @@ class ConfigManager:
         with self._operation_lock:
             try:
                 logger.debug(f"Deleting config '{config_name}'")
-                result = self.db_client.delete_one({'config_name': config_name}).deleted_count
+                result = self.db_client.delete_one(
+                    {"config_name": config_name}
+                ).deleted_count
                 if result > 0:
                     logger.debug(f"Config '{config_name}' successfully deleted")
                 else:
@@ -123,7 +139,10 @@ class ConfigManager:
         with self._operation_lock:
             try:
                 logger.debug("Listing all configs")
-                configs = [doc['config_name'] for doc in self.db_client.find({}, {'config_name': 1})]
+                configs = [
+                    doc["config_name"]
+                    for doc in self.db_client.find({}, {"config_name": 1})
+                ]
                 logger.debug(f"Found {len(configs)} configs")
                 return configs
             except Exception as e:
@@ -152,5 +171,7 @@ class ConfigManager:
             config[key] = value
             return self.save_config(config_name, config)
         except Exception as e:
-            logger.error(f"Error updating key '{key}' in config '{config_name}': {str(e)}")
+            logger.error(
+                f"Error updating key '{key}' in config '{config_name}': {str(e)}"
+            )
             return False

@@ -49,6 +49,7 @@ class SourcesHandler:
     """
     Handles the concurrent execution of search engines to retrieve and process publication ideas.
     """
+
     CONFIG_SCHEMA = "information"
 
     def __init__(self):
@@ -56,8 +57,12 @@ class SourcesHandler:
         self.active = True  # Controls whether the handler is actively running
         # Initialize configuration and runtime parameters
         self.active_sources = []  # List of active sources to use
-        self.search_engines = []  # Search engines corresponding to active sources
-        self.execution_period = 1  # Minimum time period between executions (in days)
+        self.search_engines = (
+            []
+        )  # Search engines corresponding to active sources
+        self.execution_period = (
+            1  # Minimum time period between executions (in days)
+        )
         self.one_by_one = True  # Process results immediately if True
         self.last_run_time = None  # Last time the handler was executed
 
@@ -79,7 +84,9 @@ class SourcesHandler:
         logger.info("Initializing sources handler.")
         while not stop_event or not stop_event.is_set():
             if self.active:
-                self.run_search_engines(stop_event)  # Execute all search engines
+                self.run_search_engines(
+                    stop_event
+                )  # Execute all search engines
                 logger.debug("Source handler sleeping.")
             time.sleep(5)
         logger.info("Searcher exited because of stop event triggered")
@@ -94,11 +101,13 @@ class SourcesHandler:
         count = 0
         for image in images:
             try:
-                dest_path = "/".join([
-                    FileManagedFolders.IMAGES_FOLDER,
-                    publication_id,
-                    str(uuid.uuid4())
-                ])
+                dest_path = "/".join(
+                    [
+                        FileManagedFolders.IMAGES_FOLDER,
+                        publication_id,
+                        str(uuid.uuid4()),
+                    ]
+                )
                 logger.info(f"Saving image into {dest_path}")
                 self.file_manager.upload_from_bytes(image, dest_path)
                 count += 1
@@ -116,16 +125,24 @@ class SourcesHandler:
 
         extracted_images = material.pop("extracted_images", [])
         logger.info(f"Material has {len(extracted_images)} images")
-        publication_id = self.publications_manager.insert(material)  # Insert material into the collection
+        publication_id = self.publications_manager.insert(
+            material
+        )  # Insert material into the collection
 
         if not publication_id:
             logger.warning("Could not save material")
             return
 
         if extracted_images:
-            logger.info(f"Saving {len(extracted_images)} images for publication {publication_id}")
-            saved_count = self.save_images(publication_id=publication_id, images=extracted_images)
-            logger.info(f"{saved_count} images saved for publication {publication_id}")
+            logger.info(
+                f"Saving {len(extracted_images)} images for publication {publication_id}"
+            )
+            saved_count = self.save_images(
+                publication_id=publication_id, images=extracted_images
+            )
+            logger.info(
+                f"{saved_count} images saved for publication {publication_id}"
+            )
 
     def init_active_sources(self):
         """
@@ -137,12 +154,18 @@ class SourcesHandler:
         for x in self.active_sources:
             try:
                 source_enum = F.get_enum_from_value(x, InformationSource)
-                search_engine = ContentSearchEngineProvider.get_content_search_engine(source_enum)
+                search_engine = (
+                    ContentSearchEngineProvider.get_content_search_engine(
+                        source_enum
+                    )
+                )
                 self.search_engines.append(search_engine)
             except Exception as e:
                 logger.error(f"Failed to initialize source '{x}': {e}")
 
-    def run_search_engine(self, search_engine, stop_event: threading.Event = None):
+    def run_search_engine(
+        self, search_engine, stop_event: threading.Event = None
+    ):
         """
         Run a specific search engine and process its results.
 
@@ -151,9 +174,13 @@ class SourcesHandler:
         """
         try:
             logger.debug(f"Running search engine {search_engine}")
-            results = search_engine.search(self.save_material if self.one_by_one else None, stop_event)
+            results = search_engine.search(
+                self.save_material if self.one_by_one else None, stop_event
+            )
             if not self.one_by_one:
-                results = search_engine.filter(results)  # Filter results if needed
+                results = search_engine.filter(
+                    results
+                )  # Filter results if needed
                 for result in results:
                     self.save_material(result)  # Save each result
             logger.debug(f"Finished running search engine {search_engine}")
@@ -175,9 +202,17 @@ class SourcesHandler:
         threads = []
         for search_engine in self.search_engines:
             # Create a thread for each search engine
-            threads.append(threading.Thread(name=search_engine, target=self.run_search_engine, args=[search_engine, stop_event]))
+            threads.append(
+                threading.Thread(
+                    name=search_engine,
+                    target=self.run_search_engine,
+                    args=[search_engine, stop_event],
+                )
+            )
 
-        self.last_run_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update last run time
+        self.last_run_time = datetime.datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )  # Update last run time
         self.update_last_run_time()  # Persist the updated time in the config
 
         for thread in threads:
@@ -191,7 +226,9 @@ class SourcesHandler:
         """
         Update the last run time in the configuration file.
         """
-        self.config_client.update_config_key(self.CONFIG_SCHEMA, "last_run_time", self.last_run_time)
+        self.config_client.update_config_key(
+            self.CONFIG_SCHEMA, "last_run_time", self.last_run_time
+        )
 
     def reload_config(self):
         """
@@ -217,9 +254,13 @@ class SourcesHandler:
         config = self.config_client.load_config(self.CONFIG_SCHEMA)
 
         for key in config.keys():
-            config[key] = getattr(self, key)  # Reflect current state in the config
+            config[key] = getattr(
+                self, key
+            )  # Reflect current state in the config
 
-        self.config_client.save_config(self.CONFIG_SCHEMA, config)  # Save to file
+        self.config_client.save_config(
+            self.CONFIG_SCHEMA, config
+        )  # Save to file
 
 
 def run(stop_event: threading.Event = None):
@@ -230,5 +271,5 @@ def run(stop_event: threading.Event = None):
     logger.info("Exiting Run function")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

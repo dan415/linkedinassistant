@@ -14,10 +14,14 @@ class LinkedinPublisher:
     """
 
     _LINKEDIN_CONFIG_SCHEMA = "linkedin"
-    _LINKEDIN_REGISTER_UPLOAD_URL = 'https://api.linkedin.com/v2/assets?action=registerUpload'
+    _LINKEDIN_REGISTER_UPLOAD_URL = (
+        "https://api.linkedin.com/v2/assets?action=registerUpload"
+    )
     _LINKEDIN_SHARE_URL = "https://api.linkedin.com/v2/ugcPosts"
 
-    def __init__(self, logger: Optional[logging.Logger] = ServiceLogger(__name__)) -> None:
+    def __init__(
+        self, logger: Optional[logging.Logger] = ServiceLogger(__name__)
+    ) -> None:
         # Initialize configuration and secrets for LinkedIn API access
         self.logger = logger
         self.client_id: str = ""
@@ -58,37 +62,48 @@ class LinkedinPublisher:
             "lifecycleState": "PUBLISHED",
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {
-                        "text": f"{content}\n\n{self.footer}"
-                    },
+                    "shareCommentary": {"text": f"{content}\n\n{self.footer}"},
                 }
             },
             "visibility": {
                 "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-            }
+            },
         }
 
         # Add media if provided
         if asset:
-            post_data["specificContent"]["com.linkedin.ugc.ShareContent"]["shareMediaCategory"] = "IMAGE"
-            post_data["specificContent"]["com.linkedin.ugc.ShareContent"]["media"] = [{
-                "status": "READY",
-                "description": {
-                    "text": "Generated image for the post"
-                },
-                "media": asset,
-            }]
+            post_data["specificContent"]["com.linkedin.ugc.ShareContent"][
+                "shareMediaCategory"
+            ] = "IMAGE"
+            post_data["specificContent"]["com.linkedin.ugc.ShareContent"][
+                "media"
+            ] = [
+                {
+                    "status": "READY",
+                    "description": {"text": "Generated image for the post"},
+                    "media": asset,
+                }
+            ]
         else:
-            post_data["specificContent"]["com.linkedin.ugc.ShareContent"]["shareMediaCategory"] = "NONE"
+            post_data["specificContent"]["com.linkedin.ugc.ShareContent"][
+                "shareMediaCategory"
+            ] = "NONE"
 
         try:
             # Make the API call
-            response = requests.post(self._LINKEDIN_SHARE_URL, headers=self.get_headers(), json=post_data, timeout=10)
+            response = requests.post(
+                self._LINKEDIN_SHARE_URL,
+                headers=self.get_headers(),
+                json=post_data,
+                timeout=10,
+            )
             if response.status_code == 201:
                 self.logger.info("Posted to LinkedIn")
                 return True
             else:
-                self.logger.error(f"Failed to post: {response.status_code} - {response.text}")
+                self.logger.error(
+                    f"Failed to post: {response.status_code} - {response.text}"
+                )
                 self.access_token = None  # Invalidate token on failure
                 self.update_config()
                 return False
@@ -96,16 +111,18 @@ class LinkedinPublisher:
             self.logger.error(f"Failed to post: {str(e)}")
             return False
 
-    def get_headers(self, content_type: Optional[str] = 'application/json') -> Dict[str, str]:
+    def get_headers(
+        self, content_type: Optional[str] = "application/json"
+    ) -> Dict[str, str]:
         """
         Generate headers for the API request, including the access token.
 
         :param content_type: Content-Type header value.
         :return: Dictionary of headers.
         """
-        res: Dict[str, str] = {'Authorization': f'Bearer {self.access_token}'}
+        res: Dict[str, str] = {"Authorization": f"Bearer {self.access_token}"}
         if content_type:
-            res['Content-Type'] = content_type
+            res["Content-Type"] = content_type
         return res
 
     def register_image_upload(self) -> Dict[str, Any]:
@@ -118,15 +135,20 @@ class LinkedinPublisher:
             "registerUploadRequest": {
                 "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
                 "owner": f"urn:li:person:{self.linkedin_id}",
-                "serviceRelationships": [{
-                    "relationshipType": "OWNER",
-                    "identifier": "urn:li:userGeneratedContent"
-                }]
+                "serviceRelationships": [
+                    {
+                        "relationshipType": "OWNER",
+                        "identifier": "urn:li:userGeneratedContent",
+                    }
+                ],
             }
         }
 
-        upload_response = requests.post(self._LINKEDIN_REGISTER_UPLOAD_URL, json=register_upload_body,
-                                        headers=self.get_headers())
+        upload_response = requests.post(
+            self._LINKEDIN_REGISTER_UPLOAD_URL,
+            json=register_upload_body,
+            headers=self.get_headers(),
+        )
         upload_response.raise_for_status()  # Raise exception for HTTP errors
         return upload_response.json()
 
@@ -141,21 +163,22 @@ class LinkedinPublisher:
         upload_data = self.register_image_upload()
 
         # Extract upload details
-        asset: str = upload_data['value']['asset']
-        upload_url: str = upload_data['value']['uploadMechanism'][('com.linkedin.digitalmedia.uploading'
-                                                                   '.MediaUploadHttpRequest')][
-            'uploadUrl']
+        asset: str = upload_data["value"]["asset"]
+        upload_url: str = upload_data["value"]["uploadMechanism"][
+            ("com.linkedin.digitalmedia.uploading" ".MediaUploadHttpRequest")
+        ]["uploadUrl"]
 
         # Perform the binary upload
         self.logger.debug(f"Uploading image to {upload_url}")
         binary_upload_response = requests.post(
             upload_url,
             data=image_data,
-            headers=self.get_headers(content_type=None)
+            headers=self.get_headers(content_type=None),
         )
         if binary_upload_response.status_code != 201:
             self.logger.error(
-                f"Image upload failed: {binary_upload_response.status_code} - {binary_upload_response.text}")
+                f"Image upload failed: {binary_upload_response.status_code} - {binary_upload_response.text}"
+            )
             binary_upload_response.raise_for_status()
         return asset
 
@@ -170,7 +193,9 @@ class LinkedinPublisher:
         if self.needs_auth():
             return False
 
-        self.logger.info(f"Publishing post with image? {image_data is not None}")
+        self.logger.info(
+            f"Publishing post with image? {image_data is not None}"
+        )
         asset = None
         try:
             if image_data:
@@ -203,12 +228,20 @@ class LinkedinPublisher:
             self.__setattr__(key, config[key])
 
         # Load secrets from the vault
-        self.client_id = self.vault_client.get_secret(SecretKeys.LINKEDIN_CLIENT_ID)
-        self.client_secret = self.vault_client.get_secret(SecretKeys.LINKEDIN_CLIENT_SECRET)
-        self.redirect_uri = "https://" + self.vault_client.get_secret(SecretKeys.NGROK_DOMAIN)
+        self.client_id = self.vault_client.get_secret(
+            SecretKeys.LINKEDIN_CLIENT_ID
+        )
+        self.client_secret = self.vault_client.get_secret(
+            SecretKeys.LINKEDIN_CLIENT_SECRET
+        )
+        self.redirect_uri = "https://" + self.vault_client.get_secret(
+            SecretKeys.NGROK_DOMAIN
+        )
         self.linkedin_id = self.vault_client.get_secret(SecretKeys.LINKEDIN_ID)
         try:
-            self.access_token = self.vault_client.get_secret(SecretKeys.LINKEDIN_ACCESS_TOKEN)
+            self.access_token = self.vault_client.get_secret(
+                SecretKeys.LINKEDIN_ACCESS_TOKEN
+            )
         except VaultError as ex:
             self.logger.warning(f"Access token not found in vault: {ex}")
             self.access_token = None

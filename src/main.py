@@ -24,7 +24,9 @@ def init():
     logger.info("Initializing LinkedInAssistant")
     vault_client = VaultClient()
     db_client = MongoClient(vault_client.get_secret(SecretKeys.MONGO_URI))
-    db = db_client.get_database(vault_client.get_secret(SecretKeys.MONGO_DATABASE))
+    db = db_client.get_database(
+        vault_client.get_secret(SecretKeys.MONGO_DATABASE)
+    )
 
     for collection_name, indices in COLLECTIONS_AND_INDICES.items():
         if collection_name not in db.list_collection_names():
@@ -38,11 +40,15 @@ def init():
 
                 if collection_name == "config":
                     try:
-                        with open(os.path.join(JSON_DIR, "default_configs.json"), 'r') as file:
+                        with open(
+                            os.path.join(JSON_DIR, "default_configs.json"), "r"
+                        ) as file:
                             default_configs = json.load(file)
                         collection.insert_many(default_configs)
                     except OSError as ex:
-                        logger.warning(f"Could not load default configs succesfully due to {ex}")
+                        logger.warning(
+                            f"Could not load default configs succesfully due to {ex}"
+                        )
 
 
 def start_auth_server():
@@ -54,10 +60,7 @@ def start_auth_server():
 
     """
     logger.info("Starting aut server")
-    threading.Thread(
-        name="auth_server",
-        target=auth_server.run
-    ).start()
+    threading.Thread(name="auth_server", target=auth_server.run).start()
 
 
 def run(stop_event: Event) -> None:
@@ -71,14 +74,14 @@ def run(stop_event: Event) -> None:
     tasks = [
         ("publications_handler", publications_handler.run),
         ("sources_handler", source_handler.run),
-        ("bot", bot.run)
+        ("bot", bot.run),
     ]
     task_threads = []
     for task_name, task_function in tasks:
         thread = threading.Thread(
             name=task_name,
             target=task_function,
-            kwargs={"stop_event": stop_event}
+            kwargs={"stop_event": stop_event},
         )
         task_threads.append(thread)
         thread.start()
@@ -106,5 +109,5 @@ def main():
         event.set()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

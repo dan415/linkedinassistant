@@ -14,9 +14,10 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
     """
     LinkedIn Assistant Windows Service class. It is used to run the LinkedIn Assistant as a Windows Service.
     """
+
     _svc_name_ = SERVICE_NAME
-    _svc_display_name_ = 'Linkedin Assistant'
-    _svc_description_ = 'Linkedin Assistant'
+    _svc_display_name_ = "Linkedin Assistant"
+    _svc_description_ = "Linkedin Assistant"
     _svc_start_type_ = win32service.SERVICE_AUTO_START
 
     def __init__(self, args):
@@ -56,15 +57,20 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
                     logger.error(f"Error in Linkedin Assistant: {e}")
                     retries += 1
                     if retries >= self.max_retries:
-                        logger.error("Maximum retries reached. Exiting service.")
+                        logger.error(
+                            "Maximum retries reached. Exiting service."
+                        )
                         break
                     if not self.stop_signal.is_set():
                         logger.info(
                             f"Service will retry in {self.retry_delay} seconds "
-                            f"(Attempt {retries}/{self.max_retries})...")
+                            f"(Attempt {retries}/{self.max_retries})..."
+                        )
                         time.sleep(self.retry_delay)
 
-        self.worker_thread = threading.Thread(target=service_worker, daemon=True)
+        self.worker_thread = threading.Thread(
+            target=service_worker, daemon=True
+        )
         self.worker_thread.start()
 
     def SvcDoRun(self):
@@ -78,7 +84,7 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
             servicemanager.LogMsg(
                 servicemanager.EVENTLOG_INFORMATION_TYPE,
                 servicemanager.PYS_SERVICE_STARTED,
-                (self._svc_name_, '')
+                (self._svc_name_, ""),
             )
 
             self.run()
@@ -117,13 +123,13 @@ class LinkedinAssistantService(win32serviceutil.ServiceFramework):
             servicemanager.LogMsg(
                 servicemanager.EVENTLOG_INFORMATION_TYPE,
                 servicemanager.PYS_SERVICE_STOPPED,
-                (self._svc_name_, '')
+                (self._svc_name_, ""),
             )
         except Exception as e:
             logger.error(f"Error during cleanup: {e}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     Main entry point for the service.
 

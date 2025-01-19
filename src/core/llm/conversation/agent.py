@@ -26,9 +26,12 @@ class LangChainGPT:
     """
     LangChain GPT agent with ReAct and memory. It manages conversation history and uses ReAct reasoning.
     """
+
     _CONFIG_SCHEMA = "llm-conversation-agent"
 
-    def __init__(self, logger: logging.Logger = ServiceLogger(__name__)) -> None:
+    def __init__(
+        self, logger: logging.Logger = ServiceLogger(__name__)
+    ) -> None:
         # Initialize instance variables and load configuration
         self.logger = logger
         self.tools: List[Any] = []
@@ -39,8 +42,12 @@ class LangChainGPT:
         self.image: Optional[bytes] = None
         self.image_model_provider = ""
         self.system_prompt_template: str = ""  # Template for system prompts
-        self.image_generation_prompt: str = ""  # Template for image generation prompts
-        self.conversation_id: Optional[str] = None  # Unique ID for each conversation
+        self.image_generation_prompt: str = (
+            ""  # Template for image generation prompts
+        )
+        self.conversation_id: Optional[str] = (
+            None  # Unique ID for each conversation
+        )
         self.apply_unicode_bold: bool = True  # Flag to toggle bold formatting
         self.max_conversation_length: Optional[int] = None
         self.max_tokens: Optional[int] = None
@@ -56,12 +63,16 @@ class LangChainGPT:
                 name="create_image",
                 func=self.generate_image,
                 description="Used to integrate with Dall-E 3 to generate an image",
-                args_schema=self.ImageGenerationInput
+                args_schema=self.ImageGenerationInput,
             )
         ]
 
-        self.vault_client: VaultClient = VaultClient()  # Initialize VaultClient for secrets
-        self.config_client: ConfigManager = ConfigManager()  # Initialize ConfigManager
+        self.vault_client: VaultClient = (
+            VaultClient()
+        )  # Initialize VaultClient for secrets
+        self.config_client: ConfigManager = (
+            ConfigManager()
+        )  # Initialize ConfigManager
         self.reload_config()  # Load initial configuration
 
     class ImageGenerationInput(BaseModel):
@@ -74,14 +85,16 @@ class LangChainGPT:
         self.logger.debug("Reloading config")
 
         # Load configuration schema and set attributes dynamically
-        config: Dict[str, Any] = self.config_client.load_config(self._CONFIG_SCHEMA)
+        config: Dict[str, Any] = self.config_client.load_config(
+            self._CONFIG_SCHEMA
+        )
         for key in config.keys():
             self.__setattr__(key, config[key])
 
         # Set up MongoDB memory saver using secrets from Vault
         self.memory = MongoDBSaver(
             MongoClient(self.vault_client.get_secret(SecretKeys.MONGO_URI)),
-            db_name=self.vault_client.get_secret(SecretKeys.MONGO_DATABASE)
+            db_name=self.vault_client.get_secret(SecretKeys.MONGO_DATABASE),
         )
 
         # Initialize the LLM provider and tools
@@ -93,7 +106,7 @@ class LangChainGPT:
             self.llm,
             tools=self.tools,
             state_modifier=self.memory_trimmer,
-            checkpointer=self.memory
+            checkpointer=self.memory,
         )
 
     def generate_image(self, image_description: str) -> str:
@@ -105,14 +118,20 @@ class LangChainGPT:
         try:
             self.logger.info("Generating image")
             image_model = LLMProvider.build(self.image_model_provider)
-            prompt: str = self.image_generation_prompt.format(description=image_description)
+            prompt: str = self.image_generation_prompt.format(
+                description=image_description
+            )
             image_urls = image_model.run(prompt)
             image_url = image_urls.split("\n")[0]
             result = requests.get(image_url, stream=True)
-            self.logger.info(f"Tried to get image from url {image_url} with result {result.status_code}")
+            self.logger.info(
+                f"Tried to get image from url {image_url} with result {result.status_code}"
+            )
             result.raise_for_status()
             self.image = result.content
-            return "Image generated successfully, it will be displayed to the user"
+            return (
+                "Image generated successfully, it will be displayed to the user"
+            )
         except Exception as ex:
             # Log errors and return failure message
             self.image = None
@@ -152,7 +171,9 @@ class LangChainGPT:
         if not self.conversation_id:
             self.conversation_id = str(uuid.uuid4())
 
-        return self.agent.invoke(messages, {"configurable": {"thread_id": self.conversation_id}})
+        return self.agent.invoke(
+            messages, {"configurable": {"thread_id": self.conversation_id}}
+        )
 
     def _format_response(self, messages: Dict[str, Any]) -> str:
         """Format the agent's response for output.
@@ -163,7 +184,9 @@ class LangChainGPT:
         """
         response: str = messages["messages"][-1].content
         # Apply bold formatting if enabled
-        return F.boldify_unicode(response) if self.apply_unicode_bold else response
+        return (
+            F.boldify_unicode(response) if self.apply_unicode_bold else response
+        )
 
     def produce_publication(self, publication: Dict[str, Any]) -> str:
         """Generate a response based on a publication input.
@@ -178,10 +201,12 @@ class LangChainGPT:
         publication_cp.pop("image", None)
 
         # Prepare input messages and invoke the agent
-        inputs: Dict[str, Any] = {"messages": [
-            ("system", self.system_prompt_template),
-            ("user", json.dumps(publication_cp))
-        ]}
+        inputs: Dict[str, Any] = {
+            "messages": [
+                ("system", self.system_prompt_template),
+                ("user", json.dumps(publication_cp)),
+            ]
+        }
         return self._format_response(self.__invoke(inputs))
 
     def memory_trimmer(self, state: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -191,15 +216,26 @@ class LangChainGPT:
 
         :returns: The trimmed list of messages
         """
-        if self.trimming_strategy != "token" and self.trimming_strategy != "message":
-            raise ValueError("Trimming Strategy should either be 'token' or 'message'")
+        if (
+            self.trimming_strategy != "token"
+            and self.trimming_strategy != "message"
+        ):
+            raise ValueError(
+                "Trimming Strategy should either be 'token' or 'message'"
+            )
 
         # Trim messages based on the strategy and limits
         messages = trim_messages(
             messages=state["messages"],
-            token_counter=len if self.trimming_strategy == "message" else self.llm,
+            token_counter=(
+                len if self.trimming_strategy == "message" else self.llm
+            ),
             strategy="last",
-            max_tokens=self.max_conversation_length if self.trimming_strategy == "message" else self.max_tokens,
+            max_tokens=(
+                self.max_conversation_length
+                if self.trimming_strategy == "message"
+                else self.max_tokens
+            ),
             start_on="human",
             end_on=("human", "tool"),
             include_system=True,
@@ -209,7 +245,9 @@ class LangChainGPT:
         self.logger.debug(messages)
         return messages
 
-    def call(self, input_message: str, images: Optional[List[bytes]] = None) -> str:
+    def call(
+        self, input_message: str, images: Optional[List[bytes]] = None
+    ) -> str:
         """
         Call the agent to process the input message.
         :param input_message: The input string for the agent.
@@ -225,10 +263,16 @@ class LangChainGPT:
         # Add image inputs if provided
         if images:
             for image in images:
-                input_message_payload.append({
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{base64.b64encode(image).decode('utf-8')}"}
-                })
+                input_message_payload.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64.b64encode(image).decode('utf-8')}"
+                        },
+                    }
+                )
 
         # Invoke the agent and return the formatted response
-        return self._format_response(self.__invoke({"messages": [("user", input_message_payload)]}))
+        return self._format_response(
+            self.__invoke({"messages": [("user", input_message_payload)]})
+        )

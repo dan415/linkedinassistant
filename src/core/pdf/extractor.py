@@ -3,7 +3,11 @@ import io
 from abc import ABC, abstractmethod
 import pypdf
 from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode, AcceleratorOptions
+from docling.datamodel.pipeline_options import (
+    PdfPipelineOptions,
+    TableFormerMode,
+    AcceleratorOptions,
+)
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.io import DocumentStream
 import src.core.utils.functions as F
@@ -66,7 +70,9 @@ class DoclingExtractor(PDFExtractor):
 
         self.doc_converter = DocumentConverter(
             format_options={
-                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+                InputFormat.PDF: PdfFormatOption(
+                    pipeline_options=pipeline_options
+                )
             }
         )
 
@@ -82,10 +88,10 @@ class DoclingExtractor(PDFExtractor):
         result = self.doc_converter.convert(source)
         self.extracted_images = list(
             map(
-                lambda x: base64.b64decode(x.image.uri.unicode_string().split(",")[1]),
-                filter(
-                    lambda y: len(y.captions) > 0,
-                    result.document.pictures)
+                lambda x: base64.b64decode(
+                    x.image.uri.unicode_string().split(",")[1]
+                ),
+                filter(lambda y: len(y.captions) > 0, result.document.pictures),
             )
         )
         return result.document.export_to_markdown()

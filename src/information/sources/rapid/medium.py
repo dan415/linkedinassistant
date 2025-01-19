@@ -1,6 +1,9 @@
 import threading
 from src.core.utils.logging import ServiceLogger
-from src.information.sources.base import requires_valid_period, InformationSource
+from src.information.sources.base import (
+    requires_valid_period,
+    InformationSource,
+)
 from src.information.sources.rapid.base import RapidSource
 
 
@@ -19,7 +22,7 @@ class MediumSearchEngine(RapidSource):
         :param author:  author id
         :return:  author full name
         """
-        url = f'{self.url}/user/{author}'
+        url = f"{self.url}/user/{author}"
 
         result = ""
         try:
@@ -40,7 +43,7 @@ class MediumSearchEngine(RapidSource):
         :param article:  article id
         :return: article information
         """
-        url = f'{self.url}/article/{article}'
+        url = f"{self.url}/article/{article}"
         result = {}
         try:
             response = self.execute_rapid_request(url)
@@ -64,7 +67,7 @@ class MediumSearchEngine(RapidSource):
         :param article:  article id
         :return:  article content
         """
-        url = f'{self.url}/article/{article}/content'
+        url = f"{self.url}/article/{article}/content"
         result = ""
         try:
             response = self.execute_rapid_request(url)
@@ -88,10 +91,12 @@ class MediumSearchEngine(RapidSource):
         """
         all_results = []
         try:
-            url = f'{self.url}/search/articles'
+            url = f"{self.url}/search/articles"
             response = self.execute_rapid_request(url, params={"query": topic})
             results = response.json().get("articles", [])
-            self.logger.info("Found %s results for topic %s", len(results), topic)
+            self.logger.info(
+                "Found %s results for topic %s", len(results), topic
+            )
             for result in results:
                 article = {}
                 article.update(self.get_article_info(result))
@@ -106,7 +111,9 @@ class MediumSearchEngine(RapidSource):
             return all_results
 
     @requires_valid_period
-    def search(self, save_callback=None, stop_event: threading.Event = None) -> list:
+    def search(
+        self, save_callback=None, stop_event: threading.Event = None
+    ) -> list:
         """
         Runs the search for each topic. Then returns the results
         :param stop_event: Optional thread event to trigger graceful termination
@@ -118,7 +125,9 @@ class MediumSearchEngine(RapidSource):
         for topic in self.topics:
 
             if stop_event and stop_event.is_set():
-                self.logger.info("Stop event called in the middle of processing a pdf")
+                self.logger.info(
+                    "Stop event called in the middle of processing a pdf"
+                )
                 break
 
             all_results.extend(self.research_topic(topic, save_callback))

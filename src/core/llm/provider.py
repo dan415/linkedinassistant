@@ -18,7 +18,7 @@ class LLMProvider:
         "google": "langchain_google_genai.GoogleGenerativeAI",
         "openai": "langchain_openai.OpenAI",
         "dalle-openai": "langchain_community.utilities.dalle_image_generator.DallEAPIWrapper",
-        "chat-custom": "langchain_openai.ChatOpenAI"  # Some models can be accesed through ChatOpenAI \
+        "chat-custom": "langchain_openai.ChatOpenAI",  # Some models can be accesed through ChatOpenAI \
         # if base url and api_key are provided
     }
 
@@ -38,11 +38,15 @@ class LLMProvider:
         """
 
         if "-" not in config_name:
-            raise ValueError(f"Invalid provider string format: {config_name}. Expected format: 'type-provider'.")
+            raise ValueError(
+                f"Invalid provider string format: {config_name}. Expected format: 'type-provider'."
+            )
 
         identifier_and_provider = config_name.split("-", 1)
         if len(identifier_and_provider) != 2:
-            raise ValueError(f"Invalid provider string format: {config_name}. Expected format: 'type-provider'.")
+            raise ValueError(
+                f"Invalid provider string format: {config_name}. Expected format: 'type-provider'."
+            )
 
         identifier, type_and_provider = identifier_and_provider
 
@@ -70,7 +74,9 @@ class LLMProvider:
         else:
             llm_name = provider.upper()
             api_key_name = f"{llm_name}_API_KEY"
-            os.environ[api_key_name] = cls._vault_client.get_secret(api_key_name)
+            os.environ[api_key_name] = cls._vault_client.get_secret(
+                api_key_name
+            )
 
         config = cls._config_manager.load_config(config_name)
 
