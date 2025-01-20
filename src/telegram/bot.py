@@ -362,6 +362,7 @@ class BotsCommands:
     Commands take the form /command_name, where command_name is the name of the actual method that will be called.
 
     """
+
     _MAX_MESSAGE_LENGTH = 4096
     _MAX_LISTABLE = 40
     _COMMAND_DESCRIPTIONS = {
@@ -426,7 +427,7 @@ class BotsCommands:
 
         while len(message) > self._MAX_MESSAGE_LENGTH:
             # Last space before the limit
-            split_index = message.rfind(' ', 0, self._MAX_MESSAGE_LENGTH)
+            split_index = message.rfind(" ", 0, self._MAX_MESSAGE_LENGTH)
 
             # If no space is found, split at the limit
             if split_index == -1:
@@ -496,7 +497,10 @@ class BotsCommands:
         """
         logger.info("Clear triggered")
         try:
-            if not index or index == self.state.publications_manager.current_index():
+            if (
+                not index
+                or index == self.state.publications_manager.current_index()
+            ):
                 self.state.publications_manager.update_state(
                     self.state.conversation_id, PublicationState.DISCARDED
                 )
@@ -525,12 +529,12 @@ class BotsCommands:
         """
         logger.info("List triggered")
         lista = [
-                    f"{element[0]}: {element[1].get('title', '')}"
-                    for element in self.state.publications_manager.list()
-                    if element[1].get('title', '')
-                ]
+            f"{element[0]}: {element[1].get('title', '')}"
+            for element in self.state.publications_manager.list()
+            if element[1].get("title", "")
+        ]
         cant_show_all = len(lista) > self._MAX_LISTABLE
-        lista_shortened = lista[:min(self._MAX_LISTABLE, len(lista))]
+        lista_shortened = lista[: min(self._MAX_LISTABLE, len(lista))]
         if len(lista_shortened) > 0:
             logger.info("Suggestions:\n\n%s", "\n".join(lista_shortened))
             self.bot.send_message(

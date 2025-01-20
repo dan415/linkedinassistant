@@ -5,6 +5,7 @@ import uuid
 from functools import wraps
 from src.core.config.manager import ConfigManager
 from src.core.constants import FileManagedFolders
+from src.core.exceptions import OutOfTimeExecutionError
 from src.core.file_manager.b2 import B2Handler
 from src.core.publications import PublicationIterator
 import src.core.utils.functions as F
@@ -184,6 +185,10 @@ class SourcesHandler:
                 for result in results:
                     self.save_material(result)  # Save each result
             logger.debug(f"Finished running search engine {search_engine}")
+        except OutOfTimeExecutionError:
+            logger.info(
+                f"Search engine {search_engine} is not yet meant to execute."
+            )
         except Exception as e:
             logger.error(f"Error running search engine {search_engine}: {e}")
 

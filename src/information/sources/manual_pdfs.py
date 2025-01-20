@@ -5,8 +5,9 @@ from src.core.pdf.provider import PDFExtractorProvider
 from src.core.utils.logging import ServiceLogger
 from src.information.sources.base import (
     ContentSearchEngine,
-    requires_valid_period,
-    InformationSource, stateful,
+    require_valid_run_time,
+    InformationSource,
+    stateful,
 )
 from src.core.llm.retrieval.provider import DocumentRetrieverProvider
 
@@ -31,7 +32,7 @@ class ManualSourceEngine(ContentSearchEngine):
             B2Handler()
         )  # Manager for interacting with the B2 storage
 
-    @requires_valid_period
+    @require_valid_run_time
     @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None

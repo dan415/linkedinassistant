@@ -11,8 +11,9 @@ from src.core.utils.logging import ServiceLogger
 from src.core.vault.hashicorp import VaultClient
 from src.core.constants import SecretKeys
 from src.information.sources.base import (
-    requires_valid_period,
-    InformationSource, stateful,
+    require_valid_run_time,
+    InformationSource,
+    stateful,
 )
 from src.information.sources.rapid.base import RapidSource
 from src.information.sources.rapid.youtube.pool import YoutubeUrlPool
@@ -172,7 +173,7 @@ class YoutubeTranscriptRetriever(RapidSource):
         self.logger.info("Marking URL as processed: %s", url)
         return material
 
-    @requires_valid_period
+    @require_valid_run_time
     @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None

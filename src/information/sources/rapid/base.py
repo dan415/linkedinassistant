@@ -3,7 +3,7 @@ from abc import ABC
 from functools import wraps
 import requests
 from src.core.constants import SecretKeys
-from src.core.exceptions import VaultError
+from src.core.exceptions import VaultError, RapidRateLimitExceeded
 from src.information.sources.base import ContentSearchEngine
 from src.core.vault.hashicorp import VaultClient
 
@@ -27,10 +27,10 @@ def rate_limited_operation(func):
         self.reload_config()
 
         if self.limit and self.count_requests >= self.limit:
-            self.logger.info(
+            self.logger.warning(
                 f"Limit reached: {self.count_requests}/{self.limit}"
             )
-            raise Exception("Limit reached")
+            raise RapidRateLimitExceeded()
 
         self.increment_request_count()
         result = func(self, *args, **kwargs)
