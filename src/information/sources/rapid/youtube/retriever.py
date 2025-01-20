@@ -12,7 +12,7 @@ from src.core.vault.hashicorp import VaultClient
 from src.core.constants import SecretKeys
 from src.information.sources.base import (
     requires_valid_period,
-    InformationSource,
+    InformationSource, stateful,
 )
 from src.information.sources.rapid.base import RapidSource
 from src.information.sources.rapid.youtube.pool import YoutubeUrlPool
@@ -173,6 +173,7 @@ class YoutubeTranscriptRetriever(RapidSource):
         return material
 
     @requires_valid_period
+    @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None
     ) -> list:

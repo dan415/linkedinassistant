@@ -18,6 +18,24 @@ class InformationSource(Enum):
     YOUTUBE = "youtube"
 
 
+def stateful(func):
+    """Decorator to maintain state across function calls.
+    This decorator is used to maintain state across function calls by
+    storing the state in the object instance. It is useful for tracking
+    the number of requests made and enforcing rate limits.
+
+    :param: logger: logger to use
+    """
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        self.save_config()
+        return result
+
+    return wrapper
+
+
 def requires_valid_period(func):
     """Decorator to ensure valid request periods and enforce request limits.
     This decorator checks if the allowed period for requests is valid and whether
@@ -38,8 +56,8 @@ def requires_valid_period(func):
             self.reset()
             raise Exception("Period is not valid")
 
-        result = func(self, *args, **kwargs)
         self.period_datetime = datetime.datetime.now().isoformat()
+        result = func(self, *args, **kwargs)
         return result
 
     return wrapper
@@ -68,13 +86,13 @@ class ContentSearchEngine(ABC):
         """Check if the current period is still valid."""
         if self.period_datetime:
             return (
-                datetime.datetime.now() - datetime.timedelta(days=self.period)
+                    datetime.datetime.now() - datetime.timedelta(days=self.period)
             ) >= datetime.datetime.fromisoformat(self.period_datetime)
         return True
 
     @abstractmethod
     def search(
-        self, save_callback: Callable, stop_event: threading.Event = None
+            self, save_callback: Callable, stop_event: threading.Event = None
     ) -> list:
         """Perform a search in the information source and return results.
         This method must be implemented by subclasses to define specific

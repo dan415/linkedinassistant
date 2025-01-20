@@ -7,7 +7,7 @@ from src.core.utils.logging import ServiceLogger
 from src.information.sources.base import (
     ContentSearchEngine,
     requires_valid_period,
-    InformationSource,
+    InformationSource, stateful,
 )
 from src.core.llm.retrieval.provider import DocumentRetrieverProvider
 
@@ -86,6 +86,7 @@ class ArxivSearchEngine(ContentSearchEngine):
             return []
 
     @requires_valid_period
+    @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None
     ) -> list:

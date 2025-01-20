@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from src.core.utils.logging import ServiceLogger
 from src.information.sources.base import (
     requires_valid_period,
-    InformationSource,
+    InformationSource, stateful,
 )
 from src.information.sources.rapid.base import RapidSource
 import src.core.utils.functions as F
@@ -61,6 +61,7 @@ class GoogleNewsInformationEngine(RapidSource):
                 self.save_if_valid(save_callback, result)
 
     @requires_valid_period
+    @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None
     ) -> list:

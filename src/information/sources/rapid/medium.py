@@ -2,7 +2,7 @@ import threading
 from src.core.utils.logging import ServiceLogger
 from src.information.sources.base import (
     requires_valid_period,
-    InformationSource,
+    InformationSource, stateful,
 )
 from src.information.sources.rapid.base import RapidSource
 
@@ -98,6 +98,7 @@ class MediumSearchEngine(RapidSource):
             self.logger.info(
                 "Found %s results for topic %s", len(results), topic
             )
+            results = results[:min(len(results), self.max_results)]
             for result in results:
                 article = {}
                 article.update(self.get_article_info(result))
@@ -112,6 +113,7 @@ class MediumSearchEngine(RapidSource):
             return all_results
 
     @requires_valid_period
+    @stateful
     def search(
         self, save_callback=None, stop_event: threading.Event = None
     ) -> list:
