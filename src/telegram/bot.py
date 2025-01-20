@@ -362,6 +362,7 @@ class BotsCommands:
     Commands take the form /command_name, where command_name is the name of the actual method that will be called.
 
     """
+    _MAX_MESSAGE_LENGTH = 4096
     _MAX_LISTABLE = 40
     _COMMAND_DESCRIPTIONS = {
         "start": "Start the bot and initialize interaction.",
@@ -417,6 +418,25 @@ class BotsCommands:
             self.state.chat_id, MSG_START.format(message.chat.id)
         )
 
+    def send_message(self, chat_id: int, message: str):
+        """
+        Send a message to a specific chat. If the message length exceeds 4096,
+        it will be split into multiple messages at the last space before the limit.
+        """
+
+        while len(message) > self._MAX_MESSAGE_LENGTH:
+            # Last space before the limit
+            split_index = message.rfind(' ', 0, self._MAX_MESSAGE_LENGTH)
+
+            # If no space is found, split at the limit
+            if split_index == -1:
+                split_index = self._MAX_MESSAGE_LENGTH
+
+            self.bot.send_message(chat_id, message[:split_index])
+            message = message[split_index:].lstrip()
+
+        self.bot.send_message(chat_id, message)
+
     def help(self, message: Message):
         """
         Provide a list of available bot commands along with their descriptions.
@@ -466,19 +486,31 @@ class BotsCommands:
         logger.info("Healthcheck triggered")
         self.bot.send_message(self.state.chat_id, MSG_HEALTHCHECK)
 
-    def clear(self, message: Message):
+    def clear(self, message: Message, index=None):
         """
         Clear the current publication and reset the bot's memory for new suggestions.
 
         :param message: The message object received from the chat.
+        :param index: The index of the suggestion to clear. If None, the current suggestion is cleared.
         :return: None
         """
         logger.info("Clear triggered")
         try:
-            self.state.publications_manager.update_state(
-                self.state.conversation_id, PublicationState.DISCARDED
-            )
-            self.state.reset()
+            if not index or index == self.state.publications_manager.current_index():
+                self.state.publications_manager.update_state(
+                    self.state.conversation_id, PublicationState.DISCARDED
+                )
+                self.state.reset()
+
+                # Move the cursor back to the last element so that
+                # the next call to next() does not skip the next element
+                # which has advanced one spot due to the current element being removed
+                self.state.publications_manager.last()
+            else:
+                publication = self.state.publications_manager.select(index)
+                self.state.publications_manager.update_state(
+                    publication["publication_id"], PublicationState.DISCARDED
+                )
             self.bot.send_message(self.state.chat_id, MSG_CLEARED)
         except Exception as e:
             logger.error(f"Error clearing publication: {e}")
@@ -1030,8 +1062,6 @@ class TeleLinkedinBot:
                     self.state.publications_manager.center_iterator(
                         self.state.conversation_id
                     )
-                else:
-                    self.state.publications_manager.reset_iterator()
                 current = next(self.state.publications_manager, None)
                 if current:
                     logger.info("Sending next suggestion")
