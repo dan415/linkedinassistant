@@ -2,7 +2,6 @@ import base64
 import copy
 import json
 import logging
-import os
 import uuid
 from typing import Any, Dict, List, Optional, Union
 import requests
@@ -31,7 +30,7 @@ class LangChainGPT:
     _CONFIG_SCHEMA = "llm-conversation-agent"
 
     def __init__(
-            self, logger: logging.Logger = ServiceLogger(__name__)
+        self, logger: logging.Logger = ServiceLogger(__name__)
     ) -> None:
         # Initialize instance variables and load configuration
         self.logger = logger
@@ -145,9 +144,10 @@ class LangChainGPT:
         :return: BraveSearch instance
         """
         from langchain_community.tools import BraveSearch
+
         return BraveSearch.from_api_key(
             api_key=self.vault_client.get_secret(SecretKeys.BRAVE_API_KEY),
-            search_kwargs={"count": 3}
+            search_kwargs={"count": 3},
         )
 
     def _load_tools(self) -> None:
@@ -172,7 +172,7 @@ class LangChainGPT:
         if builtin_tools:
             self.tools.extend(load_tools(builtin_tools))
 
-    def __invoke(self, messages: Dict[str, Any]) -> Union[dict[str, Any], Any]:
+    def _invoke(self, messages: Dict[str, Any]) -> Union[dict[str, Any], Any]:
         """Invoke the ReAct agent with the given messages.
 
         :param: The input data for the graph.
@@ -219,7 +219,7 @@ class LangChainGPT:
                 ("user", json.dumps(publication_cp)),
             ]
         }
-        return self._format_response(self.__invoke(inputs))
+        return self._format_response(self._invoke(inputs))
 
     def memory_trimmer(self, state: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Trim conversation memory based on the configured strategy.
@@ -229,8 +229,8 @@ class LangChainGPT:
         :returns: The trimmed list of messages
         """
         if (
-                self.trimming_strategy != "token"
-                and self.trimming_strategy != "message"
+            self.trimming_strategy != "token"
+            and self.trimming_strategy != "message"
         ):
             raise ValueError(
                 "Trimming Strategy should either be 'token' or 'message'"
@@ -258,7 +258,7 @@ class LangChainGPT:
         return messages
 
     def call(
-            self, input_message: str, images: Optional[List[bytes]] = None
+        self, input_message: str, images: Optional[List[bytes]] = None
     ) -> str:
         """
         Call the agent to process the input message.
@@ -286,5 +286,5 @@ class LangChainGPT:
 
         # Invoke the agent and return the formatted response
         return self._format_response(
-            self.__invoke({"messages": [("user", input_message_payload)]})
+            self._invoke({"messages": [("user", input_message_payload)]})
         )
