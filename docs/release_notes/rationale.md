@@ -31,11 +31,10 @@ Welcome to **v2.0.0**—a transformative update that redefines the capabilities 
   - **YouTube Integration**: Add YouTube URLs to the bot for post creation
   - **Search Engine Activation**: Enable or disable the search engine for post generation
 - **Agent Boosted Capabilities**
-  - **Tool Usage**: Access to all pre-built LangChain tools for enhanced post creation, like accessing the internet, generate images or 
-  acccess arxiv papers.
+  - **Tool Usage**: Access to all pre-built LangChain tools for enhanced post creation, like accessing the internet, generate images, search with brave or acccess arxiv papers.
+  - **Persistent Conversation History**: Maintain conversation history while the post is not yet posted by integrating automatic checkpointing of conversation messages on MongoDB with custom made memory saver.
 - **Easier installation**:
   - Only need to set up external services and vault secrets prior to installation.
-  - **Added Docker Support**: Run the system with Docker for easy deployment and management.
   - **Insallation scripts**: Added installation scripts for easy setup and configuration for both Linux and Windows
 
 

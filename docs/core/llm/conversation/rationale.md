@@ -58,4 +58,4 @@ The Brave Search tool is a tool that allows you to search for information on the
 
 1. You need to first log in to https://brave.com/search/api and obtain your api_key.
 2. Then, you need to save the api key inside your secrets vault as "BRAVE_API_KEY".
-3. Lastly, set the tool: "brave_tool" in the configuration file.
+3. Lastly, set the tool: "brave_search" in the configuration file.
