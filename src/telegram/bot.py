@@ -487,7 +487,7 @@ class BotsCommands:
         logger.info("Healthcheck triggered")
         self.bot.send_message(self.state.chat_id, MSG_HEALTHCHECK)
 
-    def clear(self, message: Message, index=None):
+    def clear(self, message: Message, index=Optional[str]):
         """
         Clear the current publication and reset the bot's memory for new suggestions.
 
@@ -496,10 +496,12 @@ class BotsCommands:
         :return: None
         """
         logger.info("Clear triggered")
+        assert index is None or index.isdigit(), "Index must be an integer"
+        index = int(index) if index else None
         try:
             if (
                 not index
-                or index == self.state.publications_manager.current_index()
+                or index == self.state.publications_manager.current_index
             ):
                 self.state.publications_manager.update_state(
                     self.state.conversation_id, PublicationState.DISCARDED
