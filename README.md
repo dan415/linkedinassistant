@@ -241,7 +241,7 @@ it but installation will fail at the end if incorrectly provided)
 If using Unix, on terminal, run:
 
 ```bash
-sudo ./install.sh
+sudo ./install.sh src/main.py
 ```
 
 ---
