@@ -152,11 +152,14 @@
 <p>The configuration file is located inside the <code>config</code> collection the field <code>config_name</code>: <code>"information-sources-rapid-youtube"</code>. It contains the following parameters:</p>
 <ul>
 <li><code>limit</code>: The maximum number of results to retrieve from the API.</li>
-<li><code>period</code>: The period of time to search for in days.</li>
 <li><code>url</code>: The URL of the Rapid API source.</li>
 <li><code>host</code>: The host of the Rapid API source.</li>
 <li><code>minimum_length</code>: The minimum length of the contents. Papers with content less than this number of characters are filtered out</li>
 <li><code>count_requests</code>: An integer counter that keeps track of the number of requests made to the API. This is used to keep track of the number of requests made to the API, and to disable the source when the limit is reached.</li>
+<li><code>execution_period</code>: The period of time in seconds to wait before executing the source again.</li>
+<li><code>period_datetime</code>: The beginning of the last period.</li>
+<li><code>last_run_time</code>: The time of the last execution of the source.</li>
+<li><code>period</code>: The period of time for resetting the counter of requests to the API.</li>
 </ul>
 <h3> Algorithm </h3>
 

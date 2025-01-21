@@ -52,6 +52,8 @@
                   <li class="toctree-l1 current"><a class="reference internal current" >LLMs</a>
     <ul class="current">
                 <li class="toctree-l2 current"><a class="reference internal current" href="#">Conversations Agent</a>
+    <ul class="current">
+    </ul>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../model_providers/rationale.html">Model Providers</a>
                 </li>
@@ -174,7 +176,7 @@ the text in the messages to the agent. </p>
 <ul>
 <li><code>max_conversation_length</code>: The maximum length of the conversation. This is used to limit the memory of the agent at n previous messages.</li>
 <li><code>system_prompt_template</code>: The system prompt template is used in conjunction with the actual post (in json format) in order to generate the content. It gives the model the required instructions</li>
-<li><code>tools</code>: Can be a list combination of any prebuilt langchain agent + <code>generate_image</code>. This tool is the implemented form of generating an image and setting it as the post image. The react agent expects the find at least one tool to use, so this list cannot be empty.</li>
+<li><code>tools</code>: Can be a list combination of any prebuilt langchain agent (that dont require api_keys and are supported by load_tools) + <code>create_image</code>. This tool is the implemented form of generating an image and setting it as the post image. The react agent expects the find at least one tool to use, so this list cannot be empty.</li>
 <li><code>model_provider</code>: The chat model provider, can be any supported chat model</li>
 <li><code>image_model_provider</code>: Image model provider, as of now, only <code>dalle-openai</code> is supported</li>
 <li><code>image_generation_prompt</code>: Prompt for generating the images</li>
@@ -183,6 +185,13 @@ the text in the messages to the agent. </p>
 <li><code>max_tokens</code>: Max tokens to pass to the model. It is used to trim the conversation history when <code>trimming_strategy</code> is set to <code>token</code></li>
 <li><code>max_conversation_length</code>: Number of max allowed messages to be passed to the model. It is used to trim the conversation history when <code>trimming_strategy</code> is set to <code>message</code></li>
 </ul>
+<h2 id="about-the-brave-search-tool">About the Brave Search tool:</h2>
+<p>The Brave Search tool is a tool that allows you to search for information on the web. It is a privacy-focused search engine that does not track your searches. It is built on top of the Brave browser, which is a privacy-focused browser that blocks ads and trackers. The Brave Search tool is a great alternative to other search engines like Google, Bing, and Yahoo, which track your searches and use your data for targeted advertising. The Brave Search tool is open-source and transparent, so you can trust that your searches are private and secure.</p>
+<ol>
+<li>You need to first log in to https://brave.com/search/api and obtain your api_key.</li>
+<li>Then, you need to save the api key inside your secrets vault as "BRAVE_API_KEY".</li>
+<li>Lastly, set the tool: "brave_search" in the configuration file.</li>
+</ol>
               
             </div>
           </div><footer>

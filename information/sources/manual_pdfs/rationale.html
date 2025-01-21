@@ -162,6 +162,8 @@ a method to keep track of the pdfs that have been processed.</p>
 <li><code>output_directory</code>: The directory in BlackBlaze B2 where the PDFs that have been processed are moved to. Defaults to <code>Information/Sources/Manual/Output</code></li>
 <li><code>provider</code>: Right now it can only be <code>Langchain-RAG</code>. This defines the RAG agent used to extract the context that will be used in order to generate publications. ColBert has been deprecated and as of now only Langchain-RAG is supported</li>
 <li><code>pdf_extractor_provider</code>: Can be either <code>docling</code> or <code>pypdf</code>. More detailed information on the different pdf extractor providers on the pdf section.</li>
+<li><code>last_run_time</code>: The time of the last execution of the source.</li>
+<li><code>execution_period</code>: The period of time in seconds to wait before executing the source again.</li>
 </ul>
 <h3> Algorithm </h3>
 
