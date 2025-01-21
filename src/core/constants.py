@@ -55,6 +55,7 @@ class SecretKeys:
     LINKEDIN_ID = "LINKEDIN_LINKEDIN_ID"
     TELEGRAM_CHAT_ID = "TELEGRAM_CHAT_ID"
     YOUTUBE_API_KEY = "YOUTUBE_API_KEY"
+    BRAVE_API_KEY = "BRAVE_API_KEY"
 
 
 class PublicationState(Enum):
