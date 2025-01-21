@@ -11,13 +11,16 @@ Google News.
 The configuration is located inside the `config` collection the field `config_name`: `"information-sources-rapid-google_news"`. It contains the following parameters:
 
 * `limit`: The maximum number of results to retrieve from the API.
-* `period`: The period of time to search for in days.
 * `url`: The URL of the Rapid API source.
 * `host`: The host of the Rapid API source.
 * `max_results`: The maximum number of results to retrieve from the API.
 * `minimum_length`: The minimum length of the contents. Papers with content less than this number of characters are filtered out
 * `count_requests`: An integer counter that keeps track of the number of requests made to the API. This is used to keep track of the number of requests made to the API, and to disable the source when the limit is reached.
 * `topics`: A list of topics to search for. Every topic is a "normal" passed to medium's search engine.
+* `execution_period`: The period of time in seconds to wait before executing the source again.
+* `period_datetime`: The beginning of the last period.
+* `last_run_time`: The time of the last execution of the source.
+* `period`: The period of time for resetting the counter of requests to the API.
 
 
 <h3> Algorithm </h3>

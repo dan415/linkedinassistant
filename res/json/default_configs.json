@@ -1,334 +1,242 @@
-[
-  {
-    "config_name": "telegram",
-    "suggestion_period": {
-      "$numberInt": "1"
-    },
-    "cool_off_time": null,
-    "conversation_id": "84b94cb7-0001-4bbc-8b7e-623bcfdfc67f"
-  },
-  {
-    "config_name": "llm-conversation-agent",
-    "system_prompt_template": "You are a Linkedin assistant for a Data Scientist. You are in charged of creating posts about news, papers and articles related to topics he has deemed relevant. His automated ideas retrival pipeline searches for new posting ideas and passes them to you. You are in charge of writing the post. He will then review the post, and might either accept it, reject it, or prompt you to make changes. You are in charge of making the changes. You also have some tools at your disposal for completing the posts or generating images for them (per user request). You are great at this, as your style of writing always catches the attention of the reader. You are also very good at summarizing the main points of the article in a concise way, while at the same time explaining capturing the innovative ideas of new state-of-the-art techniques and such.\n\nFormatting Instructions:\n- The texts you make will be in Unicode Text Format, as it is the format used by LinkedIn.\n- Make titles and bullet points in Unicode Bold\n- Hyperlinked text is also not supported, if desired, add full links as they come\n- Do not add bold or italic formatting to hashtags\n\n  Now, take a deep breath, and start writing a post about the following article: ",
-    "tools": [
-      "arxiv",
-      "create_image"
-    ],
-    "model_provider": "gemini2-chat-google",
-    "image_generation_prompt": "Produce an image that does not include text to accompany my LinkedIn post that fits the following description: {description}",
-    "max_tokens": {
-      "$numberInt": "127000"
-    },
-    "max_conversation_length": {
-      "$numberInt": "2"
-    },
-    "trimming_strategy": "token",
-    "image_model_provider": "hd-dalle-openai",
-    "apply_unicode_bold": true
-  },
-  {
-    "config_name": "linkedin",
-    "footer": "\n\nDisclaimer: This post was created by my AI Posting Assistant. My assistant searches for new posting ideas from papers, news, articles, etc. creates posts that get sent to me via Telegram for validation, and posts them if approved. If you want to know more about this, please don't hesitate to contact me!"
-  },
-  {
-    "config_name": "information",
-    "active_sources": [
-      "arxiv"
-    ],
-    "execution_period": {
-      "$numberInt": "7"
-    },
-    "last_run_time": null,
-    "one_by_one": true,
-    "active": true
-  },
-  {
-    "config_name": "information-sources-arxiv",
-    "max_results": {
-      "$numberInt": "5"
-    },
-    "url": "http://export.arxiv.org/api/",
-    "minimum_length": {
-      "$numberInt": "50"
-    },
-    "provider": "Langchain-RAG",
-    "topics": [
-      "cat:math.AG",
-      "cat:cs.AI",
-      "cat:cs.GT",
-      "cat:cs.CV",
-      "cat:cs.ET",
-      "cat:cs.IR",
-      "cat:cs.LG",
-      "cat:cs.NE",
-      "cat:cs.PL",
-      "cat:cs.RO"
-    ],
-    "period": {
-      "$numberInt": "7"
-    },
-    "pdf_extractor_provider": "docling",
-    "period_datetime": null
-  },
-  {
-    "config_name": "information-sources-manual",
-    "minimum_length": {
-      "$numberInt": "50"
-    },
-    "provider": "Langchain-RAG",
-    "pdf_extractor_provider": "docling",
-    "period": {
-      "$numberInt": "1"
-    },
-    "period_datetime": null
-  },
-  {
-    "config_name": "information-sources-rapid-medium",
-    "limit": {
-      "$numberInt": "150"
-    },
-    "period": {
-      "$numberInt": "2"
-    },
-    "url": "https://medium2.p.rapidapi.com",
-    "host": "medium2.p.rapidapi.com",
-    "max_results": {
-      "$numberInt": "5"
-    },
-    "minimum_length": {
-      "$numberInt": "50"
-    },
-    "count_requests": {
-      "$numberInt": "45"
-    },
-    "topics": [
-      "Artificial Intelligence",
-      "Python",
-      "Technology"
-    ],
-    "period_datetime": null
-  },
-  {
-    "config_name": "information-sources-rapid-google_news",
-    "limit": {
-      "$numberInt": "100"
-    },
-    "period": {
-      "$numberInt": "1"
-    },
-    "url": "https://google-api31.p.rapidapi.com",
-    "host": "google-api31.p.rapidapi.com",
-    "max_results": {
-      "$numberInt": "5"
-    },
-    "minimum_length": {
-      "$numberInt": "50"
-    },
-    "count_requests": {
-      "$numberInt": "3"
-    },
-    "topics": [
-      "Artificial Intelligence",
-      "OpenAI",
-      "Technology",
-      "Google"
-    ],
-    "period_datetime": null
-  },
-  {
-    "config_name": "information-sources-rapid-youtube",
-    "period": {
-      "$numberInt": "1"
-    },
-    "url": "https://youtube-transcript3.p.rapidapi.com/api/transcript-with-url",
-    "host": "youtube-transcript3.p.rapidapi.com",
-    "minimum_length": {
-      "$numberInt": "50"
-    },
-    "count_requests": {
-      "$numberInt": "1"
-    },
-    "period_datetime": null
-  },
-  {
-    "config_name": "base-chat-openai",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model_name": "gpt-4o",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "frequency_penalty": {
-      "$numberDouble": "0.0"
-    },
-    "presence_penalty": {
-      "$numberDouble": "0.0"
-    }
-  },
-  {
-    "config_name": "base-openai",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model_name": "gpt-4o",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "frequency_penalty": {
-      "$numberDouble": "0.0"
-    },
-    "presence_penalty": {
-      "$numberDouble": "0.0"
-    }
-  },
-  {
-    "config_name": "llm-retrieval-langchain",
-    "chunk_size": {
-      "$numberInt": "1000"
-    },
-    "chunk_overlap": {
-      "$numberInt": "100"
-    },
-    "embeddings_provider": "large-embeddings-openai",
-    "model_provider": "mini-chat-openai",
-    "query_expansion_prompt": "Based on the following summary, generate 5 specific terms or questions that are relevant for building an article. Do not enumerate the questions or add formatting to it, just separate each question with a '\\n' after each of them. These questions must contain as much semantic information in regards to the topic in the article being asked as possible: {summary}",
-    "answer_prompt": "Based on the following context, please provide a clear and concise answer to the question. If the context doesn't contain enough information to answer the question fully, say so. Context: {context} Question: {question} Answer:",
-    "title_extraction_prompt": "Given the following text from a document, identify and extract what appears to be the title or main heading. If there are multiple potential titles, choose the most appropriate one that best represents the document's main topic. If no clear title is found, synthesize one based on the main topic or subject matter discussed. Text: {text} Title:",
-    "n_chunk_results": {
-      "$numberLong": "5"
-    }
-  },
-  {
-    "config_name": "hd-dalle-openai",
-    "quality": "hd",
-    "size": "1024x1024",
-    "model": "dall-e-3",
-    "n": {
-      "$numberInt": "1"
-    }
-  },
-  {
-    "config_name": "large-embeddings-openai",
-    "model": "text-embedding-3-large",
-    "dimensions": "3072"
-  },
-  {
-    "config_name": "mini-chat-openai",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model_name": "gpt-4o-mini",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "frequency_penalty": {
-      "$numberDouble": "0.0"
-    },
-    "presence_penalty": {
-      "$numberDouble": "0.0"
-    }
-  },
-  {
-    "config_name": "docling",
-    "do_table_structure": true,
-    "do_ocr": false,
-    "generate_picture_images": true,
-    "table_former_mode": "accurate",
-    "accelerator_options": {
-      "device": "cpu",
-      "num_threads": {
-        "$numberInt": "4"
-      }
-    }
-  },
-  {
-    "config_name": "mini-openai",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model_name": "gpt-4o-mini",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "frequency_penalty": {
-      "$numberDouble": "0.0"
-    },
-    "presence_penalty": {
-      "$numberDouble": "0.0"
-    }
-  },
-  {
-    "config_name": "llama3370b-chat-groq",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model": "llama-3.3-70b-versatile",
-    "top_p": {
-      "$numberInt": "1"
-    }
-  },
-  {
-    "config_name": "gemini1.5-chat-google",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model": "gemini-1.5-pro",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "top_k": {
-      "$numberInt": "1"
-    }
-  },
-  {
-    "config_name": "gemini1.5-chat-google",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model": "gemini-1.5-pro",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "top_k": {
-      "$numberInt": "1"
-    }
-  },
-  {
-    "config_name": "gemini1.5-google",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model": "gemini-1.5-pro",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "top_k": null
-  },
-  {
-    "config_name": "gemini1.5-embeddings-google",
-    "model": "models/embedding-001"
-  },
-  {
-    "config_name": "gemini2-chat-google",
-    "temperature": {
-      "$numberDouble": "0.5"
-    },
-    "model": "gemini-2.0-flash-exp",
-    "top_p": {
-      "$numberInt": "1"
-    },
-    "top_k": {
-      "$numberInt": "1"
-    }
-  },
-  {
-    "config_name":"deepseek-chat-custom",
-    "temperature":{"$numberDouble":"1.3"},
-    "model": "deepseek-chat",
-    "api_key": "DEEPSEEK_API_KEY",
-    "base_url": "https://api.deepseek.com",
-    "frequency_penalty":{"$numberDouble":"0.0"},
-    "presence_penalty":{"$numberDouble":"0.0"}
-}
-]
+[{
+  "config_name": "telegram",
+  "suggestion_period": 1,
+  "cool_off_time": null,
+  "conversation_id": ""
+},
+{
+  "config_name": "llm-conversation-agent",
+  "system_prompt_template": "You are a Linkedin assistant for a Data Scientist. \nYou are in charged of creating posts about news, papers and articles related to topics he has deemed relevant. \nHis automated ideas retrival pipeline searches for new posting ideas and passes them to you. \nYou are in charge of writing the post. \nHe will then review the post, and might either accept it, reject it, or prompt you to make changes. You are in charge of making the changes. \nYou also have some tools at your disposal for completing the posts or generating images for them (per user request). \nYou are great at this, as your style of writing always catches the attention of the reader. You are also very good at summarizing the main points of the article in a concise way, while at the same time explaining capturing the innovative ideas of new state-of-the-art techniques and such.\n\nFormatting Instructions:\n- The texts you make will be in Unicode Text Format, as it is the format used by LinkedIn.\n- Make titles and bullet points in Unicode Bold\n- Hyperlinked text is also not supported, if desired, add full links as they come\n- Do not add bold or italic formatting to hashtags\n- When writing an article, retrain yourself from talking or introducing your response, the output must only be the produced article\n- Articles should be written in a compelling and easy-to-understand manner\n- Credit your sources and do not write as if the source was written by you (or me)\n\n Now, take a deep breath, and start writing a post about the following article: ",
+  "tools": [
+    "arxiv",
+    "create_image",
+    "brave_tool"
+  ],
+  "model_provider": "gemini2-chat-google",
+  "image_generation_prompt": "Produce an image that does not include text to accompany my LinkedIn post that fits the following description: {description}",
+  "max_tokens": 127000,
+  "max_conversation_length": 2,
+  "trimming_strategy": "token",
+  "image_model_provider": "hd-dalle-openai",
+  "apply_unicode_bold": true
+},
+{
+  "config_name": "linkedin",
+  "footer": "\n\nDisclaimer: This post was created by my AI Posting Assistant. My assistant searches for new posting ideas from papers, news, articles, etc. creates posts that get sent to me via Telegram for validation, and posts them if approved. If you want to know more about this, please don't hesitate to contact me!"
+},
+{
+  "config_name": "information",
+  "active_sources": [
+    "youtube"
+  ],
+  "execution_period": 1,
+  "last_run_time": null,
+  "one_by_one": true,
+  "active": true
+},
+{
+  "config_name": "information-sources-arxiv",
+  "max_results": 5,
+  "url": "http://export.arxiv.org/api/",
+  "minimum_length": 50,
+  "provider": "Langchain-RAG",
+  "topics": [
+    "cat:math.AG",
+    "cat:cs.AI",
+    "cat:cs.GT",
+    "cat:cs.CV",
+    "cat:cs.ET",
+    "cat:cs.IR",
+    "cat:cs.LG",
+    "cat:cs.NE",
+    "cat:cs.PL",
+    "cat:cs.RO"
+  ],
+  "pdf_extractor_provider": "docling",
+  "period_datetime": null,
+  "last_run_time": null,
+  "execution_period": 7
+},
+{
+  "config_name": "information-sources-manual",
+  "minimum_length": 50,
+  "provider": "Langchain-RAG",
+  "pdf_extractor_provider": "docling",
+  "period_datetime": null,
+  "last_run_time": null,
+  "execution_period": 1
+},
+{
+  "config_name": "information-sources-rapid-medium",
+  "limit": 150,
+  "period": 30,
+  "url": "https://medium2.p.rapidapi.com",
+  "host": "medium2.p.rapidapi.com",
+  "max_results": 1,
+  "minimum_length": 50,
+  "count_requests": 0,
+  "topics": [
+    "Artificial Intelligence",
+    "Python"
+  ],
+  "period_datetime": null,
+  "last_run_time": null,
+  "execution_period": 1
+},
+{
+  "config_name": "information-sources-rapid-google_news",
+  "limit": 100,
+  "period": 30,
+  "url": "https://google-api31.p.rapidapi.com",
+  "host": "google-api31.p.rapidapi.com",
+  "max_results": 1,
+  "minimum_length": 50,
+  "count_requests": 0,
+  "topics": [
+    "Artificial Intelligence",
+    "OpenAI",
+    "Technology"
+  ],
+  "period_datetime": null,
+  "last_run_time": null,
+  "execution_period": 1
+},
+{
+  "config_name": "information-sources-rapid-youtube",
+  "period": 30,
+  "url": "https://youtube-transcript3.p.rapidapi.com/api/transcript-with-url",
+  "host": "youtube-transcript3.p.rapidapi.com",
+  "minimum_length": 50,
+  "count_requests": 0,
+  "period_datetime": null,
+  "last_run_time": null,
+  "execution_period": 1
+},
+{
+  "config_name": "base-chat-openai",
+  "temperature": 0.5,
+  "model_name": "gpt-4o",
+  "top_p": 1,
+  "frequency_penalty": 0,
+  "presence_penalty": 0
+},
+{
+  "config_name": "base-openai",
+  "temperature": 0.5,
+  "model_name": "gpt-4o",
+  "top_p": 1,
+  "frequency_penalty": 0,
+  "presence_penalty": 0
+},
+{
+  "config_name": "llm-retrieval-langchain",
+  "chunk_size": 1000,
+  "chunk_overlap": 100,
+  "embeddings_provider": "large-embeddings-openai",
+  "model_provider": "mini-chat-openai",
+  "query_expansion_prompt": "Based on the following summary, generate 5 specific terms or questions that are relevant for building an article. Do not enumerate the questions or add formatting to it, just separate each question with a '\\n' after each of them. These questions must contain as much semantic information in regards to the topic in the article being asked as possible: {summary}",
+  "answer_prompt": "Based on the following context, please provide a clear and concise answer to the question. If the context doesn't contain enough information to answer the question fully, say so. Context: {context} Question: {question} Answer:",
+  "title_extraction_prompt": "Given the following text from a document, identify and extract what appears to be the title or main heading. If there are multiple potential titles, choose the most appropriate one that best represents the document's main topic. If no clear title is found, synthesize one based on the main topic or subject matter discussed. Text: {text} Title:",
+  "n_chunk_results": {
+    "$numberLong": "5"
+  }
+},
+{
+  "config_name": "hd-dalle-openai",
+  "quality": "hd",
+  "size": "1024x1024",
+  "model": "dall-e-3",
+  "n": 1
+},
+{
+  "config_name": "large-embeddings-openai",
+  "model": "text-embedding-3-large",
+  "dimensions": "3072"
+},
+{
+  "config_name": "mini-chat-openai",
+  "temperature": 0.5,
+  "model_name": "gpt-4o-mini",
+  "top_p": 1,
+  "frequency_penalty": 0,
+  "presence_penalty": 0
+},
+{
+  "do_table_structure": true,
+  "do_ocr": false,
+  "generate_picture_images": true,
+  "table_former_mode": "accurate",
+  "config_name": "docling",
+  "accelerator_options": {
+    "device": "cpu",
+    "num_threads": 4
+  }
+},
+{
+  "config_name": "mini-openai",
+  "temperature": 0.5,
+  "model_name": "gpt-4o-mini",
+  "top_p": 1,
+  "frequency_penalty": 0,
+  "presence_penalty": 0
+},
+{
+  "config_name": "llama3370b-chat-groq",
+  "temperature": 0.5,
+  "model": "llama-3.3-70b-versatile",
+  "top_p": 1
+},
+{
+  "config_name": "gemini1.5-google",
+  "temperature": 0.5,
+  "model": "gemini-1.5-pro",
+  "top_p": 1,
+  "top_k": null
+},
+{
+  "config_name": "gemini1.5-chat-google",
+  "temperature": 0.5,
+  "model": "gemini-1.5-pro",
+  "top_p": 1,
+  "top_k": 1
+},
+{
+  "config_name": "gemini1.5-embeddings-google",
+  "model": "models/embedding-001"
+},
+{
+  "config_name": "base-chat-huggingfacehub",
+  "repo_id": "mistralai/Mistral-7B-Instruct-v0.2",
+  "max_length": 128,
+  "temperature": 0.5,
+  "top_p": 0.95,
+  "top_k": 10
+},
+{
+  "config_name": "base-chat-huggingface",
+  "model_id": "HuggingFaceH4/zephyr-7b-beta",
+  "task": "text-generation",
+  "pipeline_kwargs": {
+    "max_new_tokens": 512,
+    "do_sample": false,
+    "repetition_penalty": 1.03,
+    "return_full_text": false
+  }
+},
+{
+  "config_name": "base-embeddings-huggingfacehub",
+  "task": "feature-extraction",
+  "model_name": "sentence-transformers/all-MiniLM-l6-v2"
+},
+{
+  "config_name": "base-embeddings-huggingface",
+  "task": "feature-extraction",
+  "model_name": "sentence-transformers/all-MiniLM-l6-v2"
+},
+{
+  "config_name": "gemini2-chat-google",
+  "temperature": 0.5,
+  "model": "gemini-2.0-flash-exp",
+  "top_p": 1,
+  "top_k": 1
+}]

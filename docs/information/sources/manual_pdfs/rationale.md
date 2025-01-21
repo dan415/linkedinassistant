@@ -25,6 +25,9 @@ The configuration file is located inside the `config` collection the field `conf
 * `output_directory`: The directory in BlackBlaze B2 where the PDFs that have been processed are moved to. Defaults to `Information/Sources/Manual/Output`
 * `provider`: Right now it can only be `Langchain-RAG`. This defines the RAG agent used to extract the context that will be used in order to generate publications. ColBert has been deprecated and as of now only Langchain-RAG is supported
 * `pdf_extractor_provider`: Can be either `docling` or `pypdf`. More detailed information on the different pdf extractor providers on the pdf section.
+* `last_run_time`: The time of the last execution of the source.
+* `execution_period`: The period of time in seconds to wait before executing the source again.
+
 
 <h3> Algorithm </h3>
 
