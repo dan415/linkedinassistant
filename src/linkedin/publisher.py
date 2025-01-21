@@ -42,21 +42,15 @@ class LinkedinPublisher:
         self.reload_config()
         return not self.access_token
 
-    def _post(self, content: str, asset: Optional[str]) -> bool:
+    def _build_post_data(
+        self, content: str, asset: Optional[str]
+    ) -> Dict[str, Any]:
         """
-        Post content to LinkedIn. If no access token is present, it logs an error.
-
-        :param content: Text content to post.
-        :param asset: Optional media asset to include in the post.
-        :return: True if successful, False otherwise.
+        Build the data payload for a LinkedIn post.
+        :param content:  Text content of the post.
+        :param asset:  Media asset ID for the post.
+        :return: Dictionary of post data.
         """
-        self.reload_config()
-
-        if not self.access_token:
-            self.logger.error("No access token available")
-            return False
-
-        # Construct the data payload for the LinkedIn API
         post_data: Dict[str, Any] = {
             "author": f"urn:li:person:{self.linkedin_id}",
             "lifecycleState": "PUBLISHED",
@@ -89,6 +83,24 @@ class LinkedinPublisher:
                 "shareMediaCategory"
             ] = "NONE"
 
+        return post_data
+
+    def _post(self, content: str, asset: Optional[str]) -> bool:
+        """
+        Post content to LinkedIn. If no access token is present, it logs an error.
+
+        :param content: Text content to post.
+        :param asset: Optional media asset to include in the post.
+        :return: True if successful, False otherwise.
+        """
+        self.reload_config()
+
+        if not self.access_token:
+            self.logger.error("No access token available")
+            return False
+
+        # Construct the data payload for the LinkedIn API
+        post_data = self._build_post_data(content, asset)
         try:
             # Make the API call
             response = requests.post(

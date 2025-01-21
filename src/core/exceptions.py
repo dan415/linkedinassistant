@@ -6,13 +6,13 @@ These exceptions are used to handle specific error cases when interacting with t
 
 class VaultError(Exception):
     def __init__(
-            self,
-            message=None,
-            errors=None,
-            method=None,
-            url=None,
-            text=None,
-            json=None,
+        self,
+        message=None,
+        errors=None,
+        method=None,
+        url=None,
+        text=None,
+        json=None,
     ):
         if errors:
             message = ", ".join(errors)
@@ -114,7 +114,9 @@ class RapidRateLimitExceeded(Exception):
     """
 
     def __init__(self, message: str = None):
-        super().__init__(message or "Rate limit for RapidAPI services exceeded.")
+        super().__init__(
+            message or "Rate limit for RapidAPI services exceeded."
+        )
 
 
 class AuthenticationError(VaultError):

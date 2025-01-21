@@ -86,6 +86,34 @@ class ArxivSearchEngine(ContentSearchEngine):
             )  # Log XML parsing errors
             return []
 
+    def _process_arxivs(self, stop_event, arxivs, save_callback=None):
+        """
+        Process the extracted Arxiv metadata and extract content from the PDFs.
+
+        :param stop_event: Optional thread event to trigger graceful termination
+        :param arxivs: List of extracted Arxiv metadata
+        :param save_callback: Optional callback to save valid results
+        :return: List of processed Arxiv metadata
+        """
+        results = []
+        for arxiv in arxivs:
+            if stop_event and stop_event.is_set():
+                self.logger.info(
+                    "Stop event called in the middle of procesing a pdf"
+                )
+                break
+
+            arxiv = self.process_pdf(
+                arxiv
+            )  # Process the PDF content for each result
+            if arxiv:
+                results.append(arxiv)
+                if save_callback:
+                    self.save_if_valid(
+                        save_callback, arxiv
+                    )  # Save valid results using the callback
+        return results
+
     @require_valid_run_time
     @stateful
     def search(
@@ -124,30 +152,14 @@ class ArxivSearchEngine(ContentSearchEngine):
             arxivs = self.extract_from_xmls(
                 response.text
             )  # Extract metadata from XML response
-            results = []
-            for arxiv in arxivs:
-
-                if stop_event and stop_event.is_set():
-                    self.logger.info(
-                        "Stop event called in the middle of procesing a pdf"
-                    )
-                    break
-
-                arxiv = self.extract_pdf_info(
-                    arxiv
-                )  # Process the PDF content for each result
-                if arxiv:
-                    results.append(arxiv)
-                    if save_callback:
-                        self.save_if_valid(
-                            save_callback, arxiv
-                        )  # Save valid results using the callback
-            return results
+            return self._process_arxivs(
+                stop_event, arxivs, save_callback
+            )  # Process the extracted metadata
         except Exception as e:
             self.logger.error("Error during search: %s. URL: %s", e, url)
             return []
 
-    def extract_pdf_info(self, arxiv):
+    def process_pdf(self, arxiv):
         """
         Extract content from the PDF file and process it using the document retriever.
         :param arxiv: Dictionary containing metadata for an Arxiv entry

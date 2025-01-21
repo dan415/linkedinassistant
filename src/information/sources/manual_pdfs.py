@@ -39,7 +39,6 @@ class ManualSourceEngine(ContentSearchEngine):
     ) -> list:
         """Search for the query in the information source."""
         self.logger.info("Searching for content in %s", self.information_source)
-        res = []
         try:
             # List all files in the input directory
             files = self.pdf_manager.list_folder_contents(
@@ -51,48 +50,56 @@ class ManualSourceEngine(ContentSearchEngine):
                 if isinstance(f, dict)
                 and f.get("name", "").lower().endswith(".pdf")
             ]
-
-            for pdf in pdfs:
-
-                if stop_event and stop_event.is_set():
-                    self.logger.info(
-                        "Stop event called in the middle of procesing a pdf"
-                    )
-                    break
-
-                pdf_content = self.pdf_manager.download(
-                    f"{FileManagedFolders.INPUT_PDF_FOLDER}/{pdf['name']}"
-                )
-                if pdf_content:
-                    extracted_content = self.extract_pdf_info(pdf_content)
-                    if extracted_content:
-                        res.append(extracted_content)
-                        if save_callback:
-                            self.save_if_valid(
-                                save_callback, extracted_content
-                            )  # Save valid content using the callback
-                    # Move processed PDF to the output folder
-                    source_path = (
-                        f"{FileManagedFolders.INPUT_PDF_FOLDER}/{pdf['name']}"
-                    )
-                    dest_path = (
-                        f"{FileManagedFolders.OUTPUT_PDF_FOLDER}/{pdf['name']}"
-                    )
-                    try:
-                        self.pdf_manager.move_file(source_path, dest_path)
-                    except Exception as e:
-                        self.logger.error(
-                            f"Failed to move file {source_path} to {dest_path}: {e}"
-                        )
-                else:
-                    self.logger.warning(f"Could not download pdf {pdf['name']}")
+            return self._process_pdfs(stop_event, pdfs, save_callback)
         except Exception as e:
             self.logger.error(f"Error in search: {e}")
-        finally:
-            self.logger.info("Content found: %s", res)
-            return res
 
-    def extract_pdf_info(self, pdf_content: bytes):
+    def _process_pdfs(self, stop_event, pdfs, save_callback=None):
+        """
+        Process the PDFs in the list.
+        :param stop_event: Event to stop the processing
+        :param pdfs: List of PDFs to process
+        :param save_callback: Callback to save the processed content
+        :return: List of processed PDFs
+        """
+        res = []
+        for pdf in pdfs:
+
+            if stop_event and stop_event.is_set():
+                self.logger.info(
+                    "Stop event called in the middle of procesing a pdf"
+                )
+                break
+
+            pdf_content = self.pdf_manager.download(
+                f"{FileManagedFolders.INPUT_PDF_FOLDER}/{pdf['name']}"
+            )
+            if pdf_content:
+                extracted_content = self.process_pdf(pdf_content)
+                if extracted_content:
+                    res.append(extracted_content)
+                    if save_callback:
+                        self.save_if_valid(
+                            save_callback, extracted_content
+                        )  # Save valid content using the callback
+                # Move processed PDF to the output folder
+                source_path = (
+                    f"{FileManagedFolders.INPUT_PDF_FOLDER}/{pdf['name']}"
+                )
+                dest_path = (
+                    f"{FileManagedFolders.OUTPUT_PDF_FOLDER}/{pdf['name']}"
+                )
+                try:
+                    self.pdf_manager.move_file(source_path, dest_path)
+                except Exception as e:
+                    self.logger.error(
+                        f"Failed to move file {source_path} to {dest_path}: {e}"
+                    )
+            else:
+                self.logger.warning(f"Could not download pdf {pdf['name']}")
+        return res
+
+    def process_pdf(self, pdf_content: bytes):
         """
         Extract the PDF info and content using Document Retriever Provider.
 

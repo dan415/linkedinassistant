@@ -82,7 +82,9 @@ class ContentSearchEngine(ABC):
         )
         self.minimum_length = None  # Minimum retrieved content length
         self.logger = logger
-        self.last_run_time = None  # Track the last time the search was run in order to run again
+        self.last_run_time = (
+            None  # Track the last time the search was run in order to run again
+        )
         self.execution_period = 1  # Period to run the search again
         self.config_client = ConfigManager()  # Manage configuration files
 
@@ -100,7 +102,8 @@ class ContentSearchEngine(ABC):
         """
         if self.last_run_time:
             return (
-                datetime.datetime.now() - datetime.timedelta(days=self.execution_period)
+                datetime.datetime.now()
+                - datetime.timedelta(days=self.execution_period)
             ) >= datetime.datetime.fromisoformat(self.last_run_time)
         return True
 
