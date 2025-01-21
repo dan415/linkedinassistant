@@ -12,14 +12,16 @@ from langchain_core.tools import Tool
 from langgraph.graph.graph import CompiledGraph
 from langgraph.prebuilt import create_react_agent
 from pymongo import MongoClient
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from src.core.config.manager import ConfigManager
 from src.core.constants import SecretKeys
+from src.core.exceptions import VaultError
 from src.core.llm.conversation.checkpointer import MongoDBSaver
 import src.core.utils.functions as F
 from src.core.utils.logging import ServiceLogger
 from src.core.vault.hashicorp import VaultClient
 from src.core.llm.provider import LLMProvider
+from langchain_community.tools import BraveSearch
 
 
 class LangChainGPT:
@@ -53,32 +55,51 @@ class LangChainGPT:
         self.max_tokens: Optional[int] = None
         self.trimming_strategy: Optional[str] = None
 
-        # I first tried adding the @tool decorator over the method, which seemed neater.
-        # However, doing that makes the method turn into a structured tool object BEFORE instantiating the class.
-        # Therefore, the actual method gets loaded in as an unbound method. Can't think of way to get the agent to be
-        # able to pass in the self argument, so I forced the method to be loaded during class instantiation,
-        # which works as intended :)
-        self.bound_tools = [
-            Tool(
-                name="create_image",
-                func=self.generate_image,
-                description="Used to integrate with Dall-E 3 to generate an image",
-                args_schema=self.ImageGenerationInput,
-            )
-        ]
-
         self.vault_client: VaultClient = (
             VaultClient()
         )  # Initialize VaultClient for secrets
         self.config_client: ConfigManager = (
             ConfigManager()
         )  # Initialize ConfigManager
+
+        self.bound_tools: List[Tool] = self._get_bound_tools()
         self.reload_config()  # Load initial configuration
 
     class ImageGenerationInput(BaseModel):
         image_description: str = Field(
             description="A brief and detailed description of the image to generate."
         )
+
+    def _get_bound_tools(self) -> List[Tool]:
+        # I first tried adding the @tool decorator over the method, which seemed neater.
+        # However, doing that makes the method turn into a structured tool object BEFORE instantiating the class.
+        # Therefore, the actual method gets loaded in as an unbound method. Can't think of way to get the agent to be
+        # able to pass in the self argument, so I forced the method to be loaded during class instantiation,
+        # which works as intended :)
+
+        brave_tool = None
+        try:
+            brave_tool = BraveSearch.from_api_key(
+                api_key=self.vault_client.get_secret(SecretKeys.BRAVE_API_KEY),
+                search_kwargs={"count": 3},
+            )
+        except ValidationError | VaultError as e:
+            self.logger.warning(
+                f"Could not initialize BraveSearch tool: {e}. It will not be available"
+            )
+
+        bound_tools = [
+            Tool(
+                name="create_image",
+                func=self.generate_image,
+                description="Used to integrate with Dall-E 3 to generate an image",
+                args_schema=self.ImageGenerationInput,
+            ),
+        ]
+        if brave_tool:
+            bound_tools.append(brave_tool)
+
+        return bound_tools
 
     def reload_config(self) -> None:
         """Reload the configuration."""
@@ -138,18 +159,6 @@ class LangChainGPT:
             self.logger.error(ex)
             return f"I could not generate an image due to {ex}"
 
-    def brave_tool(self):
-        """
-        Tool to interact with Brave Search
-        :return: BraveSearch instance
-        """
-        from langchain_community.tools import BraveSearch
-
-        return BraveSearch.from_api_key(
-            api_key=self.vault_client.get_secret(SecretKeys.BRAVE_API_KEY),
-            search_kwargs={"count": 3},
-        )
-
     def _load_tools(self) -> None:
         """Load tools dynamically based on configuration."""
         tools_list = copy.deepcopy(self.tools)
@@ -163,7 +172,7 @@ class LangChainGPT:
                     self.tools.append(bound_tool)
                     break
             else:
-                if F.is_function(tool, obj=self):  # other functions as tools
+                if F.is_function(tool, obj=self):  # tools from other functions
                     self.tools.append(F.get_function_by_name(tool, obj=self))
                 else:
                     builtin_tools.append(tool)  # built-in tools

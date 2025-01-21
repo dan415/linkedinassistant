@@ -10,7 +10,7 @@
   "tools": [
     "arxiv",
     "create_image",
-    "brave_tool"
+    "brave_search"
   ],
   "model_provider": "gemini2-chat-google",
   "image_generation_prompt": "Produce an image that does not include text to accompany my LinkedIn post that fits the following description: {description}",
