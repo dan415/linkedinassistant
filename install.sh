@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-    echo "Usage: build_and_install.sh <main_file>"
+    echo "Usage: install.sh <main_file>"
     exit 1
 fi
 
@@ -26,7 +26,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-python ./src/scripts/configure_keyring.py
+export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+
+python src/scripts/configure_keyring.py
+if [ $? -ne 0 ]; then
+    echo "Failed to configure keyring."
+    deactivate
+    exit 1
+fi
 
 deactivate
 if [ $? -ne 0 ]; then
@@ -54,7 +61,6 @@ Environment="PATH=$(pwd)/venv/bin:/usr/local/bin:/usr/bin:/bin"
 WantedBy=multi-user.target
 EOL
 
-# Step 8: Enable and start the service
 sudo systemctl daemon-reload
 sudo systemctl enable $SERVICE_NAME
 sudo systemctl start $SERVICE_NAME
